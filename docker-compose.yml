@@ -1,0 +1,21 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sushi_tochka
+      POSTGRES_USER: sushi
+      POSTGRES_PASSWORD: sushi
+    ports:
+      - "5434:5432"
+    volumes:
+      - sushi_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sushi -d sushi_tochka"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  sushi_postgres_data:
+

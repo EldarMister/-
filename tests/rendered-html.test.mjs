@@ -1,0 +1,44 @@
+import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
+import test from "node:test";
+
+async function render(path = "/") {
+  const workerUrl = new URL("../dist/server/index.js", import.meta.url);
+  workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}-${path}`);
+  const { default: worker } = await import(workerUrl.href);
+  return worker.fetch(
+    new Request(`http://localhost${path}`, { headers: { accept: "text/html" } }),
+    { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
+    { waitUntil() {}, passThroughOnException() {} },
+  );
+}
+
+test("server-renders the catalog and brand metadata", async () => {
+  const response = await render("/catalog/1");
+  assert.equal(response.status, 200);
+  assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
+  const html = await response.text();
+  assert.match(html, /<title>Суши Точка — меню<\/title>/i);
+  assert.match(html, /Филадельфия/);
+  assert.match(html, /Скидка последний час/);
+  assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
+});
+
+test("admin route renders its noindex dashboard shell", async () => {
+  const response = await render("/admin");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /<title>Админка \| Суши Точка<\/title>/);
+  assert.match(html, /name="robots" content="noindex, nofollow"/);
+  assert.match(html, /Управление «Суши Точка»/);
+  assert.match(html, />Товары<\/button>/);
+});
+
+test("PostgreSQL schema covers catalog, orders and administration", async () => {
+  const schema = await readFile(new URL("../server/schema.sql", import.meta.url), "utf8");
+  for (const table of ["admin_users", "categories", "products", "pickup_locations", "promotions", "orders", "order_items", "site_settings"]) {
+    assert.match(schema, new RegExp(`CREATE TABLE IF NOT EXISTS ${table}`, "i"));
+  }
+  assert.match(schema, /REFERENCES products/);
+  assert.match(schema, /CHECK \(status IN/);
+});
