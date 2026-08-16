@@ -79,7 +79,7 @@ for (const signal of ["SIGINT", "SIGTERM"] as const) process.on(signal, () => sh
 try {
   await Promise.all([waitForPort(webPort), waitForPort(apiPort)]);
   gateway.listen(publicPort, "0.0.0.0", () => {
-    console.log(`Sushi Tochka web + API: http://0.0.0.0:${publicPort}`);
+    console.log(`DAANA SUSHI web + API: http://0.0.0.0:${publicPort}`);
   });
 } catch (error) {
   console.error(error);

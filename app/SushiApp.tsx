@@ -49,7 +49,7 @@ function Header({
     <header className="site-header">
       <div className="header-inner">
         <button className="logo-button" onClick={onCatalog} aria-label="На главную">
-          <img src="/assets/icons/logo.svg" alt="Суши Точка" />
+          <img src="/assets/icons/logo.svg" alt="ДААНА СУШИ" />
         </button>
         <button className="store-selector" onClick={onLocation}>
           <MaterialIcon>storefront</MaterialIcon>
@@ -392,7 +392,7 @@ function Footer({ settings }: { settings: SiteSettings }) {
     <footer className="site-footer">
       <div className="footer-container">
         <div className="footer-top">
-          <div className="footer-brand"><img src="/assets/icons/logo.svg" alt="Суши Точка" /><span>Суши Точка © 2026 {settings.legalName}</span></div>
+          <div className="footer-brand"><img src="/assets/icons/logo.svg" alt="ДААНА СУШИ" /><span>ДААНА СУШИ © 2026 {settings.legalName}</span></div>
           <a className="footer-payment" href="/payment-rule">*правила оплаты на сайте*</a>
           <div className="quality"><span>{settings.qualityControl}</span><div><a href="https://max.ru/u/f9LHodD0cOJQU8ezxABIhMctIqDOYaOcHXohx26DyAz9nyG2JMqytsjjBbQ" aria-label="Max"><img src="/assets/icons/Max_Messenger.png" alt="" /></a><a href={settings.telegram} aria-label="Telegram"><img src="/assets/icons/Telegram_Messenger.png" alt="" /></a></div></div>
         </div>
@@ -497,7 +497,7 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
     <div className={`site-shell ${headerHidden ? "header-hidden" : ""} ${view}-view`}>
       <Header cartCount={cartCount} cartOpen={cartOpen} location={location} menuOpen={mobileMenuOpen} onCart={navigateOrder} onCartPreviewEnter={keepCartPreview} onCartPreviewLeave={closeCartPreview} onCatalog={() => navigateCategory(1)} onLocation={openLocation} onLogin={() => setLoginOpen(true)} onMenu={() => setMobileMenuOpen((open) => !open)} onPromo={navigatePromo} />
       <CategoryTabs items={categoryList} selectedId={view === "catalog" ? categoryId : 0} onSelect={navigateCategory} />
-      {mobileMenuOpen && <><button className="mobile-menu-scrim" onClick={() => setMobileMenuOpen(false)} aria-label="Закрыть меню" /><aside className="mobile-menu-panel" aria-label="Главное меню"><nav><button onClick={() => { setMobileMenuOpen(false); navigateCategory(1); }}><MaterialIcon>restaurant_menu</MaterialIcon><span>Блюда</span></button><button onClick={() => { setMobileMenuOpen(false); navigatePromo(); }}><MaterialIcon>card_giftcard</MaterialIcon><span>Акции</span></button><button onClick={navigatePayment}><MaterialIcon>receipt_long</MaterialIcon><span>Оплата</span></button><button onClick={() => { setMobileMenuOpen(false); setLoginOpen(true); }}><MaterialIcon>login</MaterialIcon><span>Кабинет</span></button></nav><div className="mobile-menu-brand"><span className="mobile-brand-mark" /><strong>СУШИ ТОЧКА - ЭТО КОГДА<br />УДОБНО И ВКУСНО</strong></div><div className="mobile-menu-quality"><strong>{siteSettings.qualityControl.replace("Отдел контроля качества", "Контроль качества")}</strong><div><a href="https://max.ru/u/f9LHodD0cOJQU8ezxABIhMctIqDOYaOcHXohx26DyAz9nyG2JMqytsjjBbQ"><img src="/assets/icons/Max_Messenger.png" alt="Max" /></a><a href={siteSettings.telegram}><img src="/assets/icons/Telegram_Messenger.png" alt="Telegram" /></a></div></div></aside></>}
+      {mobileMenuOpen && <><button className="mobile-menu-scrim" onClick={() => setMobileMenuOpen(false)} aria-label="Закрыть меню" /><aside className="mobile-menu-panel" aria-label="Главное меню"><nav><button onClick={() => { setMobileMenuOpen(false); navigateCategory(1); }}><MaterialIcon>restaurant_menu</MaterialIcon><span>Блюда</span></button><button onClick={() => { setMobileMenuOpen(false); navigatePromo(); }}><MaterialIcon>card_giftcard</MaterialIcon><span>Акции</span></button><button onClick={navigatePayment}><MaterialIcon>receipt_long</MaterialIcon><span>Оплата</span></button><button onClick={() => { setMobileMenuOpen(false); setLoginOpen(true); }}><MaterialIcon>login</MaterialIcon><span>Кабинет</span></button></nav><div className="mobile-menu-brand"><span className="mobile-brand-mark" /><strong>ДААНА СУШИ — ЭТО КОГДА<br />УДОБНО И ВКУСНО</strong></div><div className="mobile-menu-quality"><strong>{siteSettings.qualityControl.replace("Отдел контроля качества", "Контроль качества")}</strong><div><a href="https://max.ru/u/f9LHodD0cOJQU8ezxABIhMctIqDOYaOcHXohx26DyAz9nyG2JMqytsjjBbQ"><img src="/assets/icons/Max_Messenger.png" alt="Max" /></a><a href={siteSettings.telegram}><img src="/assets/icons/Telegram_Messenger.png" alt="Telegram" /></a></div></div></aside></>}
       {cartOpen && <CartPanel lines={lines} onCheckout={navigateOrder} onEnter={keepCartPreview} onLeave={closeCartPreview} onDecrease={(id) => changeQuantity(id, -1)} onIncrease={(id) => changeQuantity(id, 1)} onRemove={(id) => setCart((current) => ({ ...current, [id]: 0 }))} />}
       <main className={`site-main ${view === "order" ? "order-main" : ""} ${view === "payment" || view === "privacy" ? "legal-main" : ""}`}>
         {view === "promo" ? (

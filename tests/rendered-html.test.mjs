@@ -18,7 +18,7 @@ test("server-renders the catalog and brand metadata", async () => {
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   const html = await response.text();
-  assert.match(html, /<title>Суши Точка — меню<\/title>/i);
+  assert.match(html, /<title>ДААНА СУШИ — меню<\/title>/i);
   assert.match(html, /Филадельфия/);
   assert.match(html, /Скидка последний час/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
@@ -28,9 +28,9 @@ test("admin route renders its noindex dashboard shell", async () => {
   const response = await render("/admin");
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /<title>Админка \| Суши Точка<\/title>/);
+  assert.match(html, /<title>Админка \| ДААНА СУШИ<\/title>/);
   assert.match(html, /name="robots" content="noindex, nofollow"/);
-  assert.match(html, /Управление «Суши Точка»/);
+  assert.match(html, /Управление «ДААНА СУШИ»/);
   assert.match(html, />Товары<\/button>/);
 });
 

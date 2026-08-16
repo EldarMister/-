@@ -220,7 +220,7 @@ await migrate();
 const [databaseState] = await sql`SELECT EXISTS (SELECT 1 FROM products) AS "hasProducts"`;
 if (!databaseState.hasProducts) await seed();
 else await syncAdminPassword();
-const server = app.listen(port, () => console.log(`Sushi Tochka API: http://localhost:${port}/api`));
+const server = app.listen(port, () => console.log(`DAANA SUSHI API: http://localhost:${port}/api`));
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
   process.on(signal, () => server.close(async () => { await closeDatabase(); process.exit(0); }));
