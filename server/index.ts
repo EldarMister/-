@@ -185,7 +185,7 @@ app.put("/api/admin/promotions/:id", async (request, response) => {
 app.delete("/api/admin/promotions/:id", async (request, response) => { await sql`DELETE FROM promotions WHERE id=${numberValue(request.params.id)}`; response.status(204).end(); });
 
 app.get("/api/admin/orders", async (_request, response) => {
-  const orders = await sql`SELECT o.id,o.order_number AS "orderNumber",o.customer_name AS "customerName",o.customer_phone AS "customerPhone",o.status,o.comment,o.total,o.created_at AS "createdAt",l.name AS "locationName" FROM orders o JOIN pickup_locations l ON l.id=o.location_id ORDER BY o.created_at DESC LIMIT 500`;
+  const orders = await sql`SELECT o.id,o.order_number AS "orderNumber",o.customer_name AS "customerName",o.customer_phone AS "customerPhone",o.status,o.comment,o.total,o.created_at AS "createdAt",l.name AS "locationName",l.address AS "locationAddress" FROM orders o JOIN pickup_locations l ON l.id=o.location_id ORDER BY o.created_at DESC LIMIT 500`;
   const orderIds = orders.map((order) => order.id);
   const items = orderIds.length ? await sql`SELECT order_id AS "orderId",product_name AS "productName",unit_price AS "unitPrice",quantity,line_total AS "lineTotal" FROM order_items WHERE order_id IN ${sql(orderIds)} ORDER BY id` : [];
   response.json(orders.map((order) => ({ ...order, items: items.filter((item) => item.orderId === order.id) })));
@@ -194,6 +194,7 @@ app.patch("/api/admin/orders/:id/status", async (request, response) => {
   const status = String(request.body.status || "");
   if (!validStatuses.has(status)) return response.status(400).json({ error: "Неизвестный статус" });
   const [updated] = await sql`UPDATE orders SET status=${status},updated_at=NOW() WHERE id=${numberValue(request.params.id)} RETURNING id,order_number AS "orderNumber",status,updated_at AS "updatedAt"`;
+  if (!updated) return response.status(404).json({ error: "Заказ не найден" });
   response.json(updated);
 });
 

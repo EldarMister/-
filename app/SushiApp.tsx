@@ -136,7 +136,7 @@ function ProductCard({ product, quantity, onDecrease, onIncrease }: { product: P
         <img src={product.image} alt={product.name} loading="lazy" />
         <h2>{product.name}</h2>
         <div className="product-card-buy">
-          <div className="price-pill">{product.price} ₽</div>
+          <div className="price-pill">{product.price} С</div>
           <QuantityControl quantity={quantity} onDecrease={onDecrease} onIncrease={onIncrease} />
         </div>
       </div>
@@ -236,7 +236,7 @@ function CartPanel({ lines, onCheckout, onDecrease, onEnter, onIncrease, onLeave
                 <div className="cart-line-image"><img src={line.image} alt={line.name} /></div>
                 <div className="cart-line-main">
                   <div className="cart-line-head"><strong>{line.name}</strong><button onClick={() => onRemove(line.id)} aria-label={`Удалить ${line.name}`}><MaterialIcon>close</MaterialIcon></button></div>
-                  <div className="cart-line-bottom"><QuantityControl quantity={line.quantity} onDecrease={() => onDecrease(line.id)} onIncrease={() => onIncrease(line.id)} /><span className="price-pill small">{line.price * line.quantity} ₽</span></div>
+                  <div className="cart-line-bottom"><QuantityControl quantity={line.quantity} onDecrease={() => onDecrease(line.id)} onIncrease={() => onIncrease(line.id)} /><span className="price-pill small">{line.price * line.quantity} С</span></div>
                 </div>
               </div>
             ))}
@@ -400,14 +400,10 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
     }
     return { allSlots, quickSlots: allSlots.slice(0, 5), extendedSlots: allSlots.slice(4) };
   }, [location]);
-  const selectedReadyTime = readyTime || timeData.quickSlots[0] || "";
+  const selectedReadyTime = timeData.allSlots.includes(readyTime) ? readyTime : (timeData.quickSlots[0] || "");
   const visibleQuickSlots = timeData.quickSlots.includes(selectedReadyTime)
     ? timeData.quickSlots
     : [...timeData.quickSlots.slice(0, 4), selectedReadyTime].filter(Boolean);
-
-  useEffect(() => {
-    if (!timeData.allSlots.includes(readyTime)) setReadyTime(timeData.quickSlots[0] || "");
-  }, [readyTime, timeData]);
 
   useEffect(() => {
     if (!timePickerOpen) return;
@@ -443,19 +439,19 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
       <div className="order-heading-row">
         <div className="order-heading-visual"><img src="/assets/order/HeadingSection.webp" alt="Ваш заказ" /><button type="button" onClick={onClear}>Очистить корзину</button></div>
         <div className="order-summary">
-          <div className="order-summary-total"><strong>Корзина:</strong><b>{total} ₽</b></div>
+          <div className="order-summary-total"><strong>Корзина:</strong><b>{total} С</b></div>
           <div className="order-promo"><input value={promo} onChange={(event) => setPromo(event.target.value)} placeholder="Промокод" aria-label="Промокод" /><button type="button" onClick={() => setPromoMessage(promo.trim() ? "Промокод не найден" : "Введите промокод")}>применить</button></div>
           {promoMessage && <small className="order-promo-message">{promoMessage}</small>}
         </div>
       </div>
       <div className="order-lines">
-        {lines.length ? lines.map((line) => <article className="order-line" key={line.id}><img src={line.image} alt={line.name} /><strong>{line.name}</strong><span className="price-pill">{line.price * line.quantity} ₽</span><QuantityControl quantity={line.quantity} onDecrease={() => onChangeQuantity(line.id, -1)} onIncrease={() => onChangeQuantity(line.id, 1)} /></article>) : <div className="order-empty">Корзина пока пуста</div>}
+        {lines.length ? lines.map((line) => <article className="order-line" key={line.id}><img src={line.image} alt={line.name} /><strong>{line.name}</strong><span className="price-pill">{line.price * line.quantity} С</span><QuantityControl quantity={line.quantity} onDecrease={() => onChangeQuantity(line.id, -1)} onIncrease={() => onChangeQuantity(line.id, 1)} /></article>) : <div className="order-empty">Корзина пока пуста</div>}
       </div>
       <h2 className="order-extras-title">Не забудьте к вашему заказу</h2>
       <div className="order-extras" role="region" aria-label="Дополнительно к заказу">
         {extras.map((product) => {
           const line = lines.find((item) => item.id === product.id);
-          return <article className={`order-extra-card extra-${product.id}`} key={product.id}><img src={product.image} alt={product.name} /><h3>{product.name}</h3><span className="price-pill">{product.price} ₽</span><QuantityControl quantity={line?.quantity || 0} onDecrease={() => onChangeQuantity(product.id, -1)} onIncrease={() => onChangeQuantity(product.id, 1)} /></article>;
+          return <article className={`order-extra-card extra-${product.id}`} key={product.id}><img src={product.image} alt={product.name} /><h3>{product.name}</h3><span className="price-pill">{product.price} С</span><QuantityControl quantity={line?.quantity || 0} onDecrease={() => onChangeQuantity(product.id, -1)} onIncrease={() => onChangeQuantity(product.id, 1)} /></article>;
         })}
       </div>
       <div className="order-location-block">
@@ -474,7 +470,8 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
             <button type="button" aria-haspopup="dialog" aria-expanded={timePickerOpen} onClick={() => setTimePickerOpen(true)}>Выбрать</button>
           </div>
         </div>
-        {timePickerOpen && <div className="pickup-time-dialog" role="dialog" aria-modal="true" aria-labelledby="pickup-time-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setTimePickerOpen(false); }}>
+        {timePickerOpen && <div className="pickup-time-dialog" role="dialog" aria-modal="true" aria-labelledby="pickup-time-title">
+          <button className="pickup-time-dismiss" type="button" onClick={() => setTimePickerOpen(false)} aria-label="Закрыть выбор времени" />
           <section className="pickup-time-panel">
             <header className="pickup-time-header"><h2 id="pickup-time-title">Время самовывоза</h2></header>
             <div className="pickup-time-grid">
@@ -483,7 +480,7 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
           </section>
         </div>}
         {error && <div className="form-error order-error">{error}</div>}
-        <button className="order-pay" disabled={pending || !lines.length}>{pending ? "СОЗДАЕМ ЗАКАЗ…" : `ОПЛАТИТЬ ${total} ₽`}</button>
+        <button className="order-pay" disabled={pending || !lines.length}>{pending ? "СОЗДАЕМ ЗАКАЗ…" : `ОПЛАТИТЬ ${total} С`}</button>
         <p className="order-consent">Нажимая кнопку, я даю <strong>согласие</strong> на обработку персональных данных.</p>
       </form>
     </section>

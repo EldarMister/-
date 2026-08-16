@@ -77,14 +77,21 @@ test("PostgreSQL schema covers catalog, orders and administration", async () => 
 });
 
 test("production uses one public gateway and password-only admin login", async () => {
-  const [launcher, adminPanel, api] = await Promise.all([
+  const [launcher, adminPanel, api, storefront] = await Promise.all([
     readFile(new URL("../server/production.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/admin/AdminPanel.tsx", import.meta.url), "utf8"),
     readFile(new URL("../server/index.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/SushiApp.tsx", import.meta.url), "utf8"),
   ]);
   assert.match(launcher, /path\.startsWith\("\/api\/"\)/);
   assert.match(launcher, /path\.startsWith\("\/uploads\/"\)/);
   assert.doesNotMatch(adminPanel, /type="email"|JSON\.stringify\(\{ email, password \}\)/);
   assert.match(adminPanel, /JSON\.stringify\(\{ password \}\)/);
+  assert.match(adminPanel, />Подробнее</);
+  assert.match(adminPanel, /Отменить заказ/);
+  assert.match(adminPanel, /updateStatus\(order, "cancelled"\)/);
   assert.match(api, /SELECT id, password_hash, name FROM admin_users ORDER BY id LIMIT 1/);
+  assert.match(api, /l\.address AS "locationAddress"/);
+  assert.doesNotMatch(`${storefront}\n${adminPanel}`, /₽/);
+  assert.match(storefront, /\{product\.price\} С/);
 });
