@@ -3,8 +3,8 @@ import { SignJWT, jwtVerify } from "jose";
 
 const secret = new TextEncoder().encode(process.env.JWT_SECRET || "development-only-change-this-secret");
 
-export async function createAdminToken(user: { id: number; email: string; name: string }) {
-  return new SignJWT({ email: user.email, name: user.name, role: "admin" })
+export async function createAdminToken(user: { id: number; name: string }) {
+  return new SignJWT({ name: user.name, role: "admin" })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(String(user.id))
     .setIssuedAt()
@@ -22,4 +22,3 @@ export async function requireAdmin(request: Request, response: Response, next: N
     response.status(401).json({ error: "Сессия истекла" });
   }
 }
-

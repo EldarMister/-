@@ -5,7 +5,7 @@ import { categories as seedCategories, locations as seedLocations, products as s
 import { PaymentRules, PrivacyPolicy } from "./LegalContent";
 import type { CartLine, Category, PickupLocation, Product, Promotion } from "./types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === "production" ? "/api" : "http://localhost:4000/api");
 type SiteSettings = { legalName: string; qualityControl: string; telegram: string };
 type SushiView = "catalog" | "promo" | "order" | "payment" | "privacy";
 

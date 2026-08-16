@@ -8,6 +8,8 @@ import express, { type Request, type Response } from "express";
 import rateLimit from "express-rate-limit";
 import helmet from "helmet";
 import multer from "multer";
+import { seed } from "./seed";
+import { syncAdminPassword } from "./admin-account";
 import { createAdminToken, requireAdmin } from "./auth";
 import { closeDatabase, sql } from "./db";
 import { migrate } from "./migrate";
@@ -18,6 +20,7 @@ const rootDirectory = join(dirname(fileURLToPath(import.meta.url)), "..");
 const uploadsDirectory = join(rootDirectory, "public", "uploads");
 await mkdir(uploadsDirectory, { recursive: true });
 
+app.set("trust proxy", 1);
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 app.use(cors({ origin: (process.env.CORS_ORIGIN || "http://localhost:3000").split(","), credentials: true }));
 app.use(express.json({ limit: "1mb" }));
@@ -120,10 +123,9 @@ app.post("/api/orders", orderLimiter, async (request, response) => {
 });
 
 app.post("/api/admin/login", authLimiter, async (request, response) => {
-  const email = String(request.body.email || "").trim().toLowerCase();
-  const [user] = await sql`SELECT id, email, password_hash, name FROM admin_users WHERE email = ${email}`;
-  if (!user || !(await bcrypt.compare(String(request.body.password || ""), user.password_hash))) return response.status(401).json({ error: "Неверный логин или пароль" });
-  const publicUser = { id: Number(user.id), email: String(user.email), name: String(user.name) };
+  const [user] = await sql`SELECT id, password_hash, name FROM admin_users ORDER BY id LIMIT 1`;
+  if (!user || !(await bcrypt.compare(String(request.body.password || ""), user.password_hash))) return response.status(401).json({ error: "Неверный пароль" });
+  const publicUser = { id: Number(user.id), name: String(user.name) };
   response.json({ token: await createAdminToken(publicUser), user: publicUser });
 });
 
@@ -215,6 +217,9 @@ app.use((error: unknown, _request: Request, response: Response, _next: unknown) 
 });
 
 await migrate();
+const [databaseState] = await sql`SELECT EXISTS (SELECT 1 FROM products) AS "hasProducts"`;
+if (!databaseState.hasProducts) await seed();
+else await syncAdminPassword();
 const server = app.listen(port, () => console.log(`Sushi Tochka API: http://localhost:${port}/api`));
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {

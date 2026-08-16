@@ -4,7 +4,7 @@ import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import type { Category, PickupLocation, Product, Promotion } from "../types";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === "production" ? "/api" : "http://localhost:4000/api");
 type Tab = "orders" | "products" | "categories" | "locations" | "promotions" | "settings";
 type Order = { id: number; orderNumber: string; customerName: string; customerPhone: string; status: string; total: number; createdAt: string; locationName: string; comment: string; items: Array<{ productName: string; quantity: number; lineTotal: number }> };
 type Dashboard = { ordersToday: number; revenueToday: number; products: number; activeOrders: number };
@@ -12,21 +12,20 @@ type Dashboard = { ordersToday: number; revenueToday: number; products: number; 
 const statusLabels: Record<string, string> = { new: "Новый", confirmed: "Подтвержден", preparing: "Готовится", ready: "Готов", completed: "Выдан", cancelled: "Отменен" };
 
 function Login({ onLogin }: { onLogin: (token: string) => void }) {
-  const [email, setEmail] = useState("admin@sushitochka.local");
-  const [password, setPassword] = useState("ChangeMe123!");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [pending, setPending] = useState(false);
   const submit = async (event: FormEvent) => {
     event.preventDefault(); setPending(true); setError("");
     try {
-      const response = await fetch(`${API_URL}/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
+      const response = await fetch(`${API_URL}/admin/login`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Не удалось войти");
       localStorage.setItem("sushi-admin-token", result.token); onLogin(result.token);
     } catch (loginError) { setError(loginError instanceof Error ? loginError.message : "Сервер недоступен"); }
     finally { setPending(false); }
   };
-  return <main className="admin-login"><form onSubmit={submit}><img src="/assets/icons/logo.svg" alt="Суши Точка" /><h1>Управление сайтом</h1><label>Email<input type="email" value={email} onChange={(event) => setEmail(event.target.value)} required /></label><label>Пароль<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>{error && <div className="admin-error">{error}</div>}<button disabled={pending}>{pending ? "Вход…" : "Войти"}</button><small>Тестовые данные указаны в .env.example. Перед публикацией смените пароль.</small></form></main>;
+  return <main className="admin-login"><form onSubmit={submit}><img src="/assets/icons/logo.svg" alt="Суши Точка" /><h1>Управление сайтом</h1><label>Пароль<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" required /></label>{error && <div className="admin-error">{error}</div>}<button disabled={pending}>{pending ? "Вход…" : "Войти"}</button><small>Пароль задаётся переменной ADMIN_PASSWORD.</small></form></main>;
 }
 
 function CrudSection({ title, rows, fields, empty, endpoint, request, onRefresh }: {

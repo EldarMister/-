@@ -1,6 +1,6 @@
 import "dotenv/config";
-import bcrypt from "bcryptjs";
 import { categories, locations, products, promotions } from "../app/data";
+import { syncAdminPassword } from "./admin-account";
 import { closeDatabase, sql } from "./db";
 import { migrate } from "./migrate";
 
@@ -27,16 +27,11 @@ export async function seed() {
         VALUES (${promotion.id}, ${promotion.title}, ${promotion.description}, ${promotion.image}, ${promotion.active}, ${promotion.sortOrder})
         ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, image = EXCLUDED.image, active = EXCLUDED.active, sort_order = EXCLUDED.sort_order, updated_at = NOW()`;
     }
-    const email = process.env.ADMIN_EMAIL || "admin@sushitochka.local";
-    const password = process.env.ADMIN_PASSWORD || "ChangeMe123!";
-    const passwordHash = await bcrypt.hash(password, 12);
-    await tx`INSERT INTO admin_users (email, password_hash, name) VALUES (${email}, ${passwordHash}, 'Администратор')
-      ON CONFLICT (email) DO UPDATE SET password_hash = EXCLUDED.password_hash`;
     await tx`INSERT INTO site_settings (key, value) VALUES ('general', ${sql.json({ legalName: "ИП Багаутдинова", qualityControl: "Отдел контроля качества", telegram: "https://t.me/BIG_REST_TEAM" })}) ON CONFLICT (key) DO NOTHING`;
   });
+  await syncAdminPassword();
 }
 
 if (process.argv[1]?.endsWith("seed.ts")) {
   seed().then(() => console.log("Initial data is ready.")).finally(closeDatabase);
 }
-
