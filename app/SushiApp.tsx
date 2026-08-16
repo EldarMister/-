@@ -372,24 +372,62 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
   const [promo, setPromo] = useState("");
   const [promoMessage, setPromoMessage] = useState("");
   const [readyTime, setReadyTime] = useState("");
+  const [timePickerOpen, setTimePickerOpen] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const total = lines.reduce((sum, line) => sum + line.price * line.quantity, 0);
   const extras = products.filter((product) => product.categoryId === 5 && product.active);
   const timeData = useMemo(() => {
     const now = new Date();
-    const display = now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
-    const first = new Date(now.getTime() + 90 * 60 * 1000);
-    first.setMinutes(Math.ceil(first.getMinutes() / 15) * 15, 0, 0);
-    const slots = Array.from({ length: 5 }, (_, index) => new Date(first.getTime() + index * 15 * 60 * 1000).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }));
-    return { display, slots };
-  }, []);
+    const [openingHour = 10, openingMinute = 0] = (location?.opensAt || "10:00").split(":").map(Number);
+    const closingMatch = location?.hours.match(/-\s*(\d{1,2}):(\d{2})/);
+    const closingHour = Number(closingMatch?.[1] || 21);
+    const closingMinute = Number(closingMatch?.[2] || 0);
+    const openingReady = new Date(now);
+    openingReady.setHours(openingHour, openingMinute + 15, 0, 0);
+    const closing = new Date(now);
+    closing.setHours(closingHour, closingMinute, 0, 0);
+    const preparationReady = new Date(now.getTime() + 90 * 60 * 1000);
+    let first = new Date(Math.ceil(Math.max(preparationReady.getTime(), openingReady.getTime()) / (15 * 60 * 1000)) * 15 * 60 * 1000);
+    if (first > closing) {
+      openingReady.setDate(openingReady.getDate() + 1);
+      closing.setDate(closing.getDate() + 1);
+      first = openingReady;
+    }
+    const allSlots: string[] = [];
+    for (let cursor = first.getTime(); cursor <= closing.getTime(); cursor += 15 * 60 * 1000) {
+      allSlots.push(new Date(cursor).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }));
+    }
+    return { allSlots, quickSlots: allSlots.slice(0, 5), extendedSlots: allSlots.slice(4) };
+  }, [location]);
+  const selectedReadyTime = readyTime || timeData.quickSlots[0] || "";
+  const visibleQuickSlots = timeData.quickSlots.includes(selectedReadyTime)
+    ? timeData.quickSlots
+    : [...timeData.quickSlots.slice(0, 4), selectedReadyTime].filter(Boolean);
+
+  useEffect(() => {
+    if (!timeData.allSlots.includes(readyTime)) setReadyTime(timeData.quickSlots[0] || "");
+  }, [readyTime, timeData]);
+
+  useEffect(() => {
+    if (!timePickerOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setTimePickerOpen(false);
+    };
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [timePickerOpen]);
   const submit = async (event: FormEvent) => {
     event.preventDefault();
     if (!location) { onNeedLocation(); return; }
     if (!lines.length) { setError("Добавьте товары в корзину"); return; }
     setPending(true); setError("");
-    const details = [comment, readyTime ? `Приготовить к: ${readyTime}` : "", promo ? `Промокод: ${promo}` : ""].filter(Boolean).join(" · ");
+    const details = [comment, selectedReadyTime ? `Приготовить к: ${selectedReadyTime}` : "", promo ? `Промокод: ${promo}` : ""].filter(Boolean).join(" · ");
     const payload = { customerName: name, customerPhone: phone, comment: details, locationId: location.id, items: lines.map((line) => ({ productId: line.id, quantity: line.quantity })) };
     try {
       const response = await fetch(`${API_URL}/orders`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
@@ -429,7 +467,21 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
         <label><span className="visually-hidden">Имя</span><input value={name} onChange={(event) => setName(event.target.value)} placeholder="Имя" aria-label="Имя" required /></label>
         <label><span className="visually-hidden">Телефон</span><input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Телефон" aria-label="Телефон" inputMode="tel" required /></label>
         <label><span className="visually-hidden">Комментарий к заказу</span><textarea value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Комментарий к заказу" aria-label="Комментарий к заказу" /></label>
-        <div className="order-ready"><strong>Приготовить к: <b>{timeData.display}</b></strong><div className="order-time-slots">{timeData.slots.map((slot) => <button type="button" className={readyTime === slot ? "active" : ""} key={slot} onClick={() => setReadyTime(slot)}>{slot}</button>)}<button type="button" className={readyTime === "Выбрать" ? "active" : ""} onClick={() => setReadyTime("Выбрать")}>Выбрать</button></div></div>
+        <div className="order-ready">
+          <strong>Приготовить к: <b>{selectedReadyTime}</b></strong>
+          <div className="order-time-slots">
+            {visibleQuickSlots.map((slot) => <button type="button" className={selectedReadyTime === slot ? "active" : ""} key={slot} onClick={() => setReadyTime(slot)}>{slot}</button>)}
+            <button type="button" aria-haspopup="dialog" aria-expanded={timePickerOpen} onClick={() => setTimePickerOpen(true)}>Выбрать</button>
+          </div>
+        </div>
+        {timePickerOpen && <div className="pickup-time-dialog" role="dialog" aria-modal="true" aria-labelledby="pickup-time-title" onMouseDown={(event) => { if (event.target === event.currentTarget) setTimePickerOpen(false); }}>
+          <section className="pickup-time-panel">
+            <header className="pickup-time-header"><h2 id="pickup-time-title">Время самовывоза</h2></header>
+            <div className="pickup-time-grid">
+              {timeData.extendedSlots.map((slot) => <span className="pickup-time-cell" key={slot}><button type="button" className={selectedReadyTime === slot ? "active" : ""} onClick={() => { setReadyTime(slot); setTimePickerOpen(false); }}>{slot}</button></span>)}
+            </div>
+          </section>
+        </div>}
         {error && <div className="form-error order-error">{error}</div>}
         <button className="order-pay" disabled={pending || !lines.length}>{pending ? "СОЗДАЕМ ЗАКАЗ…" : `ОПЛАТИТЬ ${total} ₽`}</button>
         <p className="order-consent">Нажимая кнопку, я даю <strong>согласие</strong> на обработку персональных данных.</p>

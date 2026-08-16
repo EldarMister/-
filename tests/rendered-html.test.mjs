@@ -43,6 +43,19 @@ test("promotion page renders flippable cards with their back-side copy", async (
   assert.match(html, /Скидка 20% действует в последний час/);
 });
 
+test("order implements the scrollable pickup time dialog", async () => {
+  const [app, styles] = await Promise.all([
+    readFile(new URL("../app/SushiApp.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
+  ]);
+  assert.match(app, /aria-haspopup="dialog"/);
+  assert.match(app, /Время самовывоза/);
+  assert.match(app, /extendedSlots: allSlots\.slice\(4\)/);
+  assert.match(app, /setTimePickerOpen\(false\)/);
+  assert.match(styles, /\.pickup-time-panel[^}]*overflow-y:\s*auto/);
+  assert.match(styles, /\.pickup-time-grid[^}]*grid-template-columns:\s*repeat\(2/);
+});
+
 test("admin route renders its noindex dashboard shell", async () => {
   const response = await render("/admin");
   assert.equal(response.status, 200);
