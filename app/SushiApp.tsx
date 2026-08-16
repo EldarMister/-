@@ -167,6 +167,31 @@ function HeroCarousel({ onOpen }: { onOpen: () => void }) {
   );
 }
 
+function PromotionFlipCard({ promotion }: { promotion: Promotion }) {
+  const [flipped, setFlipped] = useState(false);
+  return (
+    <article className="promotion-card">
+      <button
+        className={`promotion-flip-card ${flipped ? "flipped" : ""}`}
+        type="button"
+        aria-pressed={flipped}
+        aria-label={`${promotion.title}. ${flipped ? "Показать изображение акции" : "Показать условия акции"}`}
+        onClick={() => setFlipped((value) => !value)}
+      >
+        <span className="promotion-face promotion-front" aria-hidden={flipped || undefined}>
+          <img src={promotion.image} alt={promotion.title} />
+        </span>
+        <span className="promotion-face promotion-back" aria-hidden={!flipped || undefined}>
+          <span className="promotion-copy">
+            <strong>{promotion.title}</strong>
+            <span>{promotion.description}</span>
+          </span>
+        </span>
+      </button>
+    </article>
+  );
+}
+
 function CatalogPanel({ categoryId, className = "", products, cart, onChangeQuantity, onOpenPromo, hidden = false }: {
   categoryId: number;
   className?: string;
@@ -547,7 +572,7 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
         {view === "promo" ? (
           <section className="promotions-page">
             {promotionList.filter((promotion) => promotion.active).map((promotion) => (
-              <article className="promotion-card" key={promotion.id}><img src={promotion.image} alt={promotion.title} /></article>
+              <PromotionFlipCard promotion={promotion} key={promotion.id} />
             ))}
           </section>
         ) : view === "order" ? (

@@ -33,6 +33,16 @@ test("onigiri category renders its promotion and active products", async () => {
   assert.match(html, /Скидка последний час/);
 });
 
+test("promotion page renders flippable cards with their back-side copy", async () => {
+  const response = await render("/promo");
+  assert.equal(response.status, 200);
+  const html = await response.text();
+  assert.match(html, /promotion-flip-card/);
+  assert.match(html, /-15% имениннику/);
+  assert.match(html, /Дарим именинникам скидку/);
+  assert.match(html, /Скидка 20% действует в последний час/);
+});
+
 test("admin route renders its noindex dashboard shell", async () => {
   const response = await render("/admin");
   assert.equal(response.status, 200);
