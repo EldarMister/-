@@ -8,6 +8,7 @@ import type { CartLine, Category, PickupLocation, Product, Promotion } from "./t
 const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === "production" ? "/api" : "http://localhost:4000/api");
 type SiteSettings = { legalName: string; qualityControl: string; telegram: string };
 type SushiView = "catalog" | "promo" | "order" | "payment" | "privacy";
+type CategoryTransition = { from: number; to: number; direction: "left" | "right"; token: number };
 
 type SushiAppProps = {
   initialCategoryId?: number;
@@ -88,12 +89,15 @@ function CategoryTabs({ items, selectedId, onSelect }: { items: Category[]; sele
   return (
     <nav className="category-nav" aria-label="Категории меню">
       <button className="category-arrow category-arrow-left" type="button" aria-label="Предыдущие категории" disabled={!canMoveLeft} onClick={() => move(-1)}><MaterialIcon>chevron_left</MaterialIcon></button>
-      <div className="category-scroller" ref={scroller} onScroll={syncArrows}>
+      <div className="category-scroller" ref={scroller} onScroll={syncArrows} role="tablist">
         {items.filter((category) => category.active).map((category) => (
           <button
             className={category.id === selectedId ? "active" : ""}
             key={category.id}
             onClick={() => onSelect(category.id)}
+            role="tab"
+            aria-selected={category.id === selectedId}
+            aria-controls={`category-panel-${category.id}`}
           >
             {category.name}
           </button>
@@ -160,6 +164,28 @@ function HeroCarousel({ onOpen }: { onOpen: () => void }) {
       <button className="hero-arrow hero-arrow-left" onClick={() => move(-1)} aria-label="Предыдущая акция"><MaterialIcon>chevron_left</MaterialIcon></button>
       <button className="hero-arrow hero-arrow-right" onClick={() => move(1)} aria-label="Следующая акция"><MaterialIcon>chevron_right</MaterialIcon></button>
     </div>
+  );
+}
+
+function CatalogPanel({ categoryId, className = "", products, cart, onChangeQuantity, onOpenPromo, hidden = false }: {
+  categoryId: number;
+  className?: string;
+  products: Product[];
+  cart: Record<number, number>;
+  onChangeQuantity: (id: number, delta: number) => void;
+  onOpenPromo: () => void;
+  hidden?: boolean;
+}) {
+  const visibleProducts = products.filter((product) => product.categoryId === categoryId && product.active);
+  return (
+    <section className={`product-grid category-panel category-${categoryId} ${className}`} id={`category-panel-${categoryId}`} role="tabpanel" aria-hidden={hidden || undefined}>
+      <div className="product-slot hero-slot"><HeroCarousel onOpen={onOpenPromo} /></div>
+      {visibleProducts.map((product) => (
+        <div className="product-slot card-slot" key={product.id}>
+          <ProductCard product={product} quantity={cart[product.id] || 0} onDecrease={() => onChangeQuantity(product.id, -1)} onIncrease={() => onChangeQuantity(product.id, 1)} />
+        </div>
+      ))}
+    </section>
   );
 }
 
@@ -420,8 +446,14 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   const [locationList, setLocationList] = useState<PickupLocation[]>(seedLocations);
   const [promotionList, setPromotionList] = useState<Promotion[]>(seedPromotions);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ legalName: "ИП Багаутдинова", qualityControl: "Отдел контроля качества", telegram: "https://t.me/BIG_REST_TEAM" });
+  const [categoryTransition, setCategoryTransition] = useState<CategoryTransition | null>(null);
   const cartCloseTimer = useRef<number | null>(null);
   const geoNoticeTimer = useRef<number | null>(null);
+  const categoryTransitionTimer = useRef<number | null>(null);
+
+  useEffect(() => () => {
+    if (categoryTransitionTimer.current) window.clearTimeout(categoryTransitionTimer.current);
+  }, []);
 
   // Client storage and the API are external systems; hydrate them after the SSR pass.
   useEffect(() => {
@@ -476,11 +508,23 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
     return () => window.removeEventListener("popstate", syncRoute);
   }, []);
 
-  const visibleProducts = productList.filter((product) => product.categoryId === categoryId && product.active);
   const lines = useMemo(() => productList.filter((product) => cart[product.id] > 0).map((product) => ({ ...product, quantity: cart[product.id] })), [cart, productList]);
   const cartCount = lines.reduce((sum, line) => sum + line.quantity, 0);
   const changeQuantity = (id: number, delta: number) => setCart((current) => ({ ...current, [id]: Math.max(0, (current[id] || 0) + delta) }));
-  const navigateCategory = (id: number) => { setCategoryId(id); setView("catalog"); setHeaderHidden(false); setCartOpen(false); window.history.pushState({}, "", `/catalog/${id}`); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const navigateCategory = (id: number) => {
+    if (view === "catalog" && id !== categoryId) {
+      const orderedIds = categoryList.filter((category) => category.active).sort((a, b) => a.sortOrder - b.sortOrder).map((category) => category.id);
+      const fromIndex = orderedIds.indexOf(categoryId);
+      const toIndex = orderedIds.indexOf(id);
+      const direction = toIndex >= fromIndex ? "left" : "right";
+      if (categoryTransitionTimer.current) window.clearTimeout(categoryTransitionTimer.current);
+      setCategoryTransition({ from: categoryId, to: id, direction, token: Date.now() });
+      categoryTransitionTimer.current = window.setTimeout(() => setCategoryTransition(null), 300);
+    } else {
+      setCategoryTransition(null);
+    }
+    setCategoryId(id); setView("catalog"); setHeaderHidden(false); setCartOpen(false); window.history.pushState({}, "", `/catalog/${id}`); window.scrollTo({ top: 0, behavior: "smooth" });
+  };
   const navigatePromo = () => { setView("promo"); setHeaderHidden(false); setCartOpen(false); window.history.pushState({}, "", "/promo"); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const navigateOrder = () => { setView("order"); setHeaderHidden(false); setCartOpen(false); window.history.pushState({}, "", "/order"); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const navigatePayment = () => { setView("payment"); setHeaderHidden(false); setCartOpen(false); setMobileMenuOpen(false); window.history.pushState({}, "", "/payment-rule"); window.scrollTo({ top: 0, behavior: "smooth" }); };
@@ -513,10 +557,16 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
         ) : view === "privacy" ? (
           <PrivacyPolicy />
         ) : (
-          <section className={`product-grid category-${categoryId}`}>
-            {categoryId === 1 && <div className="product-slot hero-slot"><HeroCarousel onOpen={navigatePromo} /></div>}
-            {visibleProducts.map((product) => <div className="product-slot card-slot" key={product.id}><ProductCard product={product} quantity={cart[product.id] || 0} onDecrease={() => changeQuantity(product.id, -1)} onIncrease={() => changeQuantity(product.id, 1)} /></div>)}
-          </section>
+          <div className={`category-transition-shell ${categoryTransition ? `is-transitioning slide-${categoryTransition.direction}` : ""}`}>
+            {categoryTransition ? (
+              <>
+                <CatalogPanel key={`from-${categoryTransition.token}`} categoryId={categoryTransition.from} className="category-panel-outgoing" products={productList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} hidden />
+                <CatalogPanel key={`to-${categoryTransition.token}`} categoryId={categoryTransition.to} className="category-panel-incoming" products={productList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} />
+              </>
+            ) : (
+              <CatalogPanel categoryId={categoryId} products={productList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} />
+            )}
+          </div>
         )}
       </main>
       <Footer settings={siteSettings} />

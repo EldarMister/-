@@ -50,6 +50,17 @@ a { color: inherit; }
 .category-scroller button:hover, .category-scroller button.active { color: var(--red); box-shadow: inset 0 0 0 1px var(--red); }
 
 .site-main { width: 100vw; max-width: 1280px; min-height: 520px; margin: 0 auto; padding: 16px; }
+.category-transition-shell { width: 100%; display: grid; overflow: hidden; }
+.category-panel { grid-area: 1 / 1; min-width: 0; }
+.category-transition-shell.is-transitioning .category-panel { pointer-events: none; will-change: transform; animation-duration: 300ms; animation-timing-function: cubic-bezier(.215,.61,.355,1); animation-fill-mode: both; }
+.category-transition-shell.slide-left .category-panel-outgoing { animation-name: category-slide-left-out; }
+.category-transition-shell.slide-left .category-panel-incoming { animation-name: category-slide-left-in; }
+.category-transition-shell.slide-right .category-panel-outgoing { animation-name: category-slide-right-out; }
+.category-transition-shell.slide-right .category-panel-incoming { animation-name: category-slide-right-in; }
+@keyframes category-slide-left-out { from { transform: translateX(0); } to { transform: translateX(-100%); } }
+@keyframes category-slide-left-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+@keyframes category-slide-right-out { from { transform: translateX(0); } to { transform: translateX(100%); } }
+@keyframes category-slide-right-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 .product-grid { width: calc(100% + 16px); display: flex; flex-wrap: wrap; margin: -16px 0 0 -16px; }
 .product-slot { flex: 0 0 auto; min-width: 0; padding: 16px 0 0 16px; }
 .hero-slot { width: 50%; display: flex; align-items: center; }
@@ -179,6 +190,10 @@ a { color: inherit; }
 
 .site-footer { width: 100%; height: 149px; color: #fff; background: #e60000; font-family: "Proxima Nova", serif; font-size: 14px; line-height: 21px; }
 .footer-container { width: 1024px; height: 149px; margin: 0 auto; padding: 16px 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .category-transition-shell.is-transitioning .category-panel { animation-duration: 1ms; }
+}
 .footer-top { width: 1024px; height: 75px; display: flex; align-items: flex-start; justify-content: space-between; }
 .footer-brand { width: 244px; height: 55px; text-align: center; }
 .footer-brand img { width: 198px; height: 28px; display: block; filter: brightness(0) invert(1); }

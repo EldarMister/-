@@ -95,3 +95,22 @@ CREATE INDEX IF NOT EXISTS idx_products_category ON products(category_id, sort_o
 CREATE INDEX IF NOT EXISTS idx_orders_created_at ON orders(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);
 
+CREATE TABLE IF NOT EXISTS app_migrations (
+  key TEXT PRIMARY KEY,
+  applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM app_migrations WHERE key = '2026-08-17-enable-onigiri') THEN
+    UPDATE products SET
+      name = CASE id WHEN 29 THEN 'Онигири с креветкой' WHEN 30 THEN 'Онигири с лососем' ELSE name END,
+      price = CASE id WHEN 29 THEN 165 WHEN 30 THEN 195 ELSE price END,
+      image = CASE id WHEN 29 THEN '/assets/products/1736432465572.webp' WHEN 30 THEN '/assets/products/1736432486643.webp' ELSE image END,
+      active = TRUE,
+      sort_order = CASE id WHEN 29 THEN 1 WHEN 30 THEN 2 ELSE sort_order END,
+      updated_at = NOW()
+    WHERE id IN (29, 30);
+    INSERT INTO app_migrations (key) VALUES ('2026-08-17-enable-onigiri');
+  END IF;
+END $$;
