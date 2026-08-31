@@ -74,6 +74,7 @@ test("PostgreSQL schema covers catalog, orders and administration", async () => 
   assert.match(schema, /REFERENCES products/);
   assert.match(schema, /CHECK \(status IN/);
   assert.match(schema, /2026-08-17-enable-onigiri/);
+  assert.match(schema, /2026-08-31-kyrgyz-phone-prefix/);
 });
 
 test("production uses one public gateway and password-only admin login", async () => {
@@ -94,4 +95,7 @@ test("production uses one public gateway and password-only admin login", async (
   assert.match(api, /l\.address AS "locationAddress"/);
   assert.doesNotMatch(`${storefront}\n${adminPanel}`, /₽/);
   assert.match(storefront, /\{product\.price\} С/);
+  assert.match(storefront, /KYRGYZ_PHONE_PREFIX = "\+996"/);
+  assert.match(storefront, /phone\.length !== 9/);
+  assert.match(api, /kyrgyzPhonePattern = \/\^996\\d\{9\}\$\//);
 });

@@ -19,6 +19,26 @@ function MaterialIcon({ children }: { children: string }) {
   return <span className="material-icons" aria-hidden="true">{children}</span>;
 }
 
+const KYRGYZ_PHONE_PREFIX = "+996";
+
+function kyrgyzLocalDigits(value: string) {
+  const digits = value.replace(/\D/g, "");
+  return (digits.startsWith("996") ? digits.slice(3) : digits).slice(0, 9);
+}
+
+function formatKyrgyzLocalPhone(digits: string) {
+  const groups = [digits.slice(0, 3), digits.slice(3, 6), digits.slice(6, 9)];
+  if (!digits) return "";
+  let formatted = groups[0].length === 3 ? `(${groups[0]})` : `(${groups[0]}`;
+  if (groups[1]) formatted += ` ${groups[1]}`;
+  if (groups[2]) formatted += `-${groups[2]}`;
+  return formatted;
+}
+
+function fullKyrgyzPhone(digits: string) {
+  return `${KYRGYZ_PHONE_PREFIX} ${formatKyrgyzLocalPhone(digits)}`;
+}
+
 function Header({
   cartCount,
   cartOpen,
@@ -316,7 +336,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
   const requestCode = async () => {
     setMessage("");
     try {
-      const response = await fetch(`${API_URL}/auth/request-code`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone }) });
+      const response = await fetch(`${API_URL}/auth/request-code`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone: fullKyrgyzPhone(phone) }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Не удалось отправить код");
       setCodeSent(true);
@@ -328,7 +348,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
   const verifyCode = async () => {
     setMessage("");
     try {
-      const response = await fetch(`${API_URL}/auth/verify-code`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone, code }) });
+      const response = await fetch(`${API_URL}/auth/verify-code`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone: fullKyrgyzPhone(phone), code }) });
       const result = await response.json();
       if (!response.ok) throw new Error(result.error || "Не удалось войти");
       localStorage.setItem("sushi-customer", JSON.stringify(result.customer));
@@ -343,9 +363,9 @@ function LoginModal({ onClose }: { onClose: () => void }) {
         <section className="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
           <div className="login-circle"><MaterialIcon>key</MaterialIcon></div>
           <h2 id="login-title">Личный кабинет</h2>
-          <div className="login-caption">Введите номер телефона и вам поступит звонок в течении минуты, необходимо будет ввести последние <strong>4 цифры</strong> входящего номера:<div className="phone-example">+7 000 000 <strong>XXXX</strong></div></div>
-          <label className="login-phone-field">{!codeSent && <span>+7</span>}<input value={codeSent ? code : phone} onChange={(event) => codeSent ? setCode(event.target.value.replace(/\D/g, "").slice(0, 4)) : setPhone(event.target.value)} placeholder={codeSent ? "Последние 4 цифры" : "Телефон"} inputMode={codeSent ? "numeric" : "tel"} autoComplete={codeSent ? "one-time-code" : "tel"} /></label>
-          <div className="login-submit-row"><button onClick={codeSent ? verifyCode : requestCode} disabled={codeSent ? code.length !== 4 : phone.replace(/\D/g, "").length < 10}>{codeSent ? "Войти" : "Выслать код"}</button></div>
+          <div className="login-caption">Введите номер телефона и вам поступит звонок в течении минуты, необходимо будет ввести последние <strong>4 цифры</strong> входящего номера:<div className="phone-example">+996 000 00 <strong>XXXX</strong></div></div>
+          <label className="login-phone-field">{!codeSent && <span>+996</span>}<input value={codeSent ? code : formatKyrgyzLocalPhone(phone)} onChange={(event) => codeSent ? setCode(event.target.value.replace(/\D/g, "").slice(0, 4)) : setPhone(kyrgyzLocalDigits(event.target.value))} placeholder={codeSent ? "Последние 4 цифры" : "(___) ___-___"} inputMode={codeSent ? "numeric" : "tel"} autoComplete={codeSent ? "one-time-code" : "tel"} /></label>
+          <div className="login-submit-row"><button onClick={codeSent ? verifyCode : requestCode} disabled={codeSent ? code.length !== 4 : phone.length !== 9}>{codeSent ? "Войти" : "Выслать код"}</button></div>
           <div className="login-consent">Нажимая кнопку, я даю <strong>согласие</strong> на обработку персональных данных.</div>
           {message && <small className="form-message">{message}</small>}
         </section>
@@ -422,9 +442,10 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
     event.preventDefault();
     if (!location) { onNeedLocation(); return; }
     if (!lines.length) { setError("Добавьте товары в корзину"); return; }
+    if (phone.length !== 9) { setError("Введите 9 цифр номера после +996"); return; }
     setPending(true); setError("");
     const details = [comment, selectedReadyTime ? `Приготовить к: ${selectedReadyTime}` : "", promo ? `Промокод: ${promo}` : ""].filter(Boolean).join(" · ");
-    const payload = { customerName: name, customerPhone: phone, comment: details, locationId: location.id, items: lines.map((line) => ({ productId: line.id, quantity: line.quantity })) };
+    const payload = { customerName: name, customerPhone: fullKyrgyzPhone(phone), comment: details, locationId: location.id, items: lines.map((line) => ({ productId: line.id, quantity: line.quantity })) };
     try {
       const response = await fetch(`${API_URL}/orders`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
       const result = await response.json();
@@ -461,7 +482,7 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
       <form className="order-form" onSubmit={submit}>
         <h2>Оформление заказа</h2>
         <label><span className="visually-hidden">Имя</span><input value={name} onChange={(event) => setName(event.target.value)} placeholder="Имя" aria-label="Имя" required /></label>
-        <label><span className="visually-hidden">Телефон</span><input value={phone} onChange={(event) => setPhone(event.target.value)} placeholder="Телефон" aria-label="Телефон" inputMode="tel" required /></label>
+        <label className="order-phone-field"><span aria-hidden="true">+996</span><input value={formatKyrgyzLocalPhone(phone)} onChange={(event) => setPhone(kyrgyzLocalDigits(event.target.value))} placeholder="(___) ___-___" aria-label="Телефон после +996" inputMode="tel" autoComplete="tel-national" required /></label>
         <label><span className="visually-hidden">Комментарий к заказу</span><textarea value={comment} onChange={(event) => setComment(event.target.value)} placeholder="Комментарий к заказу" aria-label="Комментарий к заказу" /></label>
         <div className="order-ready">
           <strong>Приготовить к: <b>{selectedReadyTime}</b></strong>

@@ -114,3 +114,11 @@ BEGIN
     INSERT INTO app_migrations (key) VALUES ('2026-08-17-enable-onigiri');
   END IF;
 END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM app_migrations WHERE key = '2026-08-31-kyrgyz-phone-prefix') THEN
+    UPDATE pickup_locations SET phone = '+996 (555) 506-447', updated_at = NOW() WHERE phone LIKE '+7%';
+    INSERT INTO app_migrations (key) VALUES ('2026-08-31-kyrgyz-phone-prefix');
+  END IF;
+END $$;

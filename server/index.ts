@@ -30,6 +30,7 @@ const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 40, standardHea
 const orderLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 25, standardHeaders: true, legacyHeaders: false });
 const validStatuses = new Set(["new", "confirmed", "preparing", "ready", "completed", "cancelled"]);
 const verificationCodes = new Map<string, { code: string; expiresAt: number }>();
+const kyrgyzPhonePattern = /^996\d{9}$/;
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -77,7 +78,7 @@ app.get("/api/settings", async (_request, response) => {
 
 app.post("/api/auth/request-code", authLimiter, (request, response) => {
   const phone = String(request.body.phone || "").replace(/\D/g, "");
-  if (phone.length < 10) return response.status(400).json({ error: "Укажите корректный телефон" });
+  if (!kyrgyzPhonePattern.test(phone)) return response.status(400).json({ error: "Укажите телефон в формате +996" });
   const code = process.env.NODE_ENV === "production" ? String(Math.floor(1000 + Math.random() * 9000)) : "0000";
   verificationCodes.set(phone, { code, expiresAt: Date.now() + 5 * 60 * 1000 });
   response.json({ sent: true, ...(process.env.NODE_ENV !== "production" ? { devCode: code } : {}) });
@@ -97,7 +98,7 @@ app.post("/api/orders", orderLimiter, async (request, response) => {
   const customerPhone = String(request.body.customerPhone || "").trim();
   const locationId = numberValue(request.body.locationId);
   const rawItems = Array.isArray(request.body.items) ? request.body.items : [];
-  if (!customerName || customerPhone.replace(/\D/g, "").length < 10 || !locationId || rawItems.length === 0) return response.status(400).json({ error: "Заполните контактные данные и корзину" });
+  if (!customerName || !kyrgyzPhonePattern.test(customerPhone.replace(/\D/g, "")) || !locationId || rawItems.length === 0) return response.status(400).json({ error: "Заполните контактные данные и укажите телефон в формате +996" });
   const requested = new Map<number, number>();
   for (const item of rawItems) {
     const productId = numberValue(item.productId); const quantity = Math.min(99, Math.max(1, numberValue(item.quantity, 1)));
