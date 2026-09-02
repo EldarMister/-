@@ -1,6 +1,5 @@
-import SushiApp from "./SushiApp";
+import { redirect } from "next/navigation";
 
 export default function HomePage() {
-  return <SushiApp />;
+  redirect("/catalog/1");
 }
-

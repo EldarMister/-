@@ -117,6 +117,16 @@ END $$;
 
 DO $$
 BEGIN
+  IF NOT EXISTS (SELECT 1 FROM app_migrations WHERE key = '2026-09-02-legal-operator') THEN
+    UPDATE site_settings
+    SET value = jsonb_set(value, '{legalName}', to_jsonb('ИП Мусаев Жаныбек Кочкорбаевич'::text), TRUE), updated_at = NOW()
+    WHERE key = 'general';
+    INSERT INTO app_migrations (key) VALUES ('2026-09-02-legal-operator');
+  END IF;
+END $$;
+
+DO $$
+BEGIN
   IF NOT EXISTS (SELECT 1 FROM app_migrations WHERE key = '2026-08-31-kyrgyz-phone-prefix') THEN
     UPDATE pickup_locations SET phone = '+996 (555) 506-447', updated_at = NOW() WHERE phone LIKE '+7%';
     INSERT INTO app_migrations (key) VALUES ('2026-08-31-kyrgyz-phone-prefix');

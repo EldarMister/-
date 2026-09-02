@@ -1,8 +1,11 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { categories as seedCategories, locations as seedLocations, products as seedProducts, promotions as seedPromotions } from "./data";
 import { PaymentRules, PrivacyPolicy } from "./LegalContent";
+import { LEGAL_DETAILS } from "./legalDetails";
+import { distanceInKilometers, pickupStatus, type MapPosition } from "./locationUtils";
+import PickupMap from "./PickupMap";
 import type { CartLine, Category, PickupLocation, Product, Promotion } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === "production" ? "/api" : "http://localhost:4000/api");
@@ -222,8 +225,10 @@ function CatalogPanel({ categoryId, className = "", products, cart, onChangeQuan
   hidden?: boolean;
 }) {
   const visibleProducts = products.filter((product) => product.categoryId === categoryId && product.active);
+  const categoryName = seedCategories.find((category) => category.id === categoryId)?.name || "Меню";
   return (
     <section className={`product-grid category-panel category-${categoryId} ${className}`} id={`category-panel-${categoryId}`} role="tabpanel" aria-hidden={hidden || undefined}>
+      <h1 className="visually-hidden">{categoryName} — меню ДААНА СУШИ</h1>
       <div className="product-slot hero-slot"><HeroCarousel onOpen={onOpenPromo} /></div>
       {visibleProducts.map((product) => (
         <div className="product-slot card-slot" key={product.id}>
@@ -282,10 +287,7 @@ function LocationPicker({ compact = false, items, selected, onChange }: { compac
       {open && (
         <div className="location-options" id={listboxId} role="listbox" aria-label="Точки самовывоза">
           {activeItems.map((item) => (
-            <button type="button" role="option" aria-selected={selected?.id === item.id} className={selected?.id === item.id ? "selected" : ""} key={item.id} onClick={() => { onChange(item); setOpen(false); }}>
-              <span className="location-option-copy"><strong>{item.name}</strong><small>{item.address}</small></span>
-              <span className="location-option-status">закрыто до<br />{item.opensAt}</span>
-            </button>
+            <LocationOption item={item} selected={selected?.id === item.id} onSelect={() => { onChange(item); setOpen(false); }} key={item.id} />
           ))}
         </div>
       )}
@@ -293,9 +295,25 @@ function LocationPicker({ compact = false, items, selected, onChange }: { compac
   );
 }
 
+function LocationOption({ item, selected, onSelect }: { item: PickupLocation; selected: boolean; onSelect: () => void }) {
+  const status = pickupStatus(item);
+  return (
+    <button type="button" role="option" aria-selected={selected} className={selected ? "selected" : ""} onClick={onSelect}>
+      <span className="location-option-copy"><strong>{item.name}</strong><small>{item.address}</small></span>
+      <span className="location-option-status">{status.label}<br />{status.time}</span>
+    </button>
+  );
+}
+
 function LocationModal({ current, items, onSelect }: { current: PickupLocation | null; items: PickupLocation[]; onSelect: (location: PickupLocation) => void }) {
   const [selectedId, setSelectedId] = useState<number | "">(current?.id || "");
-  const selected = items.find((location) => location.id === selectedId) || null;
+  const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
+  const chooseLocation = useCallback((item: PickupLocation) => setSelectedId(item.id), []);
+  const orderedItems = useMemo(() => {
+    if (!userPosition) return items;
+    return [...items].sort((left, right) => distanceInKilometers(userPosition, left) - distanceInKilometers(userPosition, right));
+  }, [items, userPosition]);
+  const selected = orderedItems.find((location) => location.id === selectedId) || null;
   return (
     <div className="modal-backdrop" role="presentation">
       <section className="modal-card location-modal" role="dialog" aria-modal="true" aria-labelledby="location-title">
@@ -303,7 +321,7 @@ function LocationModal({ current, items, onSelect }: { current: PickupLocation |
         <div className="location-top-row">
           <div className="select-shell">
             <span className="location-target" aria-hidden="true"><span /></span>
-            <LocationPicker items={items} selected={selected} onChange={(item) => setSelectedId(item.id)} />
+            <LocationPicker items={orderedItems} selected={selected} onChange={chooseLocation} />
           </div>
         </div>
         {selected && (
@@ -312,13 +330,8 @@ function LocationModal({ current, items, onSelect }: { current: PickupLocation |
             <span className="location-hours"><MaterialIcon>schedule</MaterialIcon><b>{selected.hours}</b></span>
           </div>
         )}
-        <div className="map-visual" aria-label="Карта точек">
-          <iframe title="Яндекс Карты" src="https://yandex.ru/map-widget/v1/?ll=104.297709%2C52.286191&z=13" />
-          {items.slice(0, 3).map((location, index) => (
-            <button className={`map-marker marker-${index + 1} ${selectedId === location.id ? "selected" : ""}`} key={location.id} onClick={() => setSelectedId(location.id)} aria-label={location.name}>
-              <span className="marker-dot">С</span><span className="marker-label"><strong>{location.name}</strong><small>закрыто до {location.opensAt}</small></span>
-            </button>
-          ))}
+        <div className="map-visual">
+          <PickupMap locations={orderedItems} selectedId={selectedId || null} onSelect={chooseLocation} onUserPosition={setUserPosition} />
         </div>
         <div className="modal-actions">
           <button className="primary-button" disabled={!selected} onClick={() => selected && onSelect(selected)}>Ок</button>
@@ -333,8 +346,9 @@ function LoginModal({ onClose }: { onClose: () => void }) {
   const [codeSent, setCodeSent] = useState(false);
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
+  const [pending, setPending] = useState(false);
   const requestCode = async () => {
-    setMessage("");
+    setMessage(""); setPending(true);
     try {
       const response = await fetch(`${API_URL}/auth/request-code`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone: fullKyrgyzPhone(phone) }) });
       const result = await response.json();
@@ -343,10 +357,10 @@ function LoginModal({ onClose }: { onClose: () => void }) {
       setMessage(result.devCode ? `Код отправлен. Код для локального запуска: ${result.devCode}.` : "Код отправлен.");
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Не удалось отправить код");
-    }
+    } finally { setPending(false); }
   };
   const verifyCode = async () => {
-    setMessage("");
+    setMessage(""); setPending(true);
     try {
       const response = await fetch(`${API_URL}/auth/verify-code`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone: fullKyrgyzPhone(phone), code }) });
       const result = await response.json();
@@ -355,7 +369,7 @@ function LoginModal({ onClose }: { onClose: () => void }) {
       onClose();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Не удалось войти");
-    }
+    } finally { setPending(false); }
   };
   return (
     <div className="modal-backdrop">
@@ -363,11 +377,11 @@ function LoginModal({ onClose }: { onClose: () => void }) {
         <section className="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
           <div className="login-circle"><MaterialIcon>key</MaterialIcon></div>
           <h2 id="login-title">Личный кабинет</h2>
-          <div className="login-caption">Введите номер телефона и вам поступит звонок в течении минуты, необходимо будет ввести последние <strong>4 цифры</strong> входящего номера:<div className="phone-example">+996 000 00 <strong>XXXX</strong></div></div>
-          <label className="login-phone-field">{!codeSent && <span>+996</span>}<input value={codeSent ? code : formatKyrgyzLocalPhone(phone)} onChange={(event) => codeSent ? setCode(event.target.value.replace(/\D/g, "").slice(0, 4)) : setPhone(kyrgyzLocalDigits(event.target.value))} placeholder={codeSent ? "Последние 4 цифры" : "(___) ___-___"} inputMode={codeSent ? "numeric" : "tel"} autoComplete={codeSent ? "one-time-code" : "tel"} /></label>
-          <div className="login-submit-row"><button onClick={codeSent ? verifyCode : requestCode} disabled={codeSent ? code.length !== 4 : phone.length !== 9}>{codeSent ? "Войти" : "Выслать код"}</button></div>
-          <div className="login-consent">Нажимая кнопку, я даю <strong>согласие</strong> на обработку персональных данных.</div>
-          {message && <small className="form-message">{message}</small>}
+          <div className="login-caption">{codeSent ? <>Мы отправили SMS с кодом на номер <strong>{KYRGYZ_PHONE_PREFIX} {formatKyrgyzLocalPhone(phone)}</strong>.<button className="login-change-phone" type="button" onClick={() => { setCodeSent(false); setCode(""); setMessage(""); }}>Изменить номер</button></> : <>Введите номер телефона. В течение минуты мы отправим вам <strong>SMS с одноразовым кодом</strong>.</>}</div>
+          <label className="login-phone-field"><span className="visually-hidden">{codeSent ? "Код из SMS" : "Номер телефона"}</span>{!codeSent && <span aria-hidden="true">+996</span>}<input value={codeSent ? code : formatKyrgyzLocalPhone(phone)} onChange={(event) => codeSent ? setCode(event.target.value.replace(/\D/g, "").slice(0, 8)) : setPhone(kyrgyzLocalDigits(event.target.value))} placeholder={codeSent ? "Код из SMS" : "(___) ___-___"} inputMode={codeSent ? "numeric" : "tel"} autoComplete={codeSent ? "one-time-code" : "tel"} /></label>
+          <div className="login-submit-row"><button onClick={codeSent ? verifyCode : requestCode} disabled={pending || (codeSent ? code.length < 4 : phone.length !== 9)}>{pending ? "Подождите…" : codeSent ? "Войти" : "Получить код"}</button></div>
+          <div className="login-consent">Нажимая кнопку, я даю <a href="/privacy">согласие на обработку персональных данных</a>.</div>
+          {message && <small className="form-message" aria-live="polite">{message}</small>}
         </section>
         <button className="login-external-close" onClick={onClose} aria-label="Закрыть"><MaterialIcon>close</MaterialIcon></button>
       </div>
@@ -519,6 +533,12 @@ function Footer({ settings }: { settings: SiteSettings }) {
         </div>
         <div className="footer-privacy"><a href="/privacy">Политика обработки персональных данных</a></div>
         <div className="footer-recaptcha">Наш сайт защищен с помощью reCAPTCHA и соответствует <a href="https://policies.google.com/privacy">Политике конфиденциальности</a> и <a href="https://policies.google.com/terms?hl=ru">Условиям использования</a> Google.</div>
+        <address className="footer-legal">
+          <span>Оператор сервиса: {LEGAL_DETAILS.operator}</span>
+          <span>ИНН: {LEGAL_DETAILS.inn}</span>
+          <span>Регистрационный номер: {LEGAL_DETAILS.registrationNumber}</span>
+          <span>Адрес: {LEGAL_DETAILS.address}</span>
+        </address>
       </div>
     </footer>
   );
@@ -540,7 +560,7 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   const [productList, setProductList] = useState<Product[]>(seedProducts);
   const [locationList, setLocationList] = useState<PickupLocation[]>(seedLocations);
   const [promotionList, setPromotionList] = useState<Promotion[]>(seedPromotions);
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ legalName: "ИП Багаутдинова", qualityControl: "Отдел контроля качества", telegram: "https://t.me/BIG_REST_TEAM" });
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ legalName: LEGAL_DETAILS.operator, qualityControl: "Отдел контроля качества", telegram: "https://t.me/BIG_REST_TEAM" });
   const [categoryTransition, setCategoryTransition] = useState<CategoryTransition | null>(null);
   const cartCloseTimer = useRef<number | null>(null);
   const geoNoticeTimer = useRef<number | null>(null);
@@ -552,22 +572,55 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
 
   // Client storage and the API are external systems; hydrate them after the SSR pass.
   useEffect(() => {
+    let savedLocationId: number | null = null;
     try {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       const savedCart = localStorage.getItem("sushi-cart"); if (savedCart) setCart(JSON.parse(savedCart));
       const savedLocation = localStorage.getItem("sushi-location");
-      if (savedLocation) setLocation(seedLocations.find((item) => item.id === Number(savedLocation)) || null);
+      if (savedLocation) {
+        const parsedLocationId = Number(savedLocation);
+        if (Number.isInteger(parsedLocationId) && parsedLocationId > 0) {
+          savedLocationId = parsedLocationId;
+          const seededLocation = seedLocations.find((item) => item.id === savedLocationId) || null;
+          setLocation(seededLocation);
+        } else {
+          localStorage.removeItem("sushi-location");
+          setLocationOpen(true);
+          setGeoNoticeOpen(true);
+        }
+      }
       else { setLocationOpen(true); setGeoNoticeOpen(true); }
     } catch { setLocationOpen(true); setGeoNoticeOpen(true); }
-    Promise.all([
+    void Promise.allSettled([
       fetch(`${API_URL}/catalog`).then((response) => response.ok ? response.json() : Promise.reject()),
       fetch(`${API_URL}/locations`).then((response) => response.ok ? response.json() : Promise.reject()),
       fetch(`${API_URL}/promotions`).then((response) => response.ok ? response.json() : Promise.reject()),
       fetch(`${API_URL}/settings`).then((response) => response.ok ? response.json() : Promise.reject()),
-    ]).then(([catalog, remoteLocations, remotePromotions, remoteSettings]) => {
-      setCategoryList(catalog.categories); setProductList(catalog.products); setLocationList(remoteLocations); setPromotionList(remotePromotions);
-      if (remoteSettings.general) setSiteSettings(remoteSettings.general);
-    }).catch(() => { /* Static seed keeps the storefront usable while the API starts. */ });
+    ]).then(([catalogResult, locationsResult, promotionsResult, settingsResult]) => {
+      if (catalogResult.status === "fulfilled") {
+        setCategoryList(catalogResult.value.categories);
+        setProductList(catalogResult.value.products);
+      }
+      if (locationsResult.status === "fulfilled") {
+        const remoteLocations = locationsResult.value as PickupLocation[];
+        setLocationList(remoteLocations);
+        if (savedLocationId !== null) {
+          const restoredLocation = remoteLocations.find((item) => item.id === savedLocationId) || null;
+          setLocation(restoredLocation);
+          if (!restoredLocation) {
+            localStorage.removeItem("sushi-location");
+            setLocationOpen(true);
+            setGeoNoticeOpen(true);
+          }
+        }
+      } else if (savedLocationId !== null && !seedLocations.some((item) => item.id === savedLocationId)) {
+        localStorage.removeItem("sushi-location");
+        setLocationOpen(true);
+        setGeoNoticeOpen(true);
+      }
+      if (promotionsResult.status === "fulfilled") setPromotionList(promotionsResult.value);
+      if (settingsResult.status === "fulfilled" && settingsResult.value.general) setSiteSettings(settingsResult.value.general);
+    });
   }, []);
 
   useEffect(() => { localStorage.setItem("sushi-cart", JSON.stringify(cart)); }, [cart]);
@@ -641,6 +694,7 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
       <main className={`site-main ${view === "order" ? "order-main" : ""} ${view === "payment" || view === "privacy" ? "legal-main" : ""}`}>
         {view === "promo" ? (
           <section className="promotions-page">
+            <h1 className="visually-hidden">Акции и скидки ДААНА СУШИ</h1>
             {promotionList.filter((promotion) => promotion.active).map((promotion) => (
               <PromotionFlipCard promotion={promotion} key={promotion.id} />
             ))}

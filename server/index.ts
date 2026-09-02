@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { randomUUID } from "node:crypto";
 import { mkdir } from "node:fs/promises";
 import { dirname, extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -13,6 +14,8 @@ import { syncAdminPassword } from "./admin-account";
 import { createAdminToken, requireAdmin } from "./auth";
 import { closeDatabase, sql } from "./db";
 import { migrate } from "./migrate";
+import { NikitaOtpError, sendNikitaOtp, verifyNikitaOtp } from "./nikita-otp";
+import { resolveYandexMapLink, YandexMapLinkError } from "./yandex-map-link";
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
@@ -27,10 +30,43 @@ app.use(express.json({ limit: "1mb" }));
 app.use("/uploads", express.static(uploadsDirectory, { maxAge: "7d", immutable: false }));
 
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 40, standardHeaders: true, legacyHeaders: false });
+const otpRequestLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_request, response) => response.status(429).json({ error: "Слишком много запросов кода. Попробуйте позже" }),
+});
+const otpVerifyLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_request, response) => response.status(429).json({ error: "Слишком много попыток. Попробуйте позже" }),
+});
 const orderLimiter = rateLimit({ windowMs: 10 * 60 * 1000, limit: 25, standardHeaders: true, legacyHeaders: false });
+const geocodeLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 80,
+  standardHeaders: true,
+  legacyHeaders: false,
+  handler: (_request, response) => response.status(429).json({ error: "Слишком много запросов к поиску адреса. Подождите несколько минут" }),
+});
 const validStatuses = new Set(["new", "confirmed", "preparing", "ready", "completed", "cancelled"]);
-const verificationCodes = new Map<string, { code: string; expiresAt: number }>();
+type VerificationChallenge =
+  | { mode: "nikita"; token: string; requestedAt: number; expiresAt: number; attempts: number }
+  | { mode: "development"; code: string; requestedAt: number; expiresAt: number; attempts: number };
+const verificationChallenges = new Map<string, VerificationChallenge>();
 const kyrgyzPhonePattern = /^996\d{9}$/;
+const verificationLifetimeMs = 10 * 60 * 1000;
+const verificationResendDelayMs = 60 * 1000;
+const maxVerificationAttempts = 5;
+
+function pruneVerificationChallenges(now = Date.now()) {
+  for (const [phone, challenge] of verificationChallenges) {
+    if (challenge.expiresAt < now) verificationChallenges.delete(phone);
+  }
+}
 
 const upload = multer({
   storage: multer.diskStorage({
@@ -48,6 +84,110 @@ function numberValue(value: unknown, fallback = 0) {
 
 function booleanValue(value: unknown, fallback = true) {
   return value === undefined ? fallback : value === true || value === "true";
+}
+
+function locationCoordinates(body: unknown) {
+  if (!body || typeof body !== "object" || Array.isArray(body)) return null;
+  const values = body as Record<string, unknown>;
+  const parseCoordinate = (value: unknown) => {
+    if (typeof value === "number") return value;
+    if (typeof value === "string" && value.trim() !== "") return Number(value);
+    return Number.NaN;
+  };
+  const latitude = parseCoordinate(values.latitude);
+  const longitude = parseCoordinate(values.longitude);
+  if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) return null;
+  return { latitude, longitude };
+}
+
+const yandexGeocoderUrl = "https://geocode-maps.yandex.ru/v1/";
+const yandexGeocoderTimeoutMs = 8_000;
+
+type YandexGeocoderResponse = {
+  response?: {
+    GeoObjectCollection?: {
+      featureMember?: Array<{
+        GeoObject?: {
+          description?: string;
+          name?: string;
+          metaDataProperty?: {
+            GeocoderMetaData?: {
+              text?: string;
+              Address?: { formatted?: string };
+            };
+          };
+          Point?: { pos?: string };
+        };
+      }>;
+    };
+  };
+};
+
+class YandexGeocoderError extends Error {
+  constructor(public readonly status: number, message: string) {
+    super(message);
+  }
+}
+
+function queryCoordinate(value: unknown) {
+  if (typeof value !== "string" || value.trim() === "") return Number.NaN;
+  return Number(value);
+}
+
+async function geocodeWithYandex(searchValue: string) {
+  const apiKey = String(process.env.YANDEX_GEOCODER_API_KEY || "").trim();
+  if (!apiKey) throw new YandexGeocoderError(503, "Геокодер Яндекса не настроен: добавьте YANDEX_GEOCODER_API_KEY");
+
+  const url = new URL(yandexGeocoderUrl);
+  url.search = new URLSearchParams({
+    apikey: apiKey,
+    geocode: searchValue,
+    lang: "ru_RU",
+    format: "json",
+    results: "1",
+  }).toString();
+
+  let upstream: globalThis.Response;
+  try {
+    upstream = await fetch(url, {
+      headers: { accept: "application/json", referer: "https://daanasushi.com/" },
+      signal: AbortSignal.timeout(yandexGeocoderTimeoutMs),
+    });
+  } catch (error) {
+    const name = error instanceof Error ? error.name : "";
+    if (name === "AbortError" || name === "TimeoutError") {
+      throw new YandexGeocoderError(504, "Яндекс Карты не ответили вовремя. Попробуйте ещё раз");
+    }
+    throw new YandexGeocoderError(502, "Не удалось связаться с геокодером Яндекса");
+  }
+
+  if (!upstream.ok) {
+    if (upstream.status === 401 || upstream.status === 403) {
+      throw new YandexGeocoderError(502, "Яндекс отклонил ключ геокодера. Проверьте YANDEX_GEOCODER_API_KEY");
+    }
+    if (upstream.status === 429) {
+      throw new YandexGeocoderError(429, "Превышен лимит запросов к геокодеру Яндекса. Попробуйте позже");
+    }
+    throw new YandexGeocoderError(502, "Геокодер Яндекса временно недоступен");
+  }
+
+  let payload: YandexGeocoderResponse;
+  try {
+    payload = await upstream.json() as YandexGeocoderResponse;
+  } catch {
+    throw new YandexGeocoderError(502, "Геокодер Яндекса вернул некорректный ответ");
+  }
+
+  const geoObject = payload.response?.GeoObjectCollection?.featureMember?.[0]?.GeoObject;
+  const [longitude, latitude] = String(geoObject?.Point?.pos || "").trim().split(/\s+/).map(Number);
+  const metadata = geoObject?.metaDataProperty?.GeocoderMetaData;
+  const fallbackAddress = [geoObject?.description, geoObject?.name].filter(Boolean).join(", ");
+  const address = String(metadata?.Address?.formatted || metadata?.text || fallbackAddress).trim();
+  if (!address || !Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+    throw new YandexGeocoderError(404, "Адрес не найден. Уточните запрос или выберите другую точку на карте");
+  }
+
+  return { address, latitude, longitude };
 }
 
 app.get("/api/health", async (_request, response) => {
@@ -76,21 +216,71 @@ app.get("/api/settings", async (_request, response) => {
   response.json(Object.fromEntries(rows.map((row) => [row.key, row.value])));
 });
 
-app.post("/api/auth/request-code", authLimiter, (request, response) => {
+app.post("/api/auth/request-code", otpRequestLimiter, async (request, response) => {
   const phone = String(request.body.phone || "").replace(/\D/g, "");
   if (!kyrgyzPhonePattern.test(phone)) return response.status(400).json({ error: "Укажите телефон в формате +996" });
-  const code = process.env.NODE_ENV === "production" ? String(Math.floor(1000 + Math.random() * 9000)) : "0000";
-  verificationCodes.set(phone, { code, expiresAt: Date.now() + 5 * 60 * 1000 });
-  response.json({ sent: true, ...(process.env.NODE_ENV !== "production" ? { devCode: code } : {}) });
+  const now = Date.now();
+  pruneVerificationChallenges(now);
+  const existingChallenge = verificationChallenges.get(phone);
+  if (existingChallenge && now - existingChallenge.requestedAt < verificationResendDelayMs) {
+    return response.status(429).json({ error: "Код уже отправлен. Повторите через минуту" });
+  }
+  const apiKey = String(process.env.NIKITA_OTP_API_KEY || "").trim();
+  try {
+    if (apiKey) {
+      const transactionId = randomUUID().replaceAll("-", "");
+      const token = await sendNikitaOtp(apiKey, phone, transactionId);
+      verificationChallenges.set(phone, { mode: "nikita", token, requestedAt: now, expiresAt: now + verificationLifetimeMs, attempts: 0 });
+      return response.json({ sent: true });
+    }
+    if (process.env.NODE_ENV === "production") return response.status(503).json({ error: "Отправка SMS ещё не настроена" });
+
+    const code = "0000";
+    verificationChallenges.set(phone, { mode: "development", code, requestedAt: now, expiresAt: now + verificationLifetimeMs, attempts: 0 });
+    return response.json({ sent: true, devCode: code });
+  } catch (error) {
+    if (error instanceof NikitaOtpError) return response.status(error.httpStatus).json({ error: error.message });
+    console.error("Nikita OTP send failed", error);
+    return response.status(502).json({ error: "Не удалось отправить SMS-код" });
+  }
 });
 
-app.post("/api/auth/verify-code", authLimiter, async (request, response) => {
+app.post("/api/auth/verify-code", otpVerifyLimiter, async (request, response) => {
   const phone = String(request.body.phone || "").replace(/\D/g, "");
-  const stored = verificationCodes.get(phone);
-  if (!stored || stored.expiresAt < Date.now() || stored.code !== String(request.body.code || "")) return response.status(400).json({ error: "Неверный или просроченный код" });
-  verificationCodes.delete(phone);
-  const [customer] = await sql`INSERT INTO customers (phone) VALUES (${phone}) ON CONFLICT (phone) DO UPDATE SET updated_at = NOW() RETURNING id, phone, name`;
-  response.json({ customer });
+  const code = String(request.body.code || "").trim();
+  if (!kyrgyzPhonePattern.test(phone) || code.length < 4 || code.length > 32) return response.status(400).json({ error: "Укажите корректные телефон и код" });
+  const challenge = verificationChallenges.get(phone);
+  if (!challenge || challenge.expiresAt < Date.now()) {
+    verificationChallenges.delete(phone);
+    return response.status(400).json({ error: "Код устарел. Запросите новый" });
+  }
+  if (challenge.attempts >= maxVerificationAttempts) {
+    verificationChallenges.delete(phone);
+    return response.status(429).json({ error: "Слишком много попыток. Запросите новый код" });
+  }
+
+  try {
+    if (challenge.mode === "nikita") {
+      const apiKey = String(process.env.NIKITA_OTP_API_KEY || "").trim();
+      if (!apiKey) return response.status(503).json({ error: "Проверка SMS временно недоступна" });
+      await verifyNikitaOtp(apiKey, challenge.token, code);
+    } else if (challenge.code !== code) {
+      challenge.attempts += 1;
+      return response.status(400).json({ error: "Неверный код" });
+    }
+
+    verificationChallenges.delete(phone);
+    const [customer] = await sql`INSERT INTO customers (phone) VALUES (${phone}) ON CONFLICT (phone) DO UPDATE SET updated_at = NOW() RETURNING id, phone, name`;
+    return response.json({ customer });
+  } catch (error) {
+    if (error instanceof NikitaOtpError) {
+      if (error.providerStatus === 12 || error.providerStatus === 13) verificationChallenges.delete(phone);
+      else if (error.providerStatus === 14) challenge.attempts += 1;
+      return response.status(error.httpStatus).json({ error: error.message });
+    }
+    console.error("Nikita OTP verification failed", error);
+    return response.status(502).json({ error: "Не удалось проверить SMS-код" });
+  }
 });
 
 app.post("/api/orders", orderLimiter, async (request, response) => {
@@ -132,6 +322,53 @@ app.post("/api/admin/login", authLimiter, async (request, response) => {
 
 app.use("/api/admin", requireAdmin);
 
+app.get("/api/admin/geocode", geocodeLimiter, async (request, response) => {
+  try {
+    const rawQuery = request.query.query;
+    if (rawQuery !== undefined) {
+      if (typeof rawQuery !== "string") return response.status(400).json({ error: "Укажите один адрес для поиска" });
+      const query = rawQuery.trim();
+      if (query.length < 3 || query.length > 300) return response.status(400).json({ error: "Адрес должен содержать от 3 до 300 символов" });
+      response.setHeader("Cache-Control", "no-store");
+      return response.json(await geocodeWithYandex(query));
+    }
+
+    const latitude = queryCoordinate(request.query.latitude);
+    const longitude = queryCoordinate(request.query.longitude);
+    if (!Number.isFinite(latitude) || latitude < -90 || latitude > 90 || !Number.isFinite(longitude) || longitude < -180 || longitude > 180) {
+      return response.status(400).json({ error: "Укажите корректные широту и долготу" });
+    }
+    response.setHeader("Cache-Control", "no-store");
+    return response.json(await geocodeWithYandex(`${longitude},${latitude}`));
+  } catch (error) {
+    if (error instanceof YandexGeocoderError) return response.status(error.status).json({ error: error.message });
+    console.error("Yandex geocoding failed", error);
+    return response.status(502).json({ error: "Не удалось выполнить поиск адреса" });
+  }
+});
+
+app.post("/api/admin/yandex-map-link", geocodeLimiter, async (request, response) => {
+  try {
+    const rawUrl = request.body?.url;
+    if (typeof rawUrl !== "string") return response.status(400).json({ error: "Вставьте ссылку из Яндекс Карт" });
+    const coordinates = await resolveYandexMapLink(rawUrl);
+    let address = "";
+    if (String(process.env.YANDEX_GEOCODER_API_KEY || "").trim()) {
+      try {
+        address = (await geocodeWithYandex(`${coordinates.longitude},${coordinates.latitude}`)).address;
+      } catch (error) {
+        console.warn("Yandex link coordinates resolved without reverse geocoding", error instanceof Error ? error.message : error);
+      }
+    }
+    response.setHeader("Cache-Control", "no-store");
+    return response.json({ ...coordinates, address });
+  } catch (error) {
+    if (error instanceof YandexMapLinkError) return response.status(error.status).json({ error: error.message });
+    console.error("Yandex map link resolution failed", error);
+    return response.status(502).json({ error: "Не удалось обработать ссылку Яндекс Карт" });
+  }
+});
+
 app.get("/api/admin/dashboard", async (_request, response) => {
   const [stats] = await sql`SELECT (SELECT COUNT(*)::int FROM orders WHERE created_at >= CURRENT_DATE) AS "ordersToday", (SELECT COALESCE(SUM(total),0)::int FROM orders WHERE created_at >= CURRENT_DATE AND status <> 'cancelled') AS "revenueToday", (SELECT COUNT(*)::int FROM products WHERE active = TRUE) AS products, (SELECT COUNT(*)::int FROM orders WHERE status IN ('new','confirmed','preparing')) AS "activeOrders"`;
   response.json(stats);
@@ -165,12 +402,17 @@ app.delete("/api/admin/products/:id", async (request, response) => { await sql`D
 
 app.get("/api/admin/locations", async (_request, response) => response.json(await sql`SELECT id, name, address, phone, hours, opens_at AS "opensAt", latitude, longitude, active FROM pickup_locations ORDER BY id`));
 app.post("/api/admin/locations", async (request, response) => {
-  const [created] = await sql`INSERT INTO pickup_locations (id,name,address,phone,hours,opens_at,latitude,longitude,active) VALUES ((SELECT COALESCE(MAX(id),0)+1 FROM pickup_locations),${String(request.body.name || "Новая точка")},${String(request.body.address || "")},${String(request.body.phone || "")},${String(request.body.hours || "10:00 - 21:00")},${String(request.body.opensAt || "10:00")},${numberValue(request.body.latitude)},${numberValue(request.body.longitude)},${booleanValue(request.body.active)}) RETURNING id,name,address,phone,hours,opens_at AS "opensAt",latitude,longitude,active`;
+  const coordinates = locationCoordinates(request.body);
+  if (!coordinates) { response.status(400).json({ error: "Укажите корректные широту и долготу" }); return; }
+  const [created] = await sql`INSERT INTO pickup_locations (id,name,address,phone,hours,opens_at,latitude,longitude,active) VALUES ((SELECT COALESCE(MAX(id),0)+1 FROM pickup_locations),${String(request.body.name || "Новая точка")},${String(request.body.address || "")},${String(request.body.phone || "")},${String(request.body.hours || "10:00 - 21:00")},${String(request.body.opensAt || "10:00")},${coordinates.latitude},${coordinates.longitude},${booleanValue(request.body.active)}) RETURNING id,name,address,phone,hours,opens_at AS "opensAt",latitude,longitude,active`;
   response.status(201).json(created);
 });
 app.put("/api/admin/locations/:id", async (request, response) => {
-  const [updated] = await sql`UPDATE pickup_locations SET name=${String(request.body.name)},address=${String(request.body.address)},phone=${String(request.body.phone)},hours=${String(request.body.hours)},opens_at=${String(request.body.opensAt)},latitude=${numberValue(request.body.latitude)},longitude=${numberValue(request.body.longitude)},active=${booleanValue(request.body.active)},updated_at=NOW() WHERE id=${numberValue(request.params.id)} RETURNING id,name,address,phone,hours,opens_at AS "opensAt",latitude,longitude,active`;
-  response.json(updated);
+  const coordinates = locationCoordinates(request.body);
+  if (!coordinates) { response.status(400).json({ error: "Укажите корректные широту и долготу" }); return; }
+  const [updated] = await sql`UPDATE pickup_locations SET name=${String(request.body.name)},address=${String(request.body.address)},phone=${String(request.body.phone)},hours=${String(request.body.hours)},opens_at=${String(request.body.opensAt)},latitude=${coordinates.latitude},longitude=${coordinates.longitude},active=${booleanValue(request.body.active)},updated_at=NOW() WHERE id=${numberValue(request.params.id)} RETURNING id,name,address,phone,hours,opens_at AS "opensAt",latitude,longitude,active`;
+  if (updated) response.json(updated);
+  else response.status(404).json({ error: "Точка не найдена" });
 });
 app.delete("/api/admin/locations/:id", async (request, response) => { try { await sql`DELETE FROM pickup_locations WHERE id=${numberValue(request.params.id)}`; response.status(204).end(); } catch { response.status(409).json({ error: "Точка используется в заказах" }); } });
 
