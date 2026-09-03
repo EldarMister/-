@@ -320,7 +320,7 @@ function LocationModal({ current, items, onSelect }: { current: PickupLocation |
         <h2 id="location-title" className="visually-hidden">Выберите точку, где вы заберете заказ</h2>
         <div className="location-top-row">
           <div className="select-shell">
-            <span className="location-target" aria-hidden="true"><span /></span>
+            <span className="location-target" aria-hidden="true"><MaterialIcon>location_on</MaterialIcon></span>
             <LocationPicker items={orderedItems} selected={selected} onChange={chooseLocation} />
           </div>
         </div>

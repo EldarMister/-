@@ -238,17 +238,16 @@ a { color: inherit; }
 .modal-close { position: absolute; top: 10px; right: 10px; display: grid; place-items: center; border: 0; padding: 0; background: transparent; color: var(--red); cursor: pointer; }
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
 .location-modal { align-self: start; width: min(100%, 500px); height: 541px; margin-top: 4px; padding: 16px; overflow: visible; }
-.location-top-row { width: 468px; height: 118px; display: flow-root; }
+.location-top-row { position: relative; z-index: 800; width: 468px; height: 118px; display: flow-root; }
 .select-shell { position: relative; width: 468px; height: 86px; display: block; margin: 16px 0; border-radius: 43px; background: #edeef2; }
-.location-target { position: absolute; left: 16px; top: 16px; width: 54px; height: 54px; display: grid; place-items: center; }
-.location-target::before { content: ""; width: 32px; height: 32px; border: 1.6px solid #d70000; border-radius: 50%; }
-.location-target > span { position: absolute; width: 10px; height: 10px; border: 2px solid #d70000; border-radius: 50%; }
-.location-picker { position: absolute; z-index: 7; left: 86px; top: 16px; width: 366px; height: 54px; }
+.location-target { position: absolute; left: 16px; top: 16px; width: 54px; height: 54px; display: grid; place-items: center; border-radius: 50%; background: #d70000; color: #fff; }
+.location-target .material-icons { color: #fff; font-size: 39px; }
+.location-picker { position: absolute; z-index: 900; left: 86px; top: 16px; width: 366px; height: 54px; }
 .location-select-display { position: relative; width: 366px; height: 54px; display: flex; align-items: center; overflow: hidden; padding: 0 42px 0 14px; border: 1.6px solid #3d5a90; border-radius: 27px; background: #fff; color: #555; font-family: "Proxima Nova", serif; font-size: 14px; text-align: left; white-space: nowrap; cursor: pointer; }
 .location-select-display > span:first-child { display: block; overflow: hidden; text-overflow: ellipsis; }
 .location-select-display strong { color: #111; font-family: "Gilroy-Bold", sans-serif; font-weight: 400; }
 .location-select-display .material-icons { position: absolute; right: 8px; top: 15px; color: #777; font-size: 24px; }
-.location-options { position: absolute; z-index: 20; left: 0; top: 47px; width: 538px; height: 466px; overflow-y: auto; border: 1px solid #ddd; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,.28); scrollbar-color: #888 #eee; scrollbar-width: auto; }
+.location-options { position: absolute; z-index: 910; left: 0; top: 47px; width: 538px; height: auto; max-height: 466px; overflow-y: auto; border: 1px solid #ddd; background: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.3); scrollbar-color: #888 #eee; scrollbar-width: auto; }
 .location-options > button { width: 100%; min-height: 59px; display: grid; grid-template-columns: minmax(0,1fr) 98px; align-items: start; padding: 10px 14px 8px 16px; border: 0; background: #fff; color: #111; font-family: "Roboto", sans-serif; text-align: left; cursor: pointer; }
 .location-options > button:hover { background: #f5f5f5; }.location-options > button.selected { background: #f9dddd; }
 .location-picker.compact .location-options > button.selected { background: #fff; }.location-picker.compact .location-options > button.selected .location-option-copy strong, .location-picker.compact .location-options > button.selected .location-option-status { color: #111; }
@@ -258,7 +257,7 @@ a { color: inherit; }
 .location-details a, .location-details span { display: flex; align-items: center; gap: 2px; color: #000; text-decoration: none; white-space: nowrap; }
 .location-details .material-icons { color: #d70000; font-size: 18px; }
 .location-hours b { font-weight: 400; white-space: pre; }
-.map-visual { position: relative; width: 468px; height: 288px; margin: 0; overflow: hidden; border-radius: 0 0 14px 14px; background: #e8e5da; box-shadow: 0 3px 8px rgba(0,0,0,.25); }
+.map-visual { position: relative; z-index: 1; width: 468px; height: 288px; margin: 0; overflow: hidden; border-radius: 0 0 14px 14px; background: #e8e5da; box-shadow: 0 3px 8px rgba(0,0,0,.25); }
 .pickup-map-shell, .pickup-map-canvas { width: 100%; height: 100%; }
 .pickup-map-shell { position: relative; }
 .pickup-map-canvas { z-index: 0; background: #e8e5da; font-family: "Roboto", sans-serif; }
@@ -270,14 +269,15 @@ a { color: inherit; }
 .pickup-map-address-search button { min-width: 74px; height: 38px; padding: 0 13px; border: 0; border-radius: 7px; background: #d70000; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; }
 .pickup-map-address-search button:disabled { opacity: .55; cursor: wait; }
 .pickup-map-address-search input:focus-visible, .pickup-map-address-search button:focus-visible { outline: 3px solid rgba(42,91,173,.38); outline-offset: 1px; }
-.pickup-map-zoom { position: absolute; z-index: 550; top: 10px; right: 10px; display: grid; overflow: hidden; border-radius: 6px; background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,.28); }
+.pickup-map-controls { position: absolute; z-index: 550; top: 10px; right: 10px; display: grid; justify-items: end; gap: 8px; }
+.pickup-map-zoom { display: grid; overflow: hidden; border: 1px solid rgba(32,36,42,.12); border-radius: 7px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.3); }
 .pickup-map-zoom button { width: 38px; height: 38px; padding: 0; border: 0; background: #fff; color: #252a31; font-size: 25px; line-height: 1; cursor: pointer; }
 .pickup-map-zoom button + button { border-top: 1px solid #e0e2e5; }.pickup-map-zoom button:hover { background: #f4f4f4; }
 .pickup-map-zoom button:focus-visible { position: relative; z-index: 1; outline: 3px solid rgba(42,91,173,.45); outline-offset: -3px; }
-.pickup-map-locate { position: absolute; z-index: 500; top: 94px; right: 10px; width: 38px; height: 38px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 6px; background: #fff; color: #20242a; box-shadow: 0 1px 6px rgba(0,0,0,.28); font-size: 23px; line-height: 1; cursor: pointer; }
+.pickup-map-locate { width: 38px; height: 38px; display: grid; place-items: center; padding: 0; border: 1px solid rgba(32,36,42,.12); border-radius: 7px; background: #fff; color: #20242a; box-shadow: 0 2px 8px rgba(0,0,0,.3); font-size: 23px; line-height: 1; cursor: pointer; }
 .pickup-map-locate:hover { background: #f4f4f4; }
 .pickup-map-locate:focus-visible, .pickup-map-open:focus-visible { outline: 3px solid rgba(42,91,173,.45); outline-offset: 2px; }
-.pickup-map-open { position: absolute; z-index: 500; left: 10px; bottom: 10px; min-height: 34px; display: inline-flex; align-items: center; padding: 0 12px; border-radius: 5px; background: rgba(255,255,255,.96); box-shadow: 0 1px 5px rgba(0,0,0,.28); color: #41464d; font-size: 13px; font-weight: 700; text-decoration: none; }
+.pickup-map-open { position: absolute; z-index: 500; left: 10px; bottom: 10px; min-height: 36px; display: inline-flex; align-items: center; padding: 0 13px; border: 1px solid rgba(32,36,42,.14); border-radius: 7px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,.3); color: #20242a; font-size: 13px; font-weight: 700; text-decoration: none; }
 .pickup-map-open::before { content: ""; width: 10px; height: 10px; margin-right: 8px; border: 3px solid #e44d52; border-radius: 50% 50% 50% 0; transform: rotate(-45deg); }
 .pickup-map-geostatus { position: absolute; z-index: 500; left: 50%; bottom: 52px; width: max-content; max-width: calc(100% - 80px); margin: 0; transform: translateX(-50%); padding: 6px 10px; border-radius: 6px; background: rgba(255,255,255,.96); box-shadow: 0 1px 5px rgba(0,0,0,.25); color: #343940; font-size: 11px; line-height: 15px; text-align: center; }
 .pickup-map-address-status { position: absolute; z-index: 650; top: 56px; left: 50%; width: max-content; max-width: calc(100% - 90px); margin: 0; transform: translateX(-50%); padding: 6px 10px; border-radius: 6px; background: rgba(255,255,255,.96); box-shadow: 0 1px 5px rgba(0,0,0,.2); color: #343940; font-size: 11px; line-height: 15px; text-align: center; pointer-events: none; }

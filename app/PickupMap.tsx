@@ -544,13 +544,17 @@ export default function PickupMap({
           </button>
         </div>
       ) : null}
-      {apiReady ? (
-        <div className="pickup-map-zoom" aria-label="Масштаб карты">
-          <button type="button" onClick={() => changeZoom(1)} aria-label="Приблизить">+</button>
-          <button type="button" onClick={() => changeZoom(-1)} aria-label="Отдалить">−</button>
+      {apiReady || !editorEnabled ? (
+        <div className="pickup-map-controls">
+          {apiReady ? (
+            <div className="pickup-map-zoom" aria-label="Масштаб карты">
+              <button type="button" onClick={() => changeZoom(1)} aria-label="Приблизить">+</button>
+              <button type="button" onClick={() => changeZoom(-1)} aria-label="Отдалить">−</button>
+            </div>
+          ) : null}
+          {!editorEnabled ? <button className="pickup-map-locate" type="button" onClick={locateUser} aria-label="Показать моё местоположение">◎</button> : null}
         </div>
       ) : null}
-      {!editorEnabled ? <button className="pickup-map-locate" type="button" onClick={locateUser} aria-label="Показать моё местоположение">◎</button> : null}
       {!editorEnabled ? <a className="pickup-map-open" href={mapLink} target="_blank" rel="noreferrer">Открыть в Яндекс Картах</a> : null}
       {!editorEnabled && geoMessage ? <p className="pickup-map-geostatus" role="status" aria-live="polite">{geoMessage}</p> : null}
       {editorEnabled && addressMessage ? <p className="pickup-map-address-status" role="status" aria-live="polite">{addressMessage}</p> : null}

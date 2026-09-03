@@ -153,6 +153,7 @@ test("pickup locations use Yandex Maps with address editing in the admin dashboa
   ]);
 
   assert.match(storefront, /<PickupMap/);
+  assert.match(storefront, /<MaterialIcon>location_on<\/MaterialIcon>/);
   assert.doesNotMatch(storefront, /max\.ru|Max_Messenger/);
   assert.doesNotMatch(storefront, /Отдел контроля качества|Контроль качества|qualityControl/);
   assert.doesNotMatch(storefront, /yandex\.ru\/map-widget|items\.slice\(0,\s*3\)|map-marker marker-/);
@@ -188,6 +189,9 @@ test("pickup locations use Yandex Maps with address editing in the admin dashboa
   assert.match(api, /app\.get\("\/api\/admin\/geocode"/);
   assert.match(schema, /2026-09-03-kyrgyz-pickup-map/);
   assert.match(styles, /\.pickup-map-canvas/);
+  assert.match(styles, /\.location-top-row[^}]*z-index:\s*800/);
+  assert.match(styles, /\.location-options[^}]*z-index:\s*910/);
+  assert.match(styles, /\.pickup-map-controls/);
   assert.match(envExample, /NEXT_PUBLIC_YANDEX_MAPS_API_KEY=/);
   assert.match(envExample, /YANDEX_GEOCODER_API_KEY=/);
   assert.doesNotMatch(envExample, /NEXT_PUBLIC_YANDEX_GEOCODER_API_KEY=/);
