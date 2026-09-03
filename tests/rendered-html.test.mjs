@@ -154,6 +154,7 @@ test("pickup locations use Yandex Maps with address editing in the admin dashboa
 
   assert.match(storefront, /<PickupMap/);
   assert.doesNotMatch(storefront, /max\.ru|Max_Messenger/);
+  assert.doesNotMatch(storefront, /Отдел контроля качества|Контроль качества|qualityControl/);
   assert.doesNotMatch(storefront, /yandex\.ru\/map-widget|items\.slice\(0,\s*3\)|map-marker marker-/);
   assert.doesNotMatch(map, /openstreetmap|leaflet/i);
   assert.match(map, /api-maps\.yandex\.ru\/v3/);
@@ -203,6 +204,7 @@ test("PostgreSQL schema covers catalog, orders and administration", async () => 
   assert.match(schema, /2026-08-31-kyrgyz-phone-prefix/);
   assert.match(schema, /2026-09-02-legal-operator/);
   assert.match(schema, /2026-09-03-kyrgyz-pickup-map/);
+  assert.match(schema, /2026-09-03-remove-quality-control/);
 });
 
 test("production uses one public gateway and password-only admin login", async () => {
@@ -213,6 +215,7 @@ test("production uses one public gateway and password-only admin login", async (
     readFile(new URL("../app/SushiApp.tsx", import.meta.url), "utf8"),
   ]);
   assert.match(launcher, /path\.startsWith\("\/api\/"\)/);
+  assert.doesNotMatch(adminPanel, /Отдел контроля качества|Подпись контроля качества|qualityControl/);
   assert.match(launcher, /path\.startsWith\("\/uploads\/"\)/);
   assert.doesNotMatch(adminPanel, /type="email"|JSON\.stringify\(\{ email, password \}\)/);
   assert.match(adminPanel, /JSON\.stringify\(\{ password \}\)/);

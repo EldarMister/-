@@ -27,7 +27,7 @@ export async function seed() {
         VALUES (${promotion.id}, ${promotion.title}, ${promotion.description}, ${promotion.image}, ${promotion.active}, ${promotion.sortOrder})
         ON CONFLICT (id) DO UPDATE SET title = EXCLUDED.title, description = EXCLUDED.description, image = EXCLUDED.image, active = EXCLUDED.active, sort_order = EXCLUDED.sort_order, updated_at = NOW()`;
     }
-    await tx`INSERT INTO site_settings (key, value) VALUES ('general', ${sql.json({ legalName: "ИП Мусаев Жаныбек Кочкорбаевич", qualityControl: "Отдел контроля качества", telegram: "https://t.me/BIG_REST_TEAM" })}) ON CONFLICT (key) DO NOTHING`;
+    await tx`INSERT INTO site_settings (key, value) VALUES ('general', ${sql.json({ legalName: "ИП Мусаев Жаныбек Кочкорбаевич", telegram: "https://t.me/BIG_REST_TEAM" })}) ON CONFLICT (key) DO NOTHING`;
   });
   await syncAdminPassword();
 }

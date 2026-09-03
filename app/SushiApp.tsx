@@ -9,7 +9,7 @@ import PickupMap from "./PickupMap";
 import type { CartLine, Category, PickupLocation, Product, Promotion } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === "production" ? "/api" : "http://localhost:4000/api");
-type SiteSettings = { legalName: string; qualityControl: string; telegram: string };
+type SiteSettings = { legalName: string; telegram: string };
 type SushiView = "catalog" | "promo" | "order" | "payment" | "privacy";
 type CategoryTransition = { from: number; to: number; direction: "left" | "right"; token: number };
 
@@ -529,7 +529,7 @@ function Footer({ settings }: { settings: SiteSettings }) {
         <div className="footer-top">
           <div className="footer-brand"><img src="/assets/icons/logo.svg" alt="ДААНА СУШИ" /><span>ДААНА СУШИ © 2026 {settings.legalName}</span></div>
           <a className="footer-payment" href="/payment-rule">*правила оплаты на сайте*</a>
-          <div className="quality"><span>{settings.qualityControl}</span><div><a href={settings.telegram} aria-label="Telegram"><img src="/assets/icons/Telegram_Messenger.png" alt="" /></a></div></div>
+          <div className="footer-contact"><a href={settings.telegram} aria-label="Telegram"><img src="/assets/icons/Telegram_Messenger.png" alt="" /></a></div>
         </div>
         <div className="footer-privacy"><a href="/privacy">Политика обработки персональных данных</a></div>
         <div className="footer-recaptcha">Наш сайт защищен с помощью reCAPTCHA и соответствует <a href="https://policies.google.com/privacy">Политике конфиденциальности</a> и <a href="https://policies.google.com/terms?hl=ru">Условиям использования</a> Google.</div>
@@ -560,7 +560,7 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   const [productList, setProductList] = useState<Product[]>(seedProducts);
   const [locationList, setLocationList] = useState<PickupLocation[]>(seedLocations);
   const [promotionList, setPromotionList] = useState<Promotion[]>(seedPromotions);
-  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ legalName: LEGAL_DETAILS.operator, qualityControl: "Отдел контроля качества", telegram: "https://t.me/BIG_REST_TEAM" });
+  const [siteSettings, setSiteSettings] = useState<SiteSettings>({ legalName: LEGAL_DETAILS.operator, telegram: "https://t.me/BIG_REST_TEAM" });
   const [categoryTransition, setCategoryTransition] = useState<CategoryTransition | null>(null);
   const cartCloseTimer = useRef<number | null>(null);
   const geoNoticeTimer = useRef<number | null>(null);
@@ -689,7 +689,7 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
     <div className={`site-shell ${headerHidden ? "header-hidden" : ""} ${view}-view`}>
       <Header cartCount={cartCount} cartOpen={cartOpen} location={location} menuOpen={mobileMenuOpen} onCart={navigateOrder} onCartPreviewEnter={keepCartPreview} onCartPreviewLeave={closeCartPreview} onCatalog={() => navigateCategory(1)} onLocation={openLocation} onLogin={() => setLoginOpen(true)} onMenu={() => setMobileMenuOpen((open) => !open)} onPromo={navigatePromo} />
       <CategoryTabs items={categoryList} selectedId={view === "catalog" ? categoryId : 0} onSelect={navigateCategory} />
-      {mobileMenuOpen && <><button className="mobile-menu-scrim" onClick={() => setMobileMenuOpen(false)} aria-label="Закрыть меню" /><aside className="mobile-menu-panel" aria-label="Главное меню"><nav><button onClick={() => { setMobileMenuOpen(false); navigateCategory(1); }}><MaterialIcon>restaurant_menu</MaterialIcon><span>Блюда</span></button><button onClick={() => { setMobileMenuOpen(false); navigatePromo(); }}><MaterialIcon>card_giftcard</MaterialIcon><span>Акции</span></button><button onClick={navigatePayment}><MaterialIcon>receipt_long</MaterialIcon><span>Оплата</span></button><button onClick={() => { setMobileMenuOpen(false); setLoginOpen(true); }}><MaterialIcon>login</MaterialIcon><span>Кабинет</span></button></nav><div className="mobile-menu-brand"><span className="mobile-brand-mark" /><strong>ДААНА СУШИ — ЭТО КОГДА<br />УДОБНО И ВКУСНО</strong></div><div className="mobile-menu-quality"><strong>{siteSettings.qualityControl.replace("Отдел контроля качества", "Контроль качества")}</strong><div><a href={siteSettings.telegram}><img src="/assets/icons/Telegram_Messenger.png" alt="Telegram" /></a></div></div></aside></>}
+      {mobileMenuOpen && <><button className="mobile-menu-scrim" onClick={() => setMobileMenuOpen(false)} aria-label="Закрыть меню" /><aside className="mobile-menu-panel" aria-label="Главное меню"><nav><button onClick={() => { setMobileMenuOpen(false); navigateCategory(1); }}><MaterialIcon>restaurant_menu</MaterialIcon><span>Блюда</span></button><button onClick={() => { setMobileMenuOpen(false); navigatePromo(); }}><MaterialIcon>card_giftcard</MaterialIcon><span>Акции</span></button><button onClick={navigatePayment}><MaterialIcon>receipt_long</MaterialIcon><span>Оплата</span></button><button onClick={() => { setMobileMenuOpen(false); setLoginOpen(true); }}><MaterialIcon>login</MaterialIcon><span>Кабинет</span></button></nav><div className="mobile-menu-brand"><span className="mobile-brand-mark" /><strong>ДААНА СУШИ — ЭТО КОГДА<br />УДОБНО И ВКУСНО</strong></div><div className="mobile-menu-contact"><a href={siteSettings.telegram} aria-label="Telegram"><img src="/assets/icons/Telegram_Messenger.png" alt="" /></a></div></aside></>}
       {cartOpen && <CartPanel lines={lines} onCheckout={navigateOrder} onEnter={keepCartPreview} onLeave={closeCartPreview} onDecrease={(id) => changeQuantity(id, -1)} onIncrease={(id) => changeQuantity(id, 1)} onRemove={(id) => setCart((current) => ({ ...current, [id]: 0 }))} />}
       <main className={`site-main ${view === "order" ? "order-main" : ""} ${view === "payment" || view === "privacy" ? "legal-main" : ""}`}>
         {view === "promo" ? (
