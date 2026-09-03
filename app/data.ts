@@ -64,20 +64,17 @@ export const products: Product[] = [
 ];
 
 export const locations: PickupLocation[] = [
-  { id: 1, name: "СТ Модный Квартал", address: "ТРК Модный квартал, 3 Июля 22, 4 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.2689, longitude: 104.2898, active: true },
-  { id: 2, name: "СТ Яркомолл", address: "ТРЦ ЯркоМолл, Верхняя Набережная, 10, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 22:00", opensAt: "10:00", latitude: 52.2911, longitude: 104.2838, active: true },
-  { id: 3, name: "СТ ТК Фортуна Гранд", address: "ТК Фортуна Гранд, Франк-Каменецкого, 13/1, 116 павильон, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.2904, longitude: 104.3021, active: true },
-  { id: 4, name: "ТЦ Цветной парк Байкальская", address: "ТЦ Цветной Парк, Улица Байкальская, 250/1, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.2505, longitude: 104.3575, active: true },
-  { id: 5, name: "СТ Ржанова", address: "ТД Байкальский, Ржанова, 164", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.2482, longitude: 104.376, active: true },
-  { id: 6, name: "ТРЦ Новая дача", address: "ТРЦ Новая Дача, Улица Трактовая, 10, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.333, longitude: 104.219, active: true },
-  { id: 7, name: "СТ Советская", address: "Советская, 98, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.2767, longitude: 104.3337, active: true },
-  { id: 8, name: "СТ Абсолют", address: "Улица Рабочего Штаба, 114, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.3371, longitude: 104.2532, active: true },
-  { id: 9, name: "СТ Смайл", address: "ТЦ СмайлМолл, Баумана, 233Б, павильон 3.23, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.3533, longitude: 104.166, active: true },
-  { id: 10, name: "СТ Ленинградская", address: "Ленинградская, 90, супермаркет Слата, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.363, longitude: 104.184, active: true },
-  { id: 11, name: "СТ Радужный", address: "Радужный микрорайон, 3, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.224, longitude: 104.273, active: true },
-  { id: 12, name: "СТ Снегирь", address: "ТЦ Снегирь, Улан-Баторская, 16А, 15 павильон, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.236, longitude: 104.344, active: true },
-  { id: 13, name: "СТ Сильвер Молл", address: "ТРК Сильвер Молл, Сергеева, 3/5, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 22:00", opensAt: "10:00", latitude: 52.309, longitude: 104.235, active: true },
-  { id: 14, name: "СТ Европарк", address: "ТРЦ ЕвроПарк, Улица Розы Люксембург, 215в, 1 этаж", phone: "+996 (555) 506-447", hours: "10:00 - 21:00", opensAt: "10:00", latitude: 52.37, longitude: 104.147, active: true },
+  {
+    id: 1,
+    name: "ДААНА СУШИ — Отуз-Адыр",
+    address: "Ошская область, Кара-Суйский район, с. Отуз-Адыр, ул. Токтогула, дом 4",
+    phone: "+996 (555) 506-447",
+    hours: "10:00 - 21:00",
+    opensAt: "10:00",
+    latitude: 40.606046,
+    longitude: 72.966095,
+    active: true,
+  },
 ];
 
 export const promotions: Promotion[] = [

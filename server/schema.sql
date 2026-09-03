@@ -132,3 +132,37 @@ BEGIN
     INSERT INTO app_migrations (key) VALUES ('2026-08-31-kyrgyz-phone-prefix');
   END IF;
 END $$;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM app_migrations WHERE key = '2026-09-03-kyrgyz-pickup-map') THEN
+    UPDATE pickup_locations
+    SET active = FALSE, updated_at = NOW()
+    WHERE active = TRUE
+      AND latitude BETWEEN 51 AND 54
+      AND longitude BETWEEN 103 AND 106;
+
+    IF NOT EXISTS (
+      SELECT 1
+      FROM pickup_locations
+      WHERE active = TRUE
+        AND latitude BETWEEN 39 AND 44
+        AND longitude BETWEEN 69 AND 81
+    ) THEN
+      INSERT INTO pickup_locations (id, name, address, phone, hours, opens_at, latitude, longitude, active)
+      VALUES (
+        (SELECT COALESCE(MAX(id), 0) + 1 FROM pickup_locations),
+        'ДААНА СУШИ — Отуз-Адыр',
+        'Ошская область, Кара-Суйский район, с. Отуз-Адыр, ул. Токтогула, дом 4',
+        '+996 (555) 506-447',
+        '10:00 - 21:00',
+        '10:00',
+        40.606046,
+        72.966095,
+        TRUE
+      );
+    END IF;
+
+    INSERT INTO app_migrations (key) VALUES ('2026-09-03-kyrgyz-pickup-map');
+  END IF;
+END $$;

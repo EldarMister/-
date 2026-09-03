@@ -141,19 +141,24 @@ test("admin route renders its noindex dashboard shell", async () => {
 });
 
 test("pickup locations use Yandex Maps with address editing in the admin dashboard", async () => {
-  const [storefront, map, locationsAdmin, api, styles, envExample] = await Promise.all([
+  const [storefront, map, locations, locationsAdmin, api, schema, styles, envExample] = await Promise.all([
     readFile(new URL("../app/SushiApp.tsx", import.meta.url), "utf8"),
     readFile(new URL("../app/PickupMap.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/data.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/admin/LocationsSection.tsx", import.meta.url), "utf8"),
     readFile(new URL("../server/index.ts", import.meta.url), "utf8"),
+    readFile(new URL("../server/schema.sql", import.meta.url), "utf8"),
     readFile(new URL("../app/globals.css", import.meta.url), "utf8"),
     readFile(new URL("../.env.example", import.meta.url), "utf8"),
   ]);
 
   assert.match(storefront, /<PickupMap/);
+  assert.doesNotMatch(storefront, /max\.ru|Max_Messenger/);
   assert.doesNotMatch(storefront, /yandex\.ru\/map-widget|items\.slice\(0,\s*3\)|map-marker marker-/);
   assert.doesNotMatch(map, /openstreetmap|leaflet/i);
   assert.match(map, /api-maps\.yandex\.ru\/v3/);
+  assert.match(map, /\[72\.966095, 40\.606046\]/);
+  assert.match(map, /Кыргызстан, город или село, улица, дом/);
   assert.match(map, /new maps\.YMap/);
   assert.match(map, /new currentMaps\.YMapMarker/);
   assert.match(map, /new maps\.YMapListener/);
@@ -168,6 +173,9 @@ test("pickup locations use Yandex Maps with address editing in the admin dashboa
   assert.match(map, /Math\.max\(currentZoomRef\.current, SELECTED_LOCATION_ZOOM\)/);
   assert.match(map, /setLocation\(\{ center, zoom, duration, easing: "ease-in-out" \}\)/);
   assert.match(map, /Введите адрес, нажмите на карту или перетащите красную метку/);
+  assert.match(locations, /ДААНА СУШИ — Отуз-Адыр/);
+  assert.match(locations, /Ошская область, Кара-Суйский район/);
+  assert.doesNotMatch(locations, /Иркутск|Модный Квартал|ЯркоМолл|Байкальская/);
   assert.match(locationsAdmin, /editablePosition=\{position\}/);
   assert.match(locationsAdmin, /editableAddress=\{editing\.address\}/);
   assert.match(locationsAdmin, /onLocationResolved=\{applyResolvedLocation\}/);
@@ -177,6 +185,7 @@ test("pickup locations use Yandex Maps with address editing in the admin dashboa
   assert.match(locationsAdmin, /method:\s*editing\.id \? "PUT" : "POST"/);
   assert.match(api, /function locationCoordinates/);
   assert.match(api, /app\.get\("\/api\/admin\/geocode"/);
+  assert.match(schema, /2026-09-03-kyrgyz-pickup-map/);
   assert.match(styles, /\.pickup-map-canvas/);
   assert.match(envExample, /NEXT_PUBLIC_YANDEX_MAPS_API_KEY=/);
   assert.match(envExample, /YANDEX_GEOCODER_API_KEY=/);
@@ -193,6 +202,7 @@ test("PostgreSQL schema covers catalog, orders and administration", async () => 
   assert.match(schema, /2026-08-17-enable-onigiri/);
   assert.match(schema, /2026-08-31-kyrgyz-phone-prefix/);
   assert.match(schema, /2026-09-02-legal-operator/);
+  assert.match(schema, /2026-09-03-kyrgyz-pickup-map/);
 });
 
 test("production uses one public gateway and password-only admin login", async () => {

@@ -79,8 +79,8 @@ type PickupMapProps = {
   ariaLabel?: string;
 };
 
-const DEFAULT_CENTER: LngLat = [104.305, 52.287];
-const DEFAULT_ZOOM = 12;
+const DEFAULT_CENTER: LngLat = [72.966095, 40.606046];
+const DEFAULT_ZOOM = 15;
 const SELECTED_LOCATION_ZOOM = 15;
 const SELECTED_LOCATION_TRANSITION_MS = 450;
 const YANDEX_MAPS_API_KEY = process.env.NEXT_PUBLIC_YANDEX_MAPS_API_KEY?.trim() || "";
@@ -536,7 +536,7 @@ export default function PickupMap({
             onChange={(event) => onAddressInput?.(event.target.value)}
             onKeyDown={handleAddressKeyDown}
             disabled={searchingAddress}
-            placeholder="Иркутск, улица, дом"
+            placeholder="Кыргызстан, город или село, улица, дом"
             aria-label="Адрес точки для поиска на карте"
           />
           <button type="button" onClick={() => void findAddress()} disabled={!apiReady || searchingAddress}>
