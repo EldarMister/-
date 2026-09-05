@@ -3,6 +3,7 @@
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { categories as seedCategories, locations as seedLocations, products as seedProducts, promotions as seedPromotions } from "./data";
 import { PaymentRules, PrivacyPolicy } from "./LegalContent";
+import CustomerAccountModal from "./components/CustomerAccountModal";
 import { LEGAL_DETAILS } from "./legalDetails";
 import { distanceInKilometers, pickupStatus, type MapPosition } from "./locationUtils";
 import PickupMap from "./PickupMap";
@@ -10,6 +11,7 @@ import type { CartLine, Category, PickupLocation, Product, Promotion } from "./t
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === "production" ? "/api" : "http://localhost:4000/api");
 type SiteSettings = { legalName: string; telegram: string };
+type PublicRewardSettings = { coinNetwork?: string };
 type SushiView = "catalog" | "promo" | "order" | "payment" | "privacy";
 type CategoryTransition = { from: number; to: number; direction: "left" | "right"; token: number };
 
@@ -55,6 +57,7 @@ function Header({
   onLogin,
   onMenu,
   onPromo,
+  customerLoggedIn,
 }: {
   cartCount: number;
   cartOpen: boolean;
@@ -68,6 +71,7 @@ function Header({
   onLogin: () => void;
   onMenu: () => void;
   onPromo: () => void;
+  customerLoggedIn: boolean;
 }) {
   return (
     <header className="site-header">
@@ -85,7 +89,7 @@ function Header({
             <img className="header-action-icon promo-icon" src="/assets/icons/promo.svg" alt="" /><span>Акции</span>
           </button>
           <button className="header-action" onClick={onLogin}>
-            <img className="header-action-icon login-icon" src="/assets/icons/account.svg" alt="" /><span>Войти</span>
+            <img className="header-action-icon login-icon" src="/assets/icons/account.svg" alt="" /><span>{customerLoggedIn ? "Кабинет" : "Войти"}</span>
           </button>
           <button className={`cart-button ${cartOpen ? "active" : ""}`} onClick={onCart} onMouseEnter={onCartPreviewEnter} onMouseLeave={onCartPreviewLeave} aria-label="Корзина">
             <img src="/assets/icons/cart.svg" alt="" />
@@ -157,6 +161,7 @@ function ProductCard({ product, quantity, onDecrease, onIncrease }: { product: P
     <article className="product-card">
       <div className="product-card-inner">
         <img src={product.image} alt={product.name} loading="lazy" />
+        {(product.naktaCoins || 0) > 0 && <span className="product-reward-badge"><b>+{product.naktaCoins}</b> NAKTA Coin</span>}
         <h2>{product.name}</h2>
         <div className="product-card-buy">
           <div className="price-pill">{product.price} С</div>
@@ -341,54 +346,6 @@ function LocationModal({ current, items, onSelect }: { current: PickupLocation |
   );
 }
 
-function LoginModal({ onClose }: { onClose: () => void }) {
-  const [phone, setPhone] = useState("");
-  const [codeSent, setCodeSent] = useState(false);
-  const [code, setCode] = useState("");
-  const [message, setMessage] = useState("");
-  const [pending, setPending] = useState(false);
-  const requestCode = async () => {
-    setMessage(""); setPending(true);
-    try {
-      const response = await fetch(`${API_URL}/auth/request-code`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone: fullKyrgyzPhone(phone) }) });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Не удалось отправить код");
-      setCodeSent(true);
-      setMessage(result.devCode ? `Код отправлен. Код для локального запуска: ${result.devCode}.` : "Код отправлен.");
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Не удалось отправить код");
-    } finally { setPending(false); }
-  };
-  const verifyCode = async () => {
-    setMessage(""); setPending(true);
-    try {
-      const response = await fetch(`${API_URL}/auth/verify-code`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ phone: fullKyrgyzPhone(phone), code }) });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || "Не удалось войти");
-      localStorage.setItem("sushi-customer", JSON.stringify(result.customer));
-      onClose();
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Не удалось войти");
-    } finally { setPending(false); }
-  };
-  return (
-    <div className="modal-backdrop">
-      <div className="login-dialog-wrap">
-        <section className="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
-          <div className="login-circle"><MaterialIcon>key</MaterialIcon></div>
-          <h2 id="login-title">Личный кабинет</h2>
-          <div className="login-caption">{codeSent ? <>Мы отправили SMS с кодом на номер <strong>{KYRGYZ_PHONE_PREFIX} {formatKyrgyzLocalPhone(phone)}</strong>.<button className="login-change-phone" type="button" onClick={() => { setCodeSent(false); setCode(""); setMessage(""); }}>Изменить номер</button></> : <>Введите номер телефона. В течение минуты мы отправим вам <strong>SMS с одноразовым кодом</strong>.</>}</div>
-          <label className="login-phone-field"><span className="visually-hidden">{codeSent ? "Код из SMS" : "Номер телефона"}</span>{!codeSent && <span aria-hidden="true">+996</span>}<input value={codeSent ? code : formatKyrgyzLocalPhone(phone)} onChange={(event) => codeSent ? setCode(event.target.value.replace(/\D/g, "").slice(0, 8)) : setPhone(kyrgyzLocalDigits(event.target.value))} placeholder={codeSent ? "Код из SMS" : "(___) ___-___"} inputMode={codeSent ? "numeric" : "tel"} autoComplete={codeSent ? "one-time-code" : "tel"} /></label>
-          <div className="login-submit-row"><button onClick={codeSent ? verifyCode : requestCode} disabled={pending || (codeSent ? code.length < 4 : phone.length !== 9)}>{pending ? "Подождите…" : codeSent ? "Войти" : "Получить код"}</button></div>
-          <div className="login-consent">Нажимая кнопку, я даю <a href="/privacy">согласие на обработку персональных данных</a>.</div>
-          {message && <small className="form-message" aria-live="polite">{message}</small>}
-        </section>
-        <button className="login-external-close" onClick={onClose} aria-label="Закрыть"><MaterialIcon>close</MaterialIcon></button>
-      </div>
-    </div>
-  );
-}
-
 function OrderView({ lines, products, location, locations, onChangeQuantity, onClear, onLocationChange, onNeedLocation, onSuccess }: {
   lines: CartLine[];
   products: Product[];
@@ -515,8 +472,8 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
           </section>
         </div>}
         {error && <div className="form-error order-error">{error}</div>}
-        <button className="order-pay" disabled={pending || !lines.length}>{pending ? "СОЗДАЕМ ЗАКАЗ…" : `ОПЛАТИТЬ ${total} С`}</button>
-        <p className="order-consent">Нажимая кнопку, я даю <strong>согласие</strong> на обработку персональных данных.</p>
+        <button className="order-pay" disabled={pending || !lines.length}>{pending ? "СОЗДАЕМ ЗАКАЗ…" : `ОФОРМИТЬ ЗАКАЗ · ${total} С`}</button>
+        <p className="order-consent">Нажимая кнопку, я принимаю <a href="/legal">правовую информацию</a>, <a href="/privacy">политику конфиденциальности</a> и <a href="/terms">условия использования</a>.</p>
       </form>
     </section>
   );
@@ -531,8 +488,7 @@ function Footer({ settings }: { settings: SiteSettings }) {
           <a className="footer-payment" href="/payment-rule">*правила оплаты на сайте*</a>
           <div className="footer-contact"><a href={settings.telegram} aria-label="Telegram"><img src="/assets/icons/Telegram_Messenger.png" alt="" /></a></div>
         </div>
-        <div className="footer-privacy"><a href="/privacy">Политика обработки персональных данных</a></div>
-        <div className="footer-recaptcha">Наш сайт защищен с помощью reCAPTCHA и соответствует <a href="https://policies.google.com/privacy">Политике конфиденциальности</a> и <a href="https://policies.google.com/terms?hl=ru">Условиям использования</a> Google.</div>
+        <nav className="footer-legal-links" aria-label="Правовая информация"><a href="/legal">Правовая информация</a><a href="/privacy">Конфиденциальность</a><a href="/terms">Условия использования</a><a href="/payment-rule">Правила оплаты</a><a href="/delete-account">Удаление аккаунта</a><a href="/support">Поддержка</a></nav>
         <address className="footer-legal">
           <span>Оператор сервиса: {LEGAL_DETAILS.operator}</span>
           <span>ИНН: {LEGAL_DETAILS.inn}</span>
@@ -552,6 +508,7 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   const [location, setLocation] = useState<PickupLocation | null>(null);
   const [locationOpen, setLocationOpen] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
+  const [customerLoggedIn, setCustomerLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
   const [geoNoticeOpen, setGeoNoticeOpen] = useState(false);
@@ -561,13 +518,40 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   const [locationList, setLocationList] = useState<PickupLocation[]>(seedLocations);
   const [promotionList, setPromotionList] = useState<Promotion[]>(seedPromotions);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ legalName: LEGAL_DETAILS.operator, telegram: "https://t.me/BIG_REST_TEAM" });
+  const [coinNetwork, setCoinNetwork] = useState("polygon");
   const [categoryTransition, setCategoryTransition] = useState<CategoryTransition | null>(null);
   const cartCloseTimer = useRef<number | null>(null);
   const geoNoticeTimer = useRef<number | null>(null);
   const categoryTransitionTimer = useRef<number | null>(null);
+  const customerAuthGenerationRef = useRef(0);
 
   useEffect(() => () => {
     if (categoryTransitionTimer.current) window.clearTimeout(categoryTransitionTimer.current);
+  }, []);
+
+  useEffect(() => {
+    // Remove bearer sessions left by earlier builds; authentication now lives only in an HttpOnly cookie.
+    localStorage.removeItem("sushi-customer");
+    const requestGeneration = ++customerAuthGenerationRef.current;
+    const controller = new AbortController();
+    void fetch(`${API_URL}/auth/profile`, {
+      credentials: "include",
+      cache: "no-store",
+      signal: controller.signal,
+    }).then((response) => {
+      if (customerAuthGenerationRef.current === requestGeneration) setCustomerLoggedIn(response.ok);
+    }).catch(() => {
+      if (!controller.signal.aborted && customerAuthGenerationRef.current === requestGeneration) setCustomerLoggedIn(false);
+    });
+    return () => {
+      controller.abort();
+      if (customerAuthGenerationRef.current === requestGeneration) customerAuthGenerationRef.current += 1;
+    };
+  }, []);
+
+  const handleCustomerSessionChange = useCallback((active: boolean) => {
+    customerAuthGenerationRef.current += 1;
+    setCustomerLoggedIn(active);
   }, []);
 
   // Client storage and the API are external systems; hydrate them after the SSR pass.
@@ -619,7 +603,11 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
         setGeoNoticeOpen(true);
       }
       if (promotionsResult.status === "fulfilled") setPromotionList(promotionsResult.value);
-      if (settingsResult.status === "fulfilled" && settingsResult.value.general) setSiteSettings(settingsResult.value.general);
+      if (settingsResult.status === "fulfilled") {
+        if (settingsResult.value.general) setSiteSettings(settingsResult.value.general);
+        const publicRewards = settingsResult.value.rewards as PublicRewardSettings | undefined;
+        if (publicRewards?.coinNetwork) setCoinNetwork(publicRewards.coinNetwork);
+      }
     });
   }, []);
 
@@ -687,7 +675,7 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
 
   return (
     <div className={`site-shell ${headerHidden ? "header-hidden" : ""} ${view}-view`}>
-      <Header cartCount={cartCount} cartOpen={cartOpen} location={location} menuOpen={mobileMenuOpen} onCart={navigateOrder} onCartPreviewEnter={keepCartPreview} onCartPreviewLeave={closeCartPreview} onCatalog={() => navigateCategory(1)} onLocation={openLocation} onLogin={() => setLoginOpen(true)} onMenu={() => setMobileMenuOpen((open) => !open)} onPromo={navigatePromo} />
+      <Header cartCount={cartCount} cartOpen={cartOpen} customerLoggedIn={customerLoggedIn} location={location} menuOpen={mobileMenuOpen} onCart={navigateOrder} onCartPreviewEnter={keepCartPreview} onCartPreviewLeave={closeCartPreview} onCatalog={() => navigateCategory(1)} onLocation={openLocation} onLogin={() => setLoginOpen(true)} onMenu={() => setMobileMenuOpen((open) => !open)} onPromo={navigatePromo} />
       <CategoryTabs items={categoryList} selectedId={view === "catalog" ? categoryId : 0} onSelect={navigateCategory} />
       {mobileMenuOpen && <><button className="mobile-menu-scrim" onClick={() => setMobileMenuOpen(false)} aria-label="Закрыть меню" /><aside className="mobile-menu-panel" aria-label="Главное меню"><nav><button onClick={() => { setMobileMenuOpen(false); navigateCategory(1); }}><MaterialIcon>restaurant_menu</MaterialIcon><span>Блюда</span></button><button onClick={() => { setMobileMenuOpen(false); navigatePromo(); }}><MaterialIcon>card_giftcard</MaterialIcon><span>Акции</span></button><button onClick={navigatePayment}><MaterialIcon>receipt_long</MaterialIcon><span>Оплата</span></button><button onClick={() => { setMobileMenuOpen(false); setLoginOpen(true); }}><MaterialIcon>login</MaterialIcon><span>Кабинет</span></button></nav><div className="mobile-menu-brand"><span className="mobile-brand-mark" /><strong>ДААНА СУШИ — ЭТО КОГДА<br />УДОБНО И ВКУСНО</strong></div><div className="mobile-menu-contact"><a href={siteSettings.telegram} aria-label="Telegram"><img src="/assets/icons/Telegram_Messenger.png" alt="" /></a></div></aside></>}
       {cartOpen && <CartPanel lines={lines} onCheckout={navigateOrder} onEnter={keepCartPreview} onLeave={closeCartPreview} onDecrease={(id) => changeQuantity(id, -1)} onIncrease={(id) => changeQuantity(id, 1)} onRemove={(id) => setCart((current) => ({ ...current, [id]: 0 }))} />}
@@ -721,7 +709,7 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
       <Footer settings={siteSettings} />
       {geoNoticeOpen && <div className="geo-notice" role="status"><span>Для удобства нахождения ближайшего магазина разрешите сайту определять ваше местоположение.</span><button onClick={() => setGeoNoticeOpen(false)} aria-label="Закрыть"><MaterialIcon>close</MaterialIcon></button></div>}
       {locationOpen && <LocationModal current={location} items={locationList} onSelect={saveLocation} />}
-      {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} />}
+      {loginOpen && <CustomerAccountModal apiUrl={API_URL} coinNetwork={coinNetwork} onClose={() => setLoginOpen(false)} onSessionChange={handleCustomerSessionChange} />}
       {orderNumber && <div className="modal-backdrop"><section className="modal-card success-modal"><MaterialIcon>check_circle</MaterialIcon><h2>Заказ принят</h2><p>Номер вашего заказа: <strong>{orderNumber}</strong></p><button className="primary-button" onClick={() => setOrderNumber("")}>Хорошо</button></section></div>}
     </div>
   );

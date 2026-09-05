@@ -4,7 +4,7 @@ import test from "node:test";
 
 test("admin address search uses the protected server-side Yandex Geocoder API", async () => {
   const api = await readFile(new URL("../server/index.ts", import.meta.url), "utf8");
-  const authMiddleware = api.indexOf('app.use("/api/admin", requireAdmin)');
+  const authMiddleware = api.indexOf('app.use("/api/admin", requireAdmin, requireTrustedAdminOrigin)');
   const endpoint = api.indexOf('app.get("/api/admin/geocode"');
 
   assert.ok(authMiddleware >= 0, "admin authentication middleware should exist");

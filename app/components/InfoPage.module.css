@@ -1,0 +1,259 @@
+.page {
+  min-height: 100vh;
+  min-height: 100svh;
+  background: #fff;
+  color: #191919;
+  font-family: "Gilroy", Arial, sans-serif;
+}
+
+.shell {
+  width: min(760px, 100%);
+  min-height: 100vh;
+  min-height: 100svh;
+  margin: 0 auto;
+  background: #fff;
+}
+
+.header {
+  position: sticky;
+  z-index: 5;
+  top: 0;
+  min-height: 72px;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 44px;
+  align-items: center;
+  padding: 0 20px 0 10px;
+  border-bottom: 1px solid #ececee;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
+}
+
+.header h1 {
+  grid-column: 2;
+  margin: 0;
+  color: #191919;
+  font-family: "Gilroy-Bold", "Gilroy", Arial, sans-serif;
+  font-size: 21px;
+  line-height: 27px;
+  font-weight: 400;
+  letter-spacing: -0.25px;
+  text-align: left;
+}
+
+.back {
+  grid-column: 1;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #191919;
+  transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.back:hover {
+  background: #f4f4f4;
+}
+
+.back:active {
+  transform: scale(0.94);
+}
+
+.back:focus-visible {
+  outline: 2px solid #d71920;
+  outline-offset: 1px;
+}
+
+.back svg {
+  width: 26px;
+  height: 26px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.card {
+  padding: 30px 24px 64px;
+  background: #fff;
+}
+
+.card h2 {
+  margin: 32px 0 9px;
+  color: #191919;
+  font-family: "Gilroy-Bold", "Gilroy", Arial, sans-serif;
+  font-size: 17px;
+  line-height: 23px;
+  font-weight: 400;
+}
+
+.card p,
+.card li {
+  color: #505055;
+  font-size: 16px;
+  line-height: 1.62;
+  font-weight: 400;
+}
+
+.card p {
+  margin: 0 0 15px;
+}
+
+.card ul,
+.card ol {
+  margin: 10px 0 18px;
+  padding-left: 24px;
+}
+
+.card li {
+  margin-bottom: 7px;
+  padding-left: 2px;
+}
+
+.card a {
+  color: #252525;
+  text-decoration: underline;
+  text-decoration-color: #9c9c9f;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.card a:hover {
+  text-decoration-color: #252525;
+}
+
+.card strong {
+  color: #222225;
+  font-family: "Gilroy-Bold", "Gilroy", Arial, sans-serif;
+  font-weight: 400;
+}
+
+.card :global(.legal-page) {
+  width: 100%;
+  color: inherit;
+  font-family: inherit;
+}
+
+.card :global(.legal-page > h1) {
+  margin: 0 0 20px;
+  color: #191919;
+  font-size: 24px;
+  line-height: 30px;
+}
+
+.card :global(.legal-updated) {
+  margin: 0 0 23px;
+  color: #8a8a90;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.card :global(.legal-document-list) {
+  display: block;
+  margin: 9px 0 30px;
+  padding: 0;
+  list-style: none;
+}
+
+.card :global(.legal-document-list li) {
+  margin: 0;
+  padding: 19px 0;
+  border-bottom: 1px solid #ededee;
+  background: #fff;
+  color: #77777c;
+}
+
+.card :global(.legal-document-list li:first-child) {
+  border-top: 1px solid #ededee;
+}
+
+.card :global(.legal-document-list a) {
+  display: inline-block;
+  margin-bottom: 3px;
+  color: #242424;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+.action {
+  min-height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16px;
+  padding: 0 21px;
+  border-radius: 24px;
+  background: #d71920;
+  color: #fff !important;
+  font-family: "Gilroy-Bold", "Gilroy", Arial, sans-serif;
+  text-decoration: none !important;
+}
+
+@media (max-width: 640px) {
+  .header {
+    min-height: 62px;
+    grid-template-columns: 44px minmax(0, 1fr);
+    padding: 0 14px 0 6px;
+  }
+
+  .header h1 {
+    font-size: 16px;
+    line-height: 21px;
+    letter-spacing: 0;
+  }
+
+  .back svg {
+    width: 25px;
+    height: 25px;
+  }
+
+  .card {
+    padding: 22px 20px 48px;
+  }
+
+  .card h2 {
+    margin: 27px 0 8px;
+    font-size: 15px;
+    line-height: 21px;
+  }
+
+  .card p,
+  .card li {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .card p {
+    margin-bottom: 13px;
+  }
+
+  .card ul,
+  .card ol {
+    margin: 8px 0 16px;
+    padding-left: 20px;
+  }
+
+  .card li {
+    margin-bottom: 5px;
+  }
+
+  .card :global(.legal-updated) {
+    margin-bottom: 19px;
+    font-size: 12px;
+    line-height: 17px;
+  }
+
+  .card :global(.legal-document-list) {
+    margin-top: 0;
+  }
+
+  .card :global(.legal-document-list li) {
+    padding: 17px 0;
+  }
+
+  .card :global(.legal-document-list a) {
+    font-size: 15px;
+    line-height: 21px;
+  }
+}

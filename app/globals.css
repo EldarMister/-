@@ -229,6 +229,7 @@ a { color: inherit; }
 .footer-privacy { width: 1024px; height: 21px; margin-top: -1px; }
 .footer-privacy a, .footer-recaptcha a { color: #fff; text-decoration: none; }
 .footer-recaptcha { width: 1024px; height: 21px; font-size: 14px; white-space: nowrap; }
+.footer-legal-links { width: 100%; display: flex; flex-wrap: wrap; gap: 5px 18px; margin: 0 0 4px; }.footer-legal-links a { color: #fff; font-size: 13px; line-height: 20px; text-decoration: underline; text-decoration-color: rgba(255,255,255,.5); text-underline-offset: 3px; }
 .footer-legal { width: 1024px; display: grid; grid-template-columns: 1fr auto; column-gap: 28px; margin-top: 8px; padding-top: 7px; border-top: 1px solid rgba(255,255,255,.45); font-style: normal; font-size: 12px; line-height: 18px; }
 .footer-legal span:last-child { grid-column: 1 / -1; }
 
@@ -468,6 +469,212 @@ a { color: inherit; }
   .footer-contact { width: 120px; height: 69px; }
   .footer-privacy { width: 100%; height: 15px; margin: 0; font-size: 12px; line-height: 15px; }
   .footer-recaptcha { width: 100%; height: 30px; font-size: 10px; line-height: 15px; white-space: normal; }
+  .footer-legal-links { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin-bottom: 8px; padding-right: 8px; }.footer-legal-links a { font-size: 10px; line-height: 14px; }
   .footer-legal { width: 100%; display: grid; grid-template-columns: 1fr; gap: 0; margin-top: 8px; padding: 6px 8px 0 0; font-size: 10px; line-height: 15px; }
   .footer-legal span:last-child { grid-column: auto; }
+}
+
+/* NAKTA Coin and NFT */
+.product-card-inner { position: relative; }
+.product-reward-badge { position: absolute; z-index: 2; top: 135px; left: 50%; display: inline-flex; align-items: center; gap: 4px; max-width: calc(100% - 34px); padding: 6px 11px; border: 2px solid #fff; border-radius: 999px; background: linear-gradient(135deg,#ff7a1a,#ff4214); box-shadow: 0 6px 14px rgba(222,65,18,.24); color: #fff; font-family: "Roboto",sans-serif; font-size: 11px; font-weight: 700; line-height: 1; white-space: nowrap; transform: translate(-50%,-50%); }
+.product-reward-badge b { font-size: 13px; }
+.order-consent a { color: #b90815; font-weight: 700; }
+
+.customer-account-overlay { position: fixed; z-index: 4000; inset: 0; display: flex; justify-content: flex-end; background: rgba(10,12,18,.52); backdrop-filter: blur(5px); }
+.customer-account-dismiss,.reward-withdrawal-dismiss,.customer-cancel-dismiss { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: default; }
+.customer-account-modal { position: relative; z-index: 1; width: min(100%,520px); height: 100dvh; overflow: hidden; background: #f5f5f6; box-shadow: -22px 0 70px rgba(15,18,25,.24); animation: customer-account-in .22s ease-out; }
+.customer-account-modal:not(.is-authenticated) { width: min(100%,467px); display: grid; place-items: center; background: #fff; }
+@keyframes customer-account-in { from { opacity: .5; transform: translateX(28px); } to { opacity: 1; transform: translateX(0); } }
+.customer-account-close { position: absolute; z-index: 12; top: 16px; right: 16px; width: 40px; height: 40px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.92); box-shadow: 0 5px 20px rgba(22,25,33,.12); color: #1d2028; cursor: pointer; }
+.customer-account-close .material-icons { font-size: 22px; }
+.customer-login-view { position: relative; width: 100%; min-height: 480px; display: flex; flex-direction: column; justify-content: center; padding: 64px 55px 46px; overflow: hidden; background: #fff; }
+.customer-login-view .login-circle { top: -25px; right: -25px; }
+.customer-login-view h2 { margin: 0 0 18px; font-family: "Roboto",sans-serif; font-size: 27px; font-weight: 600; }
+.customer-login-view .login-caption { min-height: 82px; margin-bottom: 16px; font-size: 15px; line-height: 1.55; }
+.customer-login-view .login-change-phone { display: block; margin-top: 8px; padding: 0; border: 0; background: transparent; color: #b90815; font: inherit; font-weight: 700; cursor: pointer; }
+.customer-login-view .login-phone-field { height: 52px; display: flex; align-items: center; gap: 8px; padding: 0 15px; border: 1px solid #cfd2d8; border-radius: 10px; background: #fff; font-size: 17px; }
+.customer-login-view .login-phone-field input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; font: inherit; }
+.customer-login-view .login-submit-row { margin-top: 14px; }
+.customer-login-view .login-submit-row button { width: 100%; min-height: 52px; border: 0; border-radius: 10px; background: #d6000f; color: #fff; font-size: 15px; font-weight: 800; cursor: pointer; }
+.customer-login-view .login-submit-row button:disabled { cursor: default; opacity: .5; }
+.customer-login-view .login-consent { margin-top: 16px; color: #747984; font-size: 11px; line-height: 1.55; text-align: center; }
+.customer-login-view .login-consent a { color: #b90815; font-weight: 700; }
+.customer-login-view .form-message { min-height: 18px; margin-top: 10px; color: #8f1019; font-size: 12px; line-height: 1.45; text-align: center; }
+.customer-account-header { min-height: 128px; display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; padding: 30px 70px 22px 24px; background: linear-gradient(135deg,#b9000e,#e01a27); color: #fff; }
+.customer-account-header small,.customer-account-header h2,.customer-account-header span { display: block; }
+.customer-account-header small { margin-bottom: 3px; opacity: .75; font-size: 11px; text-transform: uppercase; }
+.customer-account-header h2 { max-width: 260px; margin: 0; overflow: hidden; font-size: 22px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
+.customer-account-header span { margin-top: 5px; opacity: .88; font-size: 12px; }
+.customer-account-header > button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 0; border: 0; background: transparent; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; }
+.customer-account-header > button .material-icons { font-size: 17px; }
+.customer-account-tabs { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3,1fr); border-bottom: 1px solid #e3e4e8; background: #fff; }
+.customer-account-tabs button { min-height: 64px; display: grid; place-items: center; align-content: center; gap: 3px; padding: 7px; border: 0; border-bottom: 3px solid transparent; background: transparent; color: #7b7f88; font-size: 10px; font-weight: 700; cursor: pointer; }
+.customer-account-tabs button .material-icons { font-size: 22px; }
+.customer-account-tabs button.active { border-color: #d6000f; color: #bc000d; }
+.customer-account-content { height: calc(100dvh - 192px); padding: 18px; overflow-y: auto; overscroll-behavior: contain; }
+.customer-account-loading { min-height: 180px; display: grid; place-items: center; padding: 24px; color: #787d87; font-size: 13px; text-align: center; }
+.customer-account-error { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding: 12px 14px; border: 1px solid #ffc9cd; border-radius: 12px; background: #fff0f1; color: #9d0b16; font-size: 12px; line-height: 1.45; }
+.customer-account-error button { border: 0; background: transparent; color: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
+.customer-reward-balances { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
+.customer-coin-card,.customer-nft-card { min-width: 0; min-height: 142px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px; overflow: hidden; border-radius: 24px; }
+.customer-coin-card { background: linear-gradient(140deg,#ff7b1c,#ff4215); box-shadow: 0 14px 30px rgba(226,75,15,.2); color: #fff; }
+.customer-nft-card { border: 1px solid #e5dcff; background: linear-gradient(140deg,#f5f0ff,#e9dfff); color: #382a59; }
+.customer-coin-card span,.customer-coin-card strong,.customer-coin-card small,.customer-nft-card span,.customer-nft-card strong,.customer-nft-card small { display: block; }
+.customer-coin-card span,.customer-nft-card span { font-size: 11px; opacity: .76; }
+.customer-coin-card strong,.customer-nft-card strong { margin-top: 5px; font-size: 34px; line-height: 1; }
+.customer-coin-card small,.customer-nft-card small { margin-top: 5px; font-size: 9px; opacity: .7; }
+.customer-coin-card > i,.customer-nft-card > i { width: 55px; height: 55px; display: grid; flex: 0 0 55px; place-items: center; border-radius: 18px; background: rgba(255,255,255,.94); box-shadow: 0 9px 24px rgba(61,26,12,.13); font-style: normal; font-weight: 900; }
+.customer-coin-card > i { color: #ff4c16; font-size: 15px; }
+.customer-nft-card > i { color: #7650c0; }
+.customer-nft-card > i .material-icons { font-size: 32px; }
+.customer-withdraw-button { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 9px; margin: 13px 0; padding: 11px 16px; border: 0; border-radius: 16px; background: #17191e; color: #fff; font-size: 13px; font-weight: 800; cursor: pointer; }
+.customer-withdraw-button:disabled { cursor: default; opacity: .42; }
+.customer-withdraw-button .material-icons { font-size: 21px; }
+.customer-reward-explainer { display: flex; gap: 12px; margin-bottom: 14px; padding: 15px; border: 1px solid #eadfce; border-radius: 16px; background: #fffaf2; color: #635447; }
+.customer-reward-explainer > .material-icons { color: #e16618; font-size: 22px; }
+.customer-reward-explainer h3 { margin: 0 0 4px; color: #2d2926; font-size: 13px; }
+.customer-reward-explainer p { margin: 0; font-size: 10px; line-height: 1.55; }
+.customer-reward-section,.customer-orders-view > section { margin-top: 13px; padding: 17px; border: 1px solid #e5e6e9; border-radius: 18px; background: #fff; }
+.customer-reward-section > header,.customer-orders-view > section > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
+.customer-reward-section h3,.customer-orders-view h3 { margin: 0; color: #25272d; font-size: 14px; }
+.customer-reward-section header p { margin: 3px 0 0; color: #858a93; font-size: 10px; }
+.customer-reward-section header > b,.customer-orders-view header > b { min-width: 29px; height: 29px; display: grid; place-items: center; border-radius: 10px; background: #f0eaff; color: #7049bd; font-size: 11px; }
+.customer-nft-list,.customer-operation-list,.customer-coin-history,.customer-orders-view > section > div { display: grid; gap: 9px; }
+.customer-nft-item { display: grid; grid-template-columns: 54px minmax(0,1fr); gap: 11px; padding: 11px; border: 1px solid #ece9f2; border-radius: 15px; background: #fbfafc; }
+.customer-nft-art { width: 54px; height: 54px; display: grid; place-items: center; overflow: hidden; border-radius: 14px; background: linear-gradient(145deg,#eee7ff,#fff); color: #7750c8; }
+.customer-nft-art img { width: 100%; height: 100%; object-fit: cover; }
+.customer-nft-art .material-icons { font-size: 30px; }
+.customer-nft-item > div:last-child { min-width: 0; }
+.customer-nft-item > div > span { display: flex; align-items: flex-start; justify-content: space-between; gap: 7px; }
+.customer-nft-item strong { min-width: 0; overflow: hidden; color: #29252f; font-size: 11px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+.customer-nft-item em,.customer-operation-list em { flex: 0 0 auto; padding: 4px 6px; border-radius: 7px; background: #eee9fa; color: #7353aa; font-size: 8px; font-style: normal; font-weight: 800; }
+.customer-nft-item em.status-pending,.customer-nft-item em.status-submitted,.customer-operation-list em.status-pending,.customer-operation-list em.status-submitted { background: #fff1d8; color: #96600e; }
+.customer-nft-item em.status-withdrawn,.customer-operation-list em.status-withdrawn { background: #e5f7e9; color: #27763b; }
+.customer-nft-item em.status-failed,.customer-operation-list em.status-failed,.customer-operation-list em.status-cancelled { background: #ffebe9; color: #aa4034; }
+.customer-nft-item small { display: block; margin-top: 5px; color: #8a8491; font-size: 8px; }
+.customer-nft-item p { margin: 6px 0 0; overflow: hidden; color: #77717d; font-family: ui-monospace,SFMono-Regular,Consolas,monospace; font-size: 8px; line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
+.customer-nft-item p.error { padding: 6px; border-radius: 7px; background: #fff0ee; color: #a53e32; font-family: inherit; white-space: normal; }
+.customer-nft-item button,.customer-operation-list aside button { margin-top: 7px; padding: 5px 8px; border: 1px solid #ffc7cb; border-radius: 7px; background: #fff7f7; color: #aa0c18; font-size: 8px; font-weight: 800; cursor: pointer; }
+.customer-operation-list > article,.customer-coin-history > article { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 11px 0; border-top: 1px solid #eeeef0; }
+.customer-operation-list > article:first-child,.customer-coin-history > article:first-child { border-top: 0; }
+.customer-operation-list article > div { min-width: 0; }
+.customer-operation-list strong,.customer-operation-list span,.customer-operation-list small,.customer-coin-history strong,.customer-coin-history span { display: block; }
+.customer-operation-list strong,.customer-coin-history strong { color: #29292e; font-size: 10px; line-height: 1.45; }
+.customer-operation-list span,.customer-coin-history span { margin-top: 3px; color: #929298; font-size: 8px; line-height: 1.4; }
+.customer-operation-list small { margin-top: 5px; overflow: hidden; color: #69656d; font-family: ui-monospace,SFMono-Regular,Consolas,monospace; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
+.customer-operation-list p { margin: 6px 0 0; padding: 6px; border-radius: 7px; background: #fff0ee; color: #a53e32; font-size: 8px; line-height: 1.45; }
+.customer-operation-list aside { display: grid; flex: 0 0 auto; justify-items: end; }
+.customer-coin-history b { color: #2a8b43; font-size: 12px; }
+.customer-coin-history b.negative { color: #c24434; }
+.customer-empty-state { margin: 0; padding: 22px 10px; color: #91959d; font-size: 10px; line-height: 1.5; text-align: center; }
+.customer-orders-view,.customer-profile-view { display: grid; gap: 13px; }
+.customer-orders-view > section { margin-top: 0; }
+.customer-order-card { padding: 13px; border: 1px solid #e8e9ec; border-radius: 14px; background: #fafbfc; }
+.customer-order-card > div,.customer-order-card footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.customer-order-card > div > strong { color: #292c32; font-size: 11px; }
+.customer-status { padding: 4px 7px; border-radius: 999px; background: #edf2fb; color: #3f6098; font-size: 8px; font-weight: 800; }
+.customer-status.status-completed { background: #e8f6eb; color: #2c783f; }
+.customer-status.status-cancelled { background: #ffebe9; color: #aa4034; }
+.customer-order-card > p { margin: 8px 0; color: #858a93; font-size: 9px; }
+.customer-order-card footer { padding-top: 9px; border-top: 1px solid #e9eaed; }
+.customer-order-card footer strong { font-size: 13px; }
+.customer-order-card footer span { color: #e15114; font-size: 9px; font-weight: 800; }
+.customer-profile-view > section { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 17px; border: 1px solid #e5e6e9; border-radius: 15px; background: #fff; }
+.customer-profile-view > section span { color: #7b8089; font-size: 11px; }
+.customer-profile-view > section strong { color: #262930; font-size: 12px; text-align: right; }
+.customer-profile-view nav { overflow: hidden; border: 1px solid #e5e6e9; border-radius: 15px; background: #fff; }
+.customer-profile-view nav a { min-height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border-top: 1px solid #eceef1; color: #292c32; font-size: 11px; font-weight: 700; text-decoration: none; }
+.customer-profile-view nav a:first-child { border-top: 0; }
+.customer-profile-view nav .material-icons { color: #979ba3; font-size: 18px; }
+.customer-profile-logout { min-height: 49px; border: 1px solid #ffc5ca; border-radius: 14px; background: #fff5f6; color: #b30815; font-size: 11px; font-weight: 800; cursor: pointer; }
+
+.reward-withdrawal-overlay { position: fixed; z-index: 5200; inset: 0; display: grid; place-items: center; padding: 18px; overflow-y: auto; background: rgba(10,12,18,.62); backdrop-filter: blur(6px); }
+.reward-withdrawal-dialog { position: relative; z-index: 1; width: min(620px,100%); max-height: calc(100dvh - 36px); overflow-y: auto; border-radius: 25px; background: #fff; box-shadow: 0 28px 90px rgba(0,0,0,.3); }
+.reward-withdrawal-close { position: absolute; z-index: 3; top: 16px; right: 16px; width: 38px; height: 38px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #f0f1f3; color: #3b3e45; cursor: pointer; }
+.reward-withdrawal-close .material-icons { font-size: 21px; }
+.reward-withdrawal-content { padding: 30px; }
+.reward-withdrawal-content > h2,.reward-withdrawal-success h2 { margin: 0; color: #202228; font-size: 24px; }
+.reward-withdrawal-subtitle { margin: 7px 0 18px; color: #7c818a; font-size: 13px; }
+.reward-withdrawal-kinds { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.reward-kind-card { position: relative; min-height: 130px; display: grid; align-content: center; justify-items: start; padding: 20px; overflow: hidden; border: 2px solid transparent; border-radius: 21px; text-align: left; cursor: pointer; }
+.reward-kind-card.coin { background: linear-gradient(140deg,#ff7b1c,#ff4215); color: #fff; }
+.reward-kind-card.nft { border-color: #e4d9ff; background: linear-gradient(140deg,#f5f0ff,#e9dfff); color: #382a59; }
+.reward-kind-card.selected { box-shadow: 0 0 0 3px rgba(214,0,15,.18); }
+.reward-kind-card:disabled { cursor: default; filter: grayscale(.35); opacity: .48; }
+.reward-kind-card span,.reward-kind-card strong { display: block; }
+.reward-kind-card span { font-size: 11px; opacity: .78; }
+.reward-kind-card strong { margin-top: 5px; font-size: 30px; }
+.reward-kind-card > small { display: block; margin-top: 5px; font-size: 9px; opacity: .78; }
+.reward-kind-card i { position: absolute; right: 15px; bottom: 15px; width: 48px; height: 48px; display: grid; place-items: center; border-radius: 15px; background: rgba(255,255,255,.93); color: #ff4c16; font-size: 13px; font-style: normal; font-weight: 900; }
+.reward-kind-card.nft i { color: #7650c0; }
+.reward-kind-card i .material-icons { font-size: 28px; }
+.reward-nft-selector { display: grid; gap: 7px; margin: 15px 0 0; padding: 0; border: 0; }
+.reward-nft-selector legend { margin-bottom: 7px; color: #34373e; font-size: 12px; font-weight: 800; }
+.reward-nft-selector label { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid #e2e3e7; border-radius: 11px; cursor: pointer; }
+.reward-nft-selector label.selected { border-color: #8b64d4; background: #faf8ff; }
+.reward-nft-selector span b,.reward-nft-selector span small { display: block; }
+.reward-nft-selector span b { font-size: 11px; }.reward-nft-selector span small { margin-top: 2px; color: #888c94; font-size: 9px; }
+.reward-withdrawal-form { display: grid; gap: 13px; margin-top: 17px; }
+.reward-withdrawal-form > label { display: grid; gap: 7px; color: #34373e; font-size: 12px; font-weight: 800; }
+.reward-withdrawal-form > label > input,.reward-wallet-field { width: 100%; min-height: 49px; border: 1px solid #d8dae0; border-radius: 11px; background: #fff; }
+.reward-withdrawal-form > label > input { padding: 0 13px; outline: 0; }
+.reward-withdrawal-form > label > input:focus,.reward-wallet-field:focus-within { border-color: #d6000f; box-shadow: 0 0 0 3px rgba(214,0,15,.09); }
+.reward-withdrawal-form small.invalid { color: #b20e19; font-size: 9px; }
+.reward-wallet-field { display: flex; align-items: center; overflow: hidden; }
+.reward-wallet-field input { min-width: 0; flex: 1; height: 47px; padding: 0 12px; border: 0; outline: 0; font-family: ui-monospace,SFMono-Regular,Consolas,monospace; font-size: 11px; }
+.reward-wallet-field button { width: 43px; height: 47px; display: grid; flex: 0 0 43px; place-items: center; border: 0; border-left: 1px solid #e1e2e6; background: #f7f7f8; color: #555a64; cursor: pointer; }
+.reward-wallet-field .material-icons { font-size: 20px; }
+.reward-withdrawal-selection { margin: 0; padding: 12px; border-radius: 10px; background: #f5f1ff; color: #5c438e; font-size: 11px; font-weight: 700; }
+.reward-withdrawal-hint { margin: -2px 0 0; color: #858a93; font-size: 9px; line-height: 1.5; }
+.reward-withdrawal-primary,.reward-withdrawal-secondary { width: 100%; min-height: 50px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; }
+.reward-withdrawal-primary { border: 0; background: #d6000f; color: #fff; }
+.reward-withdrawal-secondary { border: 1px solid #dadce1; background: #fff; color: #484c54; }
+.reward-withdrawal-primary:disabled,.reward-withdrawal-secondary:disabled { cursor: default; opacity: .48; }
+.reward-withdrawal-heading { display: flex; align-items: flex-start; gap: 12px; padding-right: 45px; }
+.reward-withdrawal-heading > button,.reward-withdrawal-scanner header button { width: 36px; height: 36px; display: grid; flex: 0 0 36px; place-items: center; border: 0; border-radius: 50%; background: #f0f1f3; cursor: pointer; }
+.reward-withdrawal-heading h2 { margin: 0; font-size: 21px; }.reward-withdrawal-heading p { margin: 4px 0 0; color: #858a93; font-size: 10px; }
+.reward-withdrawal-summary { display: grid; gap: 0; margin: 20px 0 14px; overflow: hidden; border: 1px solid #e2e3e7; border-radius: 14px; }
+.reward-withdrawal-summary > div { display: grid; grid-template-columns: 120px minmax(0,1fr); gap: 12px; padding: 12px 14px; border-top: 1px solid #eceef1; }
+.reward-withdrawal-summary > div:first-child { border-top: 0; }
+.reward-withdrawal-summary dt { color: #858a93; font-size: 10px; }.reward-withdrawal-summary dd { min-width: 0; margin: 0; overflow: hidden; color: #292c32; font-size: 11px; font-weight: 700; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+.reward-withdrawal-warning { display: flex; gap: 10px; margin-bottom: 13px; padding: 12px; border-radius: 11px; background: #fff5dc; color: #775614; }
+.reward-withdrawal-warning .material-icons { font-size: 20px; }.reward-withdrawal-warning p { margin: 0; font-size: 9px; line-height: 1.5; }
+.reward-withdrawal-error,.reward-scanner-error { margin: 0; padding: 10px 12px; border-radius: 10px; background: #fff0f1; color: #a40a16; font-size: 10px; line-height: 1.45; }
+.reward-withdrawal-success { display: grid; justify-items: center; padding: 48px 30px 32px; text-align: center; }
+.reward-withdrawal-success > span { width: 66px; height: 66px; display: grid; place-items: center; margin-bottom: 17px; border-radius: 50%; background: #e4f7e8; color: #277a3d; }
+.reward-withdrawal-success > span .material-icons { font-size: 36px; }.reward-withdrawal-success p { max-width: 430px; margin: 10px 0 22px; color: #767b84; font-size: 11px; line-height: 1.6; }
+.reward-withdrawal-scanner { padding: 22px; }.reward-withdrawal-scanner header { display: grid; grid-template-columns: 36px 1fr 36px; align-items: center; gap: 10px; padding-right: 44px; }.reward-withdrawal-scanner header h2 { margin: 0; font-size: 18px; text-align: center; }
+.reward-withdrawal-camera { position: relative; aspect-ratio: 1; margin-top: 18px; overflow: hidden; border-radius: 20px; background: #16181d; }
+.reward-withdrawal-camera video { width: 100%; height: 100%; object-fit: cover; }.reward-withdrawal-camera > span { position: absolute; inset: 18%; border: 3px solid #fff; border-radius: 18px; box-shadow: 0 0 0 999px rgba(0,0,0,.28); }
+.reward-withdrawal-scanner > p { margin: 13px 0 0; color: #747984; font-size: 10px; line-height: 1.5; text-align: center; }
+
+.customer-cancel-overlay { position: fixed; z-index: 5400; inset: 0; display: grid; place-items: center; padding: 18px; background: rgba(10,12,18,.62); }
+.customer-cancel-dialog { position: relative; z-index: 1; width: min(410px,100%); padding: 26px; border-radius: 22px; background: #fff; box-shadow: 0 24px 75px rgba(0,0,0,.28); text-align: center; }
+.customer-cancel-dialog > span { width: 54px; height: 54px; display: grid; place-items: center; margin: 0 auto 13px; border-radius: 50%; background: #fff1dc; color: #a6660b; }.customer-cancel-dialog > span .material-icons { font-size: 29px; }
+.customer-cancel-dialog h2 { margin: 0; font-size: 20px; }.customer-cancel-dialog > p { margin: 9px 0 17px; color: #747984; font-size: 11px; line-height: 1.55; }
+.customer-cancel-dialog > div:last-child { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }.customer-cancel-dialog > div:last-child button { min-height: 44px; border: 1px solid #d9dbe0; border-radius: 10px; background: #fff; color: #454951; font-size: 11px; font-weight: 800; cursor: pointer; }.customer-cancel-dialog > div:last-child button:last-child { border-color: #d6000f; background: #d6000f; color: #fff; }
+
+@media (max-width: 599px) {
+  .product-reward-badge { top: 135px; }
+  .customer-account-modal,.customer-account-modal:not(.is-authenticated) { width: 100%; }
+  .customer-account-close { top: 11px; right: 11px; }
+  .customer-login-view { min-height: 100dvh; padding: 80px 25px 45px; }
+  .customer-account-header { min-height: 116px; padding: 24px 62px 18px 17px; }
+  .customer-account-header h2 { max-width: 190px; font-size: 19px; }
+  .customer-account-header > button { display: none; }
+  .customer-account-content { height: calc(100dvh - 180px); padding: 13px; }
+  .customer-reward-balances { grid-template-columns: 1.1fr .9fr; gap: 9px; }
+  .customer-coin-card,.customer-nft-card { min-height: 126px; padding: 15px; border-radius: 20px; }
+  .customer-coin-card strong,.customer-nft-card strong { font-size: 29px; }
+  .customer-coin-card > i,.customer-nft-card > i { width: 44px; height: 44px; flex-basis: 44px; border-radius: 14px; }
+  .customer-nft-card > i .material-icons { font-size: 26px; }
+  .reward-withdrawal-overlay { align-items: end; padding: 0; }
+  .reward-withdrawal-dialog { width: 100%; max-height: 92dvh; border-radius: 24px 24px 0 0; }
+  .reward-withdrawal-content { padding: 25px 17px 18px; }
+  .reward-kind-card { min-height: 116px; padding: 15px; }
+  .reward-kind-card strong { font-size: 25px; }
+  .reward-kind-card i { width: 41px; height: 41px; right: 11px; bottom: 11px; }
+  .reward-withdrawal-summary > div { grid-template-columns: 98px minmax(0,1fr); }
+  .customer-cancel-overlay { align-items: end; padding: 0; }
+  .customer-cancel-dialog { border-radius: 22px 22px 0 0; }
 }

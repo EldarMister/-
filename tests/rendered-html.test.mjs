@@ -48,7 +48,11 @@ test("publishes crawl controls, sitemap and web manifest", async () => {
   const sitemap = await sitemapResponse.text();
   assert.match(sitemap, /https:\/\/daanasushi\.com\/catalog\/1/);
   assert.match(sitemap, /https:\/\/daanasushi\.com\/promo/);
+  assert.match(sitemap, /https:\/\/daanasushi\.com\/legal/);
   assert.match(sitemap, /https:\/\/daanasushi\.com\/privacy/);
+  assert.match(sitemap, /https:\/\/daanasushi\.com\/terms/);
+  assert.match(sitemap, /https:\/\/daanasushi\.com\/delete-account/);
+  assert.match(sitemap, /https:\/\/daanasushi\.com\/support/);
   assert.doesNotMatch(sitemap, /\/admin|\/order|\/api/);
 
   assert.equal(manifestResponse.status, 200);
@@ -99,11 +103,39 @@ test("legal details render on public pages", async () => {
   assert.doesNotMatch(`${payment}\n${privacy}`, /Багаутдинова|381455453478|317385000009123/);
 });
 
+test("publishes accurate legal, privacy and loyalty documents", async () => {
+  for (const [path, heading] of [
+    ["/legal", "Правовая информация"],
+    ["/privacy", "Политика конфиденциальности"],
+    ["/terms", "Условия использования и заказа"],
+    ["/payment-rule", "Оплата, отмена и возврат"],
+    ["/delete-account", "Удаление аккаунта и данных"],
+    ["/support", "Поддержка"],
+  ]) {
+    const response = await render(path);
+    assert.equal(response.status, 200);
+    assert.match(await response.text(), new RegExp(`<h1[^>]*>${heading}</h1>`, "i"));
+  }
+
+  const [payment, privacy, terms] = await Promise.all([
+    render("/payment-rule").then((response) => response.text()),
+    render("/privacy").then((response) => response.text()),
+    render("/terms").then((response) => response.text()),
+  ]);
+  assert.doesNotMatch(payment, /Юcassa|ЮKassa|Введите данные своей карты/i);
+  assert.match(payment, /Оплата на сайте не проводится/i);
+  assert.match(privacy, /Nikita/);
+  assert.match(privacy, /адрес криптокошелька/i);
+  assert.match(terms, /NAKTA Coin/);
+  assert.match(terms, /Блокчейн-транзакции необратимы/i);
+});
+
 test("customer login uses Nikita OTP without exposing its API key", async () => {
-  const [api, provider, storefront, envExample] = await Promise.all([
+  const [api, provider, storefront, account, envExample] = await Promise.all([
     readFile(new URL("../server/index.ts", import.meta.url), "utf8"),
     readFile(new URL("../server/nikita-otp.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/SushiApp.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/components/CustomerAccountModal.tsx", import.meta.url), "utf8"),
     readFile(new URL("../.env.example", import.meta.url), "utf8"),
   ]);
   assert.match(provider, /https:\/\/smspro\.nikita\.kg\/api\/otp\/send/);
@@ -112,8 +144,8 @@ test("customer login uses Nikita OTP without exposing its API key", async () => 
   assert.match(api, /process\.env\.NIKITA_OTP_API_KEY/);
   assert.match(api, /verificationChallenges\.set/);
   assert.match(api, /maxVerificationAttempts = 5/);
-  assert.match(storefront, /SMS с одноразовым кодом/);
-  assert.doesNotMatch(storefront, /X-API-KEY|NIKITA_OTP_API_KEY/);
+  assert.match(account, /SMS с одноразовым кодом/);
+  assert.doesNotMatch(`${storefront}\n${account}`, /X-API-KEY|NIKITA_OTP_API_KEY/);
   assert.match(envExample, /^NIKITA_OTP_API_KEY=$/m);
 });
 
@@ -130,14 +162,21 @@ test("order implements the scrollable pickup time dialog", async () => {
   assert.match(styles, /\.pickup-time-grid[^}]*grid-template-columns:\s*repeat\(2/);
 });
 
-test("admin route renders its noindex dashboard shell", async () => {
-  const response = await render("/admin");
+test("admin route renders its noindex, session-gated dashboard shell", async () => {
+  const [response, adminSource] = await Promise.all([
+    render("/admin"),
+    readFile(new URL("../app/admin/AdminPanel.tsx", import.meta.url), "utf8"),
+  ]);
   assert.equal(response.status, 200);
   const html = await response.text();
   assert.match(html, /<title>Админка \| ДААНА СУШИ<\/title>/);
   assert.match(html, /name="robots" content="noindex, nofollow"/);
-  assert.match(html, /Управление «ДААНА СУШИ»/);
-  assert.match(html, />Товары<\/button>/);
+  assert.match(html, /Проверяем сессию/);
+  assert.match(adminSource, /Управление «ДААНА СУШИ»/);
+  assert.match(adminSource, /\["loyalty", "Лояльность"\]/);
+  assert.match(adminSource, /\/admin\/session/);
+  assert.match(adminSource, /credentials: "include"/);
+  assert.doesNotMatch(adminSource, /localStorage\.setItem\("sushi-admin-token"/);
 });
 
 test("pickup locations use Yandex Maps with address editing in the admin dashboard", async () => {

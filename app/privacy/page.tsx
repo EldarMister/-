@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
-import SushiApp from "../SushiApp";
+import { InfoPage } from "../components/InfoPage";
+import { PrivacyPolicy } from "../LegalContent";
 import { createPageMetadata } from "../seo";
 
-export const metadata: Metadata = createPageMetadata({ title: "Политика обработки персональных данных", description: "Политика обработки и защиты персональных данных пользователей сайта ДААНА СУШИ и сведения об операторе сервиса.", path: "/privacy" });
+export const metadata: Metadata = createPageMetadata({
+  title: "Политика конфиденциальности",
+  description: "Как ДААНА СУШИ обрабатывает данные аккаунта, заказов, геолокации, NAKTA Coin, NFT и заявок на вывод.",
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
-  return <SushiApp initialView="privacy" />;
+  return (
+    <InfoPage title="Политика конфиденциальности">
+      <PrivacyPolicy showTitle={false} />
+    </InfoPage>
+  );
 }

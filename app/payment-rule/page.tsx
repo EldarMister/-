@@ -1,9 +1,18 @@
 import type { Metadata } from "next";
-import SushiApp from "../SushiApp";
+import { InfoPage } from "../components/InfoPage";
+import { PaymentRules } from "../LegalContent";
 import { createPageMetadata } from "../seo";
 
-export const metadata: Metadata = createPageMetadata({ title: "Правила оплаты и реквизиты", description: "Инструкция по оплате заказа на сайте ДААНА СУШИ, условия возврата и юридические реквизиты оператора сервиса.", path: "/payment-rule" });
+export const metadata: Metadata = createPageMetadata({
+  title: "Оплата, отмена и возврат",
+  description: "Как оформить и оплатить заказ ДААНА СУШИ при получении, отменить его или сообщить о проблеме.",
+  path: "/payment-rule",
+});
 
 export default function PaymentRulePage() {
-  return <SushiApp initialView="payment" />;
+  return (
+    <InfoPage title="Оплата, отмена и возврат">
+      <PaymentRules showTitle={false} />
+    </InfoPage>
+  );
 }

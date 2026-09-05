@@ -6,6 +6,15 @@ CREATE TABLE IF NOT EXISTS admin_users (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+CREATE TABLE IF NOT EXISTS admin_sessions (
+  token_hash CHAR(64) PRIMARY KEY,
+  admin_user_id BIGINT NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_admin_sessions_expiry ON admin_sessions(expires_at);
+
 CREATE TABLE IF NOT EXISTS categories (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
@@ -99,6 +108,154 @@ CREATE TABLE IF NOT EXISTS app_migrations (
   key TEXT PRIMARY KEY,
   applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE products
+  ADD COLUMN IF NOT EXISTS nakta_coins INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE customers
+  ADD COLUMN IF NOT EXISTS nakta_coins INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE customers
+  ADD COLUMN IF NOT EXISTS reward_completed_orders INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE order_items
+  ADD COLUMN IF NOT EXISTS nakta_coins_reward INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE orders
+  ADD COLUMN IF NOT EXISTS rewards_processed_at TIMESTAMPTZ;
+
+UPDATE orders
+SET rewards_processed_at = updated_at
+WHERE status = 'completed' AND rewards_processed_at IS NULL;
+
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_products_nakta_coins') THEN
+    ALTER TABLE products ADD CONSTRAINT chk_products_nakta_coins CHECK (nakta_coins >= 0);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_customers_nakta_coins') THEN
+    ALTER TABLE customers ADD CONSTRAINT chk_customers_nakta_coins CHECK (nakta_coins >= 0);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_customers_reward_completed_orders') THEN
+    ALTER TABLE customers ADD CONSTRAINT chk_customers_reward_completed_orders CHECK (reward_completed_orders >= 0);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'chk_order_items_nakta_coins_reward') THEN
+    ALTER TABLE order_items ADD CONSTRAINT chk_order_items_nakta_coins_reward CHECK (nakta_coins_reward >= 0);
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS customer_sessions (
+  token_hash CHAR(64) PRIMARY KEY,
+  customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS nakta_coin_transactions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  order_id BIGINT NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
+  amount INTEGER NOT NULL CHECK (amount > 0),
+  description VARCHAR(240) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS nakta_coin_withdrawals (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  request_key UUID NOT NULL,
+  amount INTEGER NOT NULL CHECK (amount > 0),
+  wallet_address VARCHAR(200) NOT NULL,
+  network VARCHAR(20) NOT NULL DEFAULT 'polygon'
+    CHECK (network IN ('polygon','ethereum','bsc','solana','ton')),
+  status VARCHAR(20) NOT NULL DEFAULT 'pending'
+    CHECK (status IN ('pending','submitted','withdrawn','failed','cancelled')),
+  tx_hash VARCHAR(200),
+  error TEXT,
+  processed_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE nakta_coin_withdrawals
+  ADD COLUMN IF NOT EXISTS request_key UUID;
+
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM pg_attribute
+    WHERE attrelid = 'nakta_coin_withdrawals'::regclass
+      AND attname = 'request_key'
+      AND NOT attnotnull
+  ) THEN
+    UPDATE nakta_coin_withdrawals SET request_key = id WHERE request_key IS NULL;
+    ALTER TABLE nakta_coin_withdrawals ALTER COLUMN request_key SET NOT NULL;
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS account_nfts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  reward_key VARCHAR(180) NOT NULL UNIQUE,
+  order_id BIGINT REFERENCES orders(id) ON DELETE SET NULL,
+  milestone_order_count INTEGER NOT NULL DEFAULT 0 CHECK (milestone_order_count >= 0),
+  name VARCHAR(160) NOT NULL,
+  image TEXT NOT NULL DEFAULT '',
+  description TEXT NOT NULL DEFAULT '',
+  network VARCHAR(20) NOT NULL
+    CHECK (network IN ('polygon','ethereum','bsc','solana','ton')),
+  contract_address VARCHAR(200) NOT NULL DEFAULT '',
+  metadata_uri TEXT NOT NULL DEFAULT '',
+  token_id VARCHAR(160),
+  status VARCHAR(20) NOT NULL DEFAULT 'owned'
+    CHECK (status IN ('owned','pending','submitted','withdrawn','failed')),
+  wallet_address VARCHAR(200),
+  tx_hash VARCHAR(200),
+  withdrawal_error TEXT,
+  withdrawal_requested_at TIMESTAMPTZ,
+  withdrawn_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS customer_reward_adjustments (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id BIGINT NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  asset VARCHAR(10) NOT NULL CHECK (asset IN ('coin','nft')),
+  delta INTEGER NOT NULL CHECK (delta <> 0),
+  balance_after INTEGER NOT NULL CHECK (balance_after >= 0),
+  reason VARCHAR(240) NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_customer_sessions_customer_expires
+  ON customer_sessions(customer_id, expires_at);
+CREATE INDEX IF NOT EXISTS idx_customer_sessions_expires
+  ON customer_sessions(expires_at);
+CREATE INDEX IF NOT EXISTS idx_coin_transactions_customer_created
+  ON nakta_coin_transactions(customer_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_coin_withdrawals_customer_created
+  ON nakta_coin_withdrawals(customer_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_coin_withdrawals_status
+  ON nakta_coin_withdrawals(status, created_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_coin_withdrawals_customer_request
+  ON nakta_coin_withdrawals(customer_id, request_key);
+CREATE INDEX IF NOT EXISTS idx_account_nfts_customer_created
+  ON account_nfts(customer_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_account_nfts_status
+  ON account_nfts(status, withdrawal_requested_at DESC);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_account_nfts_customer_milestone
+  ON account_nfts(customer_id, milestone_order_count)
+  WHERE milestone_order_count > 0;
+CREATE INDEX IF NOT EXISTS idx_reward_adjustments_customer_created
+  ON customer_reward_adjustments(customer_id, created_at DESC);
+
+INSERT INTO site_settings (key, value)
+VALUES (
+  'rewards',
+  '{"nftRewardEveryOrders":10,"nftRewardName":"NFT NAKTA","nftRewardImage":"","nftRewardDescription":"","nftRewardNetwork":"polygon","nftContractAddress":"","nftMetadataUri":"","coinNetwork":"polygon"}'::jsonb
+)
+ON CONFLICT (key) DO NOTHING;
+
+INSERT INTO app_migrations (key)
+VALUES ('2026-09-05-nakta-loyalty-program')
+ON CONFLICT (key) DO NOTHING;
 
 DO $$
 BEGIN
