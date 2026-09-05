@@ -30,6 +30,7 @@ import {
 import { closeDatabase, sql } from "./db";
 import { migrate } from "./migrate";
 import { NikitaOtpError, sendNikitaOtp, verifyNikitaOtp } from "./nikita-otp";
+import { resolveCorsOrigins } from "./cors-origins";
 import {
   opaqueClientRateLimitKey,
   opaquePhoneRateLimitKey,
@@ -61,28 +62,12 @@ const nftTransferProvider = resolveNftTransferProviderConfig(
 );
 const rootDirectory = join(dirname(fileURLToPath(import.meta.url)), "..");
 const uploadsDirectory = join(rootDirectory, "public", "uploads");
-const corsOrigins = (process.env.CORS_ORIGIN || "http://localhost:3000")
-  .split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-if (process.env.NODE_ENV === "production" && (
-  !process.env.CORS_ORIGIN?.trim()
-  || corsOrigins.some((origin) => {
-    try {
-      const parsed = new URL(origin);
-      return parsed.origin !== origin || parsed.protocol !== "https:" || ["localhost", "127.0.0.1"].includes(parsed.hostname);
-    } catch {
-      return true;
-    }
-  })
-)) {
-  throw new Error("CORS_ORIGIN must list the public HTTPS site origin(s) in production");
-}
+const corsOrigins = resolveCorsOrigins(process.env.CORS_ORIGIN, process.env.NODE_ENV);
 await mkdir(uploadsDirectory, { recursive: true });
 
 app.set("trust proxy", process.env.TRUST_PROXY === "loopback" ? "loopback" : false);
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
-app.use(cors({ origin: corsOrigins, credentials: true }));
+if (corsOrigins.length > 0) app.use(cors({ origin: corsOrigins, credentials: true }));
 app.use(express.json({ limit: "1mb" }));
 app.use("/uploads", express.static(uploadsDirectory, { maxAge: "7d", immutable: false }));
 
