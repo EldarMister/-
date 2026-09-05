@@ -30,6 +30,7 @@ import {
 import { closeDatabase, sql } from "./db";
 import { migrate } from "./migrate";
 import { NikitaOtpError, sendNikitaOtp, verifyNikitaOtp } from "./nikita-otp";
+import { resolveOtpBypassPhone } from "./otp-bypass";
 import { resolveCorsOrigins } from "./cors-origins";
 import {
   opaqueClientRateLimitKey,
@@ -89,7 +90,7 @@ const otpServiceLimiter = rateLimit({
   legacyHeaders: false,
   skip: (request) => {
     const phone = String(request.body?.phone || "").replace(/\D/g, "");
-    if (!/^996\d{9}$/.test(phone) || verificationRequestsInFlight.has(phone)) return true;
+    if (!/^996\d{9}$/.test(phone) || phone === otpBypassPhone || verificationRequestsInFlight.has(phone)) return true;
     const challenge = verificationChallenges.get(phone);
     return Boolean(challenge && Date.now() - challenge.requestedAt < verificationResendDelayMs);
   },
@@ -164,6 +165,7 @@ const kyrgyzPhonePattern = /^996\d{9}$/;
 const verificationLifetimeMs = 10 * 60 * 1000;
 const verificationResendDelayMs = 60 * 1000;
 const maxVerificationAttempts = 5;
+const otpBypassPhone = resolveOtpBypassPhone(process.env.OTP_BYPASS_PHONE);
 
 function requireTrustedAdminOrigin(request: Request, response: Response, next: NextFunction) {
   if (["GET", "HEAD", "OPTIONS"].includes(request.method)) return next();
@@ -179,6 +181,19 @@ function pruneVerificationChallenges(now = Date.now()) {
   for (const [phone, challenge] of verificationChallenges) {
     if (challenge.expiresAt < now) verificationChallenges.delete(phone);
   }
+}
+
+async function createAuthenticatedCustomer(phone: string, response: Response) {
+  const [customer] = await sql<CustomerIdentity[]>`
+    INSERT INTO customers (phone)
+    VALUES (${phone})
+    ON CONFLICT (phone) DO UPDATE SET updated_at = NOW()
+    RETURNING id::int, phone, name
+  `;
+  const session = await createCustomerSession(customer);
+  setCustomerSessionCookie(response, session.verificationToken);
+  response.setHeader("Cache-Control", "no-store");
+  return { customer, expiresInSeconds: session.expiresInSeconds };
 }
 
 const upload = multer({
@@ -755,6 +770,10 @@ app.get("/api/settings", async (_request, response) => {
 app.post("/api/auth/request-code", otpClientLimiter, otpRequestLimiter, otpServiceLimiter, async (request, response) => {
   const phone = String(request.body.phone || "").replace(/\D/g, "");
   if (!kyrgyzPhonePattern.test(phone)) return response.status(400).json({ error: "Укажите телефон в формате +996" });
+  if (phone === otpBypassPhone) {
+    verificationChallenges.delete(phone);
+    return response.json(await createAuthenticatedCustomer(phone, response));
+  }
   const now = Date.now();
   pruneVerificationChallenges(now);
   const existingChallenge = verificationChallenges.get(phone);
@@ -812,11 +831,7 @@ app.post("/api/auth/verify-code", otpVerifyLimiter, async (request, response) =>
     }
 
     verificationChallenges.delete(phone);
-    const [customer] = await sql<CustomerIdentity[]>`INSERT INTO customers (phone) VALUES (${phone}) ON CONFLICT (phone) DO UPDATE SET updated_at = NOW() RETURNING id::int, phone, name`;
-    const session = await createCustomerSession(customer);
-    setCustomerSessionCookie(response, session.verificationToken);
-    response.setHeader("Cache-Control", "no-store");
-    return response.json({ customer, expiresInSeconds: session.expiresInSeconds });
+    return response.json(await createAuthenticatedCustomer(phone, response));
   } catch (error) {
     if (error instanceof NikitaOtpError) {
       if (error.providerStatus === 12 || error.providerStatus === 13) verificationChallenges.delete(phone);

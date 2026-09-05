@@ -221,6 +221,23 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
     };
   }, [cancelBusy, logoutBusy, onClose, pending, withdrawalOpen]);
 
+  const finishLogin = async (customer: Customer, expiresInSeconds: number, formattedPhone: string) => {
+    const nextSession: CustomerSession = {
+      customer,
+      phone: customer.phone || formattedPhone,
+      expiresAt: Date.now() + Math.max(60, expiresInSeconds) * 1_000,
+    };
+    sessionGenerationRef.current += 1;
+    profileRequestGenerationRef.current += 1;
+    setSession(nextSession);
+    setCodeSent(false);
+    setCode("");
+    setMessage("");
+    setSection("rewards");
+    onSessionChange?.(true);
+    await loadProfile(nextSession);
+  };
+
   const requestCode = async () => {
     setMessage("");
     setPending(true);
@@ -231,8 +248,20 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ phone: fullKyrgyzPhone(phone) }),
       });
-      const result = await response.json().catch(() => ({})) as { error?: string; message?: string; devCode?: string };
+      const result = await response.json().catch(() => ({})) as {
+        customer?: Customer;
+        expiresInSeconds?: number;
+        error?: string;
+        message?: string;
+        devCode?: string;
+      };
       if (!response.ok) throw new Error(result.error || result.message || "Не удалось отправить код");
+      if (result.customer) {
+        const expiresInSeconds = Number(result.expiresInSeconds);
+        if (!Number.isFinite(expiresInSeconds) || expiresInSeconds <= 0) throw new Error("Сервер не вернул срок сессии");
+        await finishLogin(result.customer, expiresInSeconds, fullKyrgyzPhone(phone));
+        return;
+      }
       setCodeSent(true);
       setMessage(result.devCode ? `Код отправлен. Код для локального запуска: ${result.devCode}.` : "Код отправлен.");
     } catch (reason) {
@@ -264,18 +293,7 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
         const detail = Array.isArray(result.message) ? result.message.join(", ") : result.message;
         throw new Error(result.error || detail || "Не удалось войти");
       }
-      const nextSession: CustomerSession = {
-        customer: result.customer,
-        phone: result.customer.phone || formattedPhone,
-        expiresAt: Date.now() + Math.max(60, expiresInSeconds) * 1_000,
-      };
-      sessionGenerationRef.current += 1;
-      profileRequestGenerationRef.current += 1;
-      setSession(nextSession);
-      setMessage("");
-      setSection("rewards");
-      onSessionChange?.(true);
-      await loadProfile(nextSession);
+      await finishLogin(result.customer, expiresInSeconds, formattedPhone);
     } catch (reason) {
       setMessage(reason instanceof Error ? reason.message : "Не удалось войти");
     } finally {

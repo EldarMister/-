@@ -147,6 +147,7 @@ test("customer login uses Nikita OTP without exposing its API key", async () => 
   assert.match(account, /SMS с одноразовым кодом/);
   assert.doesNotMatch(`${storefront}\n${account}`, /X-API-KEY|NIKITA_OTP_API_KEY/);
   assert.match(envExample, /^NIKITA_OTP_API_KEY=$/m);
+  assert.match(envExample, /^OTP_BYPASS_PHONE=$/m);
 });
 
 test("order implements the scrollable pickup time dialog", async () => {
