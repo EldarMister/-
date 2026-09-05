@@ -20,6 +20,8 @@
     "db:seed": "tsx server/seed.ts"
   },
   "dependencies": {
+    "@mdi/js": "^7.4.47",
+    "@mdi/react": "^1.6.1",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "cross-env": "^10.1.0",

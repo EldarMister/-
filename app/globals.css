@@ -480,11 +480,12 @@ a { color: inherit; }
 .product-reward-badge b { font-size: 13px; }
 .order-consent a { color: #b90815; font-weight: 700; }
 
-.customer-account-overlay { position: fixed; z-index: 4000; inset: 0; display: flex; justify-content: flex-end; background: rgba(10,12,18,.52); backdrop-filter: blur(5px); }
+.customer-account-overlay { position: fixed; z-index: 4000; inset: 0; display: flex; justify-content: flex-start; background: rgba(10,12,18,.52); backdrop-filter: blur(5px); }
 .customer-account-dismiss,.reward-withdrawal-dismiss,.customer-cancel-dismiss { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; background: transparent; cursor: default; }
-.customer-account-modal { position: relative; z-index: 1; width: min(100%,520px); height: 100dvh; overflow: hidden; background: #f5f5f6; box-shadow: -22px 0 70px rgba(15,18,25,.24); animation: customer-account-in .22s ease-out; }
+.customer-account-modal { position: relative; z-index: 1; width: min(80vw,360px); height: 100dvh; overflow: hidden; border-radius: 0 18px 18px 0; background: #fff; box-shadow: 4px 0 18px rgba(0,0,0,.13); font-family: Inter,"Roboto",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; animation: customer-account-in .22s ease-out; }
+.customer-account-modal.is-orders { width: 100vw; max-width: none; border-radius: 0; box-shadow: none; }
 .customer-account-modal:not(.is-authenticated) { width: min(100%,467px); display: grid; place-items: center; background: #fff; }
-@keyframes customer-account-in { from { opacity: .5; transform: translateX(28px); } to { opacity: 1; transform: translateX(0); } }
+@keyframes customer-account-in { from { opacity: .55; transform: translateX(-28px); } to { opacity: 1; transform: translateX(0); } }
 .customer-account-close { position: absolute; z-index: 12; top: 16px; right: 16px; width: 40px; height: 40px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: rgba(255,255,255,.92); box-shadow: 0 5px 20px rgba(22,25,33,.12); color: #1d2028; cursor: pointer; }
 .customer-account-close .material-icons { font-size: 22px; }
 .customer-login-view { position: relative; width: 100%; min-height: 480px; display: flex; flex-direction: column; justify-content: center; padding: 64px 55px 46px; overflow: hidden; background: #fff; }
@@ -500,93 +501,159 @@ a { color: inherit; }
 .customer-login-view .login-consent { margin-top: 16px; color: #747984; font-size: 11px; line-height: 1.55; text-align: center; }
 .customer-login-view .login-consent a { color: #b90815; font-weight: 700; }
 .customer-login-view .form-message { min-height: 18px; margin-top: 10px; color: #8f1019; font-size: 12px; line-height: 1.45; text-align: center; }
-.customer-account-header { min-height: 128px; display: flex; align-items: flex-end; justify-content: space-between; gap: 18px; padding: 30px 70px 22px 24px; background: linear-gradient(135deg,#b9000e,#e01a27); color: #fff; }
-.customer-account-header small,.customer-account-header h2,.customer-account-header span { display: block; }
-.customer-account-header small { margin-bottom: 3px; opacity: .75; font-size: 11px; text-transform: uppercase; }
-.customer-account-header h2 { max-width: 260px; margin: 0; overflow: hidden; font-size: 22px; line-height: 1.2; text-overflow: ellipsis; white-space: nowrap; }
-.customer-account-header span { margin-top: 5px; opacity: .88; font-size: 12px; }
-.customer-account-header > button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 0; border: 0; background: transparent; color: #fff; font-size: 12px; font-weight: 700; cursor: pointer; }
-.customer-account-header > button .material-icons { font-size: 17px; }
-.customer-account-tabs { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(3,1fr); border-bottom: 1px solid #e3e4e8; background: #fff; }
-.customer-account-tabs button { min-height: 64px; display: grid; place-items: center; align-content: center; gap: 3px; padding: 7px; border: 0; border-bottom: 3px solid transparent; background: transparent; color: #7b7f88; font-size: 10px; font-weight: 700; cursor: pointer; }
-.customer-account-tabs button .material-icons { font-size: 22px; }
-.customer-account-tabs button.active { border-color: #d6000f; color: #bc000d; }
-.customer-account-content { height: calc(100dvh - 192px); padding: 18px; overflow-y: auto; overscroll-behavior: contain; }
+.customer-account-screen-header { height: 54px; display: grid; grid-template-columns: 48px minmax(0,1fr) 48px; align-items: center; gap: 4px; padding: 4px 2px 2px; border-bottom: 1px solid #efeff1; background: #fff; }
+.customer-account-screen-header.is-menu { border-bottom-color: transparent; }
+.customer-account-screen-header > button { width: 48px; height: 44px; display: grid; place-items: center; padding: 0; border: 0; background: transparent; color: #1f1f23; cursor: pointer; }
+.customer-account-screen-header > button svg { width: 24px; height: 24px; }
+.customer-account-screen-header h2 { margin: 0; color: #19191d; font-size: 20px; line-height: 26px; font-weight: 700; text-align: center; }
+.customer-account-content { position: absolute; inset: 54px 0 0; min-height: 0; padding: 20px 22px 28px; overflow-y: auto; overscroll-behavior: contain; background: #f6f6f7; scrollbar-width: thin; }
+.customer-account-content.section-menu { padding: 2px 0 132px; background: #fff; }
+.customer-account-menu-view { position: relative; min-height: 100%; }
+.customer-account-summary { min-height: 66px; display: flex; align-items: center; gap: 8px; margin: 0 12px 16px; padding: 10px 14px; border-radius: 18px; background: #f4f4f2; }
+.customer-account-summary > div { min-width: 0; flex: 1; }
+.customer-account-summary small,.customer-account-summary strong { display: block; }
+.customer-account-summary small { color: #666; font-size: 12px; line-height: 16px; }
+.customer-account-summary strong { margin-top: 2px; overflow: hidden; color: #151515; font-size: 14px; line-height: 18px; text-overflow: ellipsis; white-space: nowrap; }
+.customer-account-summary > button { min-width: 74px; height: 34px; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 0 10px; border: 0; border-radius: 12px; background: #fff; color: #f84901; font-size: 12px; font-weight: 600; cursor: pointer; }
+.customer-account-summary > button svg { width: 15px; height: 15px; }
+.customer-account-menu { display: grid; }
+.customer-account-menu > button,.customer-account-menu > a { min-height: 44px; display: grid; grid-template-columns: 24px minmax(0,1fr) auto 20px; align-items: center; gap: 12px; padding: 9px 16px 9px 18px; border: 0; background: transparent; color: #151515; font: inherit; text-align: left; text-decoration: none; cursor: pointer; }
+.customer-account-menu > button:hover,.customer-account-menu > a:hover { background: #f7f7f7; }
+.customer-account-menu > button > svg:first-child,.customer-account-menu > a > svg:first-child { width: 21px; height: 21px; color: #f84901; }
+.customer-account-menu > button > svg:last-child,.customer-account-menu > a > svg:last-child { width: 20px; height: 20px; grid-column: 4; color: #a0a0a0; }
+.customer-account-menu b { font-size: 14px; line-height: 20px; font-weight: 400; }
+.customer-account-menu em { display: grid; justify-items: end; gap: 1px; color: #77777d; font-style: normal; line-height: 1; }
+.customer-account-menu em span { color: #55555b; font-size: 13px; }
+.customer-account-menu em small { color: #7d55c7; font-size: 9px; font-weight: 700; white-space: nowrap; }
+.customer-account-menu-footer { position: absolute; left: 0; right: 0; bottom: -118px; display: flex; flex-direction: column; align-items: center; }
+.customer-account-menu-footer img { width: 106px; height: 64px; object-fit: contain; }
+.customer-account-menu-footer a { min-height: 42px; display: flex; align-items: center; justify-content: center; padding: 0 20px; color: #151515; font-size: 11px; text-decoration: none; }
+.customer-account-menu-footer small { color: #a8a8a8; font-size: 10px; line-height: 14px; }
 .customer-account-loading { min-height: 180px; display: grid; place-items: center; padding: 24px; color: #787d87; font-size: 13px; text-align: center; }
 .customer-account-error { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; padding: 12px 14px; border: 1px solid #ffc9cd; border-radius: 12px; background: #fff0f1; color: #9d0b16; font-size: 12px; line-height: 1.45; }
 .customer-account-error button { border: 0; background: transparent; color: inherit; font-weight: 800; text-decoration: underline; cursor: pointer; }
-.customer-reward-balances { display: grid; grid-template-columns: 1.15fr .85fr; gap: 12px; }
-.customer-coin-card,.customer-nft-card { min-width: 0; min-height: 142px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 20px; overflow: hidden; border-radius: 24px; }
-.customer-coin-card { background: linear-gradient(140deg,#ff7b1c,#ff4215); box-shadow: 0 14px 30px rgba(226,75,15,.2); color: #fff; }
-.customer-nft-card { border: 1px solid #e5dcff; background: linear-gradient(140deg,#f5f0ff,#e9dfff); color: #382a59; }
+.profile-balance-card { min-height: 150px; display: flex; align-items: center; justify-content: space-between; padding: 24px; border-radius: 26px; background: #fff; }
+.profile-balance-card span,.profile-balance-card strong { display: block; }
+.profile-balance-card span { color: #88888e; font-size: 13px; }
+.profile-balance-card strong { margin-top: 6px; color: #1c1c20; font-size: 42px; line-height: 46px; }
+.profile-balance-card img { width: 78px; height: 78px; object-fit: contain; }
+.profile-nft-balance-card { min-height: 132px; display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 12px; padding: 22px 24px; overflow: hidden; border: 1px solid #e5dcff; border-radius: 26px; background: linear-gradient(135deg,#f3efff 0%,#ebe3ff 100%); }
+.profile-nft-balance-card > div { min-width: 0; }
+.profile-nft-balance-card span,.profile-nft-balance-card strong,.profile-nft-balance-card small { display: block; }
+.profile-nft-balance-card span { color: #756994; font-size: 13px; }
+.profile-nft-balance-card strong { margin-top: 4px; color: #332653; font-size: 38px; line-height: 42px; }
+.profile-nft-balance-card small { color: #8579a2; font-size: 10px; }
+.profile-nft-balance-card > i { width: 68px; height: 68px; display: grid; flex: 0 0 68px; place-items: center; border-radius: 21px; background: #fff; color: #7851cc; box-shadow: 0 10px 28px rgba(88,57,151,.1); font-style: normal; }
+.profile-info-card { margin-top: 14px; padding: 20px; border-radius: 22px; background: #fff; }
+.profile-info-card h3 { margin: 0 0 10px; color: #202024; font-size: 16px; line-height: 21px; }
+.profile-info-card > p { margin: 0; color: #77777d; font-size: 12px; line-height: 18px; }
+.profile-coin-history { display: grid; }
+.profile-reward-withdraw-button { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 9px; margin-top: 14px; border: 0; border-radius: 18px; background: #151515; color: #fff; font-size: 14px; font-weight: 700; box-shadow: 0 10px 24px rgba(0,0,0,.12); cursor: pointer; }
+.profile-reward-withdraw-button:disabled { cursor: default; opacity: .38; box-shadow: none; }
+.profile-reward-explainer { position: relative; overflow: hidden; padding-left: 58px; border: 1px solid #eeeef0; box-shadow: 0 8px 24px rgba(0,0,0,.04); }
+.profile-reward-explainer::before { position: absolute; left: 18px; top: 20px; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #f5f5f5; color: #202024; font-size: 16px; font-weight: 700; content: "i"; }
+.profile-reward-history { border: 1px solid #eeeef0; box-shadow: 0 8px 24px rgba(0,0,0,.04); }
+.profile-reward-history > h3 { margin-bottom: 2px; }
+.profile-history-row { padding: 12px 0; border-top: 1px solid #eeeef0; }
+.profile-history-row:first-child { border-top: 0; }
+.profile-history-main { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0; background: transparent; text-align: left; }
+button.profile-history-main:disabled { cursor: default; opacity: 1; }
+.profile-history-main > span { min-width: 0; }
+.profile-history-main b,.profile-history-main small { display: block; }
+.profile-history-main b { color: #29292e; font-size: 12px; line-height: 17px; }
+.profile-history-main small { margin-top: 3px; color: #929298; font-size: 10px; line-height: 15px; }
+.profile-history-main > strong { flex: 0 0 auto; color: #2c8a43; font-size: 14px; }
+.profile-history-main > strong.negative { color: #c54835; }
+.profile-history-main > strong.nft-status { padding: 5px 8px; border-radius: 8px; background: #eee9fa; color: #7353aa; font-size: 9px; }
+.profile-history-main > strong.nft-status.status-pending,.profile-history-main > strong.nft-status.status-submitted { background: #fff2dc; color: #9d6413; }
+.profile-history-main > strong.nft-status.status-failed { background: #ffebe8; color: #b84635; }
+.profile-history-main > strong.nft-status.status-withdrawn { background: #e6f6ea; color: #277a3d; }
+.profile-withdrawal-reason { margin: 8px 0 0 !important; padding: 9px 10px; border-radius: 10px; background: #fff0ee; color: #a53e32 !important; font-size: 10px !important; line-height: 15px !important; white-space: pre-wrap; overflow-wrap: anywhere; }
+.profile-withdrawal-address { margin: 7px 0 0 !important; overflow: hidden; color: #87828d !important; font-family: ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size: 9px !important; line-height: 14px !important; text-overflow: ellipsis; white-space: nowrap; }
+.profile-cancel-withdrawal { min-height: 36px; margin-top: 9px; padding: 7px 12px; border: 1px solid #f0c7c1; border-radius: 11px; background: #fff; color: #b84332; font-size: 10px; font-weight: 700; cursor: pointer; }
+.customer-coin-card,.customer-nft-card { min-width: 0; display: flex; align-items: center; justify-content: space-between; gap: 18px; overflow: hidden; border-radius: 26px; }
+.customer-coin-card { min-height: 150px; padding: 24px; background: #fff; }
+.customer-nft-card { min-height: 132px; margin-top: 12px; padding: 22px 24px; border: 1px solid #e5dcff; background: linear-gradient(135deg,#f3efff 0%,#ebe3ff 100%); color: #332653; }
 .customer-coin-card span,.customer-coin-card strong,.customer-coin-card small,.customer-nft-card span,.customer-nft-card strong,.customer-nft-card small { display: block; }
-.customer-coin-card span,.customer-nft-card span { font-size: 11px; opacity: .76; }
-.customer-coin-card strong,.customer-nft-card strong { margin-top: 5px; font-size: 34px; line-height: 1; }
-.customer-coin-card small,.customer-nft-card small { margin-top: 5px; font-size: 9px; opacity: .7; }
-.customer-coin-card > i,.customer-nft-card > i { width: 55px; height: 55px; display: grid; flex: 0 0 55px; place-items: center; border-radius: 18px; background: rgba(255,255,255,.94); box-shadow: 0 9px 24px rgba(61,26,12,.13); font-style: normal; font-weight: 900; }
-.customer-coin-card > i { color: #ff4c16; font-size: 15px; }
-.customer-nft-card > i { color: #7650c0; }
-.customer-nft-card > i .material-icons { font-size: 32px; }
-.customer-withdraw-button { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 9px; margin: 13px 0; padding: 11px 16px; border: 0; border-radius: 16px; background: #17191e; color: #fff; font-size: 13px; font-weight: 800; cursor: pointer; }
-.customer-withdraw-button:disabled { cursor: default; opacity: .42; }
+.customer-coin-card span { color: #88888e; font-size: 13px; }
+.customer-coin-card strong { margin-top: 6px; color: #1c1c20; font-size: 42px; line-height: 46px; }
+.customer-coin-card small { margin-top: 2px; color: #99999f; font-size: 10px; }
+.customer-coin-card > img { width: 78px; height: 78px; flex: 0 0 78px; object-fit: contain; filter: drop-shadow(0 8px 12px rgba(100,67,0,.16)); }
+.customer-nft-card span { color: #756994; font-size: 13px; }
+.customer-nft-card strong { margin-top: 4px; color: #332653; font-size: 38px; line-height: 42px; }
+.customer-nft-card small { color: #8579a2; font-size: 10px; }
+.customer-nft-card > i { width: 68px; height: 68px; display: grid; flex: 0 0 68px; place-items: center; border-radius: 21px; background: #fff; box-shadow: 0 10px 28px rgba(88,57,151,.1); color: #7851cc; font-style: normal; }
+.customer-nft-card > i .material-icons { font-size: 38px; }
+.customer-withdraw-button { width: 100%; min-height: 54px; display: flex; align-items: center; justify-content: center; gap: 9px; margin: 14px 0 0; padding: 11px 16px; border: 0; border-radius: 18px; background: #151515; box-shadow: 0 10px 24px rgba(0,0,0,.12); color: #fff; font-size: 14px; font-weight: 700; cursor: pointer; }
+.customer-withdraw-button:disabled { cursor: default; opacity: .38; box-shadow: none; }
 .customer-withdraw-button .material-icons { font-size: 21px; }
-.customer-reward-explainer { display: flex; gap: 12px; margin-bottom: 14px; padding: 15px; border: 1px solid #eadfce; border-radius: 16px; background: #fffaf2; color: #635447; }
-.customer-reward-explainer > .material-icons { color: #e16618; font-size: 22px; }
-.customer-reward-explainer h3 { margin: 0 0 4px; color: #2d2926; font-size: 13px; }
-.customer-reward-explainer p { margin: 0; font-size: 10px; line-height: 1.55; }
-.customer-reward-section,.customer-orders-view > section { margin-top: 13px; padding: 17px; border: 1px solid #e5e6e9; border-radius: 18px; background: #fff; }
-.customer-reward-section > header,.customer-orders-view > section > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 13px; }
-.customer-reward-section h3,.customer-orders-view h3 { margin: 0; color: #25272d; font-size: 14px; }
-.customer-reward-section header p { margin: 3px 0 0; color: #858a93; font-size: 10px; }
-.customer-reward-section header > b,.customer-orders-view header > b { min-width: 29px; height: 29px; display: grid; place-items: center; border-radius: 10px; background: #f0eaff; color: #7049bd; font-size: 11px; }
-.customer-nft-list,.customer-operation-list,.customer-coin-history,.customer-orders-view > section > div { display: grid; gap: 9px; }
-.customer-nft-item { display: grid; grid-template-columns: 54px minmax(0,1fr); gap: 11px; padding: 11px; border: 1px solid #ece9f2; border-radius: 15px; background: #fbfafc; }
-.customer-nft-art { width: 54px; height: 54px; display: grid; place-items: center; overflow: hidden; border-radius: 14px; background: linear-gradient(145deg,#eee7ff,#fff); color: #7750c8; }
-.customer-nft-art img { width: 100%; height: 100%; object-fit: cover; }
-.customer-nft-art .material-icons { font-size: 30px; }
-.customer-nft-item > div:last-child { min-width: 0; }
-.customer-nft-item > div > span { display: flex; align-items: flex-start; justify-content: space-between; gap: 7px; }
-.customer-nft-item strong { min-width: 0; overflow: hidden; color: #29252f; font-size: 11px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
-.customer-nft-item em,.customer-operation-list em { flex: 0 0 auto; padding: 4px 6px; border-radius: 7px; background: #eee9fa; color: #7353aa; font-size: 8px; font-style: normal; font-weight: 800; }
-.customer-nft-item em.status-pending,.customer-nft-item em.status-submitted,.customer-operation-list em.status-pending,.customer-operation-list em.status-submitted { background: #fff1d8; color: #96600e; }
-.customer-nft-item em.status-withdrawn,.customer-operation-list em.status-withdrawn { background: #e5f7e9; color: #27763b; }
-.customer-nft-item em.status-failed,.customer-operation-list em.status-failed,.customer-operation-list em.status-cancelled { background: #ffebe9; color: #aa4034; }
-.customer-nft-item small { display: block; margin-top: 5px; color: #8a8491; font-size: 8px; }
-.customer-nft-item p { margin: 6px 0 0; overflow: hidden; color: #77717d; font-family: ui-monospace,SFMono-Regular,Consolas,monospace; font-size: 8px; line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
-.customer-nft-item p.error { padding: 6px; border-radius: 7px; background: #fff0ee; color: #a53e32; font-family: inherit; white-space: normal; }
-.customer-nft-item button,.customer-operation-list aside button { margin-top: 7px; padding: 5px 8px; border: 1px solid #ffc7cb; border-radius: 7px; background: #fff7f7; color: #aa0c18; font-size: 8px; font-weight: 800; cursor: pointer; }
-.customer-operation-list > article,.customer-coin-history > article { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 11px 0; border-top: 1px solid #eeeef0; }
-.customer-operation-list > article:first-child,.customer-coin-history > article:first-child { border-top: 0; }
+.customer-reward-explainer { position: relative; display: flex; gap: 12px; margin-top: 14px; padding: 20px 20px 20px 58px; overflow: hidden; border: 1px solid #eeeef0; border-radius: 22px; background: #fff; box-shadow: 0 8px 24px rgba(0,0,0,.04); }
+.customer-reward-explainer > span { position: absolute; left: 18px; top: 20px; width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #f5f5f5; color: #202024; font-size: 16px; font-weight: 700; }
+.customer-reward-explainer h3 { margin: 0 0 10px; color: #202024; font-size: 16px; line-height: 21px; }
+.customer-reward-explainer p { margin: 0; color: #77777d; font-size: 12px; line-height: 18px; }
+.customer-reward-section { margin-top: 14px; padding: 20px; border: 1px solid #eeeef0; border-radius: 22px; background: #fff; box-shadow: 0 8px 24px rgba(0,0,0,.04); }
+.customer-reward-section > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 2px; }
+.customer-reward-section h3 { margin: 0; color: #202024; font-size: 16px; line-height: 21px; }
+.customer-operation-list { display: grid; }
+.customer-operation-list > article { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid #eeeef0; }
+.customer-operation-list > article:first-child { border-top: 0; }
 .customer-operation-list article > div { min-width: 0; }
-.customer-operation-list strong,.customer-operation-list span,.customer-operation-list small,.customer-coin-history strong,.customer-coin-history span { display: block; }
-.customer-operation-list strong,.customer-coin-history strong { color: #29292e; font-size: 10px; line-height: 1.45; }
-.customer-operation-list span,.customer-coin-history span { margin-top: 3px; color: #929298; font-size: 8px; line-height: 1.4; }
-.customer-operation-list small { margin-top: 5px; overflow: hidden; color: #69656d; font-family: ui-monospace,SFMono-Regular,Consolas,monospace; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
-.customer-operation-list p { margin: 6px 0 0; padding: 6px; border-radius: 7px; background: #fff0ee; color: #a53e32; font-size: 8px; line-height: 1.45; }
+.customer-operation-list strong,.customer-operation-list span,.customer-operation-list small { display: block; }
+.customer-operation-list strong { color: #29292e; font-size: 12px; line-height: 17px; }
+.customer-operation-list span { margin-top: 3px; color: #929298; font-size: 10px; line-height: 14px; }
+.customer-operation-list small { max-width: 190px; margin-top: 6px; overflow: hidden; color: #69656d; font-family: ui-monospace,SFMono-Regular,Consolas,monospace; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.customer-operation-list p { margin: 7px 0 0; padding: 7px; border-radius: 8px; background: #fff0ee; color: #a53e32; font-size: 10px; line-height: 14px; }
 .customer-operation-list aside { display: grid; flex: 0 0 auto; justify-items: end; }
-.customer-coin-history b { color: #2a8b43; font-size: 12px; }
-.customer-coin-history b.negative { color: #c24434; }
-.customer-empty-state { margin: 0; padding: 22px 10px; color: #91959d; font-size: 10px; line-height: 1.5; text-align: center; }
-.customer-orders-view,.customer-profile-view { display: grid; gap: 13px; }
-.customer-orders-view > section { margin-top: 0; }
-.customer-order-card { padding: 13px; border: 1px solid #e8e9ec; border-radius: 14px; background: #fafbfc; }
-.customer-order-card > div,.customer-order-card footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-.customer-order-card > div > strong { color: #292c32; font-size: 11px; }
-.customer-status { padding: 4px 7px; border-radius: 999px; background: #edf2fb; color: #3f6098; font-size: 8px; font-weight: 800; }
-.customer-status.status-completed { background: #e8f6eb; color: #2c783f; }
-.customer-status.status-cancelled { background: #ffebe9; color: #aa4034; }
-.customer-order-card > p { margin: 8px 0; color: #858a93; font-size: 9px; }
-.customer-order-card footer { padding-top: 9px; border-top: 1px solid #e9eaed; }
-.customer-order-card footer strong { font-size: 13px; }
-.customer-order-card footer span { color: #e15114; font-size: 9px; font-weight: 800; }
-.customer-profile-view > section { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 17px; border: 1px solid #e5e6e9; border-radius: 15px; background: #fff; }
-.customer-profile-view > section span { color: #7b8089; font-size: 11px; }
-.customer-profile-view > section strong { color: #262930; font-size: 12px; text-align: right; }
-.customer-profile-view nav { overflow: hidden; border: 1px solid #e5e6e9; border-radius: 15px; background: #fff; }
-.customer-profile-view nav a { min-height: 52px; display: flex; align-items: center; justify-content: space-between; padding: 10px 15px; border-top: 1px solid #eceef1; color: #292c32; font-size: 11px; font-weight: 700; text-decoration: none; }
-.customer-profile-view nav a:first-child { border-top: 0; }
-.customer-profile-view nav .material-icons { color: #979ba3; font-size: 18px; }
-.customer-profile-logout { min-height: 49px; border: 1px solid #ffc5ca; border-radius: 14px; background: #fff5f6; color: #b30815; font-size: 11px; font-weight: 800; cursor: pointer; }
+.customer-operation-list em { flex: 0 0 auto; padding: 5px 7px; border-radius: 8px; background: #eee9fa; color: #7353aa; font-size: 9px; font-style: normal; font-weight: 700; }
+.customer-operation-list em.status-pending,.customer-operation-list em.status-submitted { background: #fff1d8; color: #96600e; }
+.customer-operation-list em.status-withdrawn { background: #e5f7e9; color: #27763b; }
+.customer-operation-list em.status-failed,.customer-operation-list em.status-cancelled { background: #ffebe9; color: #aa4034; }
+.customer-operation-list aside button { margin-top: 7px; padding: 6px 8px; border: 1px solid #ffc7cb; border-radius: 8px; background: #fff7f7; color: #aa0c18; font-size: 9px; font-weight: 700; cursor: pointer; }
+.customer-history-entry > b { flex: 0 0 auto; color: #2a8b43; font-size: 14px; }
+.customer-history-entry > b.negative { color: #c24434; }
+.customer-empty-state { margin: 0; padding: 24px 10px; color: #91959d; font-size: 12px; line-height: 18px; text-align: center; }
+.customer-account-screen-header.is-orders { width: min(100%,520px); height: calc(64px + env(safe-area-inset-top)); margin: 0 auto; padding-top: calc(16px + env(safe-area-inset-top)); border-bottom: 0; align-items: start; }
+.customer-account-screen-header.is-orders > button { height: 48px; }
+.customer-account-content.section-orders { top: calc(64px + env(safe-area-inset-top)); right: auto; left: 50%; width: min(100%,520px); padding: 0 0 max(36px,calc(env(safe-area-inset-bottom) + 20px)); transform: translateX(-50%); background: #fff; scrollbar-width: none; }
+.customer-account-content.section-orders::-webkit-scrollbar { display: none; }
+.customer-orders-view { display: grid; }
+.customer-orders-view > h2 { margin: 6px 16px 0; color: #000; font-size: 27px; line-height: 34px; }
+.customer-order-tabs { height: 48px; display: grid; grid-template-columns: 1fr 1fr; margin: 14px 16px 0; padding: 4px; border-radius: 16px; background: #f3f3f3; }
+.customer-order-tabs button { height: 40px; border: 0; border-radius: 13px; background: transparent; color: #77797e; font-size: 13px; font-weight: 500; cursor: pointer; }
+.customer-order-tabs button.active { background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,.08); color: #f84901; font-weight: 600; }
+.customer-order-list { display: grid; margin: 0; }
+.customer-order-card { width: auto; display: grid; margin: 14px 16px 0; padding: 14px; border: 1px solid #e8e8e8; border-radius: 20px; background: #fff; color: #25252a; text-align: left; box-shadow: 0 4px 12px rgba(0,0,0,.05); }
+.customer-order-status { min-height: 27px; display: flex; align-items: center; justify-self: start; padding: 0 12px; border-radius: 10px; background: #fff0e9; color: #f84901; font-size: 11px; line-height: 15px; font-weight: 600; }
+.customer-order-status.status-completed { background: #ecf7ef; color: #27804f; }
+.customer-order-status.status-cancelled { background: #fff0f0; color: #d64242; }
+.customer-order-main { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-top: 12px; }
+.customer-order-main > span { min-width: 0; }
+.customer-order-main b,.customer-order-main small { display: block; }
+.customer-order-main b { color: #000; font-size: 17px; line-height: 22px; }
+.customer-order-main small { margin-top: 4px; overflow: hidden; color: #999; font-size: 12px; line-height: 16px; text-overflow: ellipsis; white-space: nowrap; }
+.customer-order-main > strong { display: flex; align-items: center; flex: 0 0 auto; gap: 7px; color: #000; font-size: 14px; white-space: nowrap; }
+.customer-order-delivery { min-height: 63px; display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 0 11px; border: 1px solid #e8e8e8; border-radius: 15px; background: #fcfcfc; }
+.customer-order-delivery > i { width: 32px; height: 32px; display: grid; flex: 0 0 32px; place-items: center; border-radius: 10px; background: #fff0e9; color: #f84901; font-style: normal; }
+.customer-order-delivery > i svg { width: 19px; height: 19px; }
+.customer-order-delivery b,.customer-order-delivery small { display: block; }
+.customer-order-delivery b { color: #202024; font-size: 11px; line-height: 15px; }
+.customer-order-delivery small { max-width: 100%; margin-top: 2px; overflow: hidden; color: #77797e; font-size: 10px; line-height: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.customer-orders-empty { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.customer-orders-empty::before { width: min(276px,calc(100% - 64px)); height: 1px; margin-top: 8px; background: #e1e1e1; content: ""; }
+.customer-orders-empty-art { position: relative; width: 147px; height: 203px; display: grid; place-items: center; margin-top: 16px; border-radius: 44px; background: #fff0e9; color: #f84901; }
+.customer-orders-empty-art svg + svg { position: absolute; bottom: 41px; padding: 10px; border-radius: 50%; background: #f84901; color: #fff; }
+.customer-orders-empty p { margin: 48px 28px 0; color: #000; font-size: 15px; line-height: 21px; }
+.customer-orders-empty button { width: min(264px,calc(100% - 32px)); height: 52px; margin-top: 24px; border: 0; border-radius: 16px; background: #f84901; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; }
+.customer-profile-view { display: block; }
+.profile-settings-field { margin-bottom: 12px; padding: 18px 20px; border-radius: 20px; background: #fff; }
+.profile-settings-field span,.profile-settings-field strong { display: block; }
+.profile-settings-field span { color: #909096; font-size: 11px; }
+.profile-settings-field strong { margin-top: 6px; color: #222227; font-size: 16px; }
+.profile-settings-link { min-height: 56px; display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding: 0 20px; border-radius: 18px; background: #fff; color: #29292e; font-size: 14px; text-decoration: none; }
+.profile-settings-link span { color: #99999f; font-size: 22px; }
+.profile-logout { width: 100%; height: 54px; display: flex; align-items: center; justify-content: space-between; margin-top: 18px; padding: 0 18px 0 22px; border: 0; border-radius: 27px; background: #161619; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; }
+.profile-logout span { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; background: #f84901; }
+.customer-account-modal button:focus-visible,.customer-account-modal a:focus-visible { outline: 3px solid rgba(248,73,1,.35); outline-offset: 2px; }
 
 .reward-withdrawal-overlay { position: fixed; z-index: 5200; inset: 0; display: grid; place-items: center; padding: 18px; overflow-y: auto; background: rgba(10,12,18,.62); backdrop-filter: blur(6px); }
 .reward-withdrawal-dialog { position: relative; z-index: 1; width: min(620px,100%); max-height: calc(100dvh - 36px); overflow-y: auto; border-radius: 25px; background: #fff; box-shadow: 0 28px 90px rgba(0,0,0,.3); }
@@ -599,7 +666,7 @@ a { color: inherit; }
 .reward-kind-card { position: relative; min-height: 130px; display: grid; align-content: center; justify-items: start; padding: 20px; overflow: hidden; border: 2px solid transparent; border-radius: 21px; text-align: left; cursor: pointer; }
 .reward-kind-card.coin { background: linear-gradient(140deg,#ff7b1c,#ff4215); color: #fff; }
 .reward-kind-card.nft { border-color: #e4d9ff; background: linear-gradient(140deg,#f5f0ff,#e9dfff); color: #382a59; }
-.reward-kind-card.selected { box-shadow: 0 0 0 3px rgba(214,0,15,.18); }
+.reward-kind-card.selected { box-shadow: 0 0 0 3px rgba(248,73,1,.2); }
 .reward-kind-card:disabled { cursor: default; filter: grayscale(.35); opacity: .48; }
 .reward-kind-card span,.reward-kind-card strong { display: block; }
 .reward-kind-card span { font-size: 11px; opacity: .78; }
@@ -618,7 +685,7 @@ a { color: inherit; }
 .reward-withdrawal-form > label { display: grid; gap: 7px; color: #34373e; font-size: 12px; font-weight: 800; }
 .reward-withdrawal-form > label > input,.reward-wallet-field { width: 100%; min-height: 49px; border: 1px solid #d8dae0; border-radius: 11px; background: #fff; }
 .reward-withdrawal-form > label > input { padding: 0 13px; outline: 0; }
-.reward-withdrawal-form > label > input:focus,.reward-wallet-field:focus-within { border-color: #d6000f; box-shadow: 0 0 0 3px rgba(214,0,15,.09); }
+.reward-withdrawal-form > label > input:focus,.reward-wallet-field:focus-within { border-color: #f84901; box-shadow: 0 0 0 3px rgba(248,73,1,.1); }
 .reward-withdrawal-form small.invalid { color: #b20e19; font-size: 9px; }
 .reward-wallet-field { display: flex; align-items: center; overflow: hidden; }
 .reward-wallet-field input { min-width: 0; flex: 1; height: 47px; padding: 0 12px; border: 0; outline: 0; font-family: ui-monospace,SFMono-Regular,Consolas,monospace; font-size: 11px; }
@@ -627,7 +694,7 @@ a { color: inherit; }
 .reward-withdrawal-selection { margin: 0; padding: 12px; border-radius: 10px; background: #f5f1ff; color: #5c438e; font-size: 11px; font-weight: 700; }
 .reward-withdrawal-hint { margin: -2px 0 0; color: #858a93; font-size: 9px; line-height: 1.5; }
 .reward-withdrawal-primary,.reward-withdrawal-secondary { width: 100%; min-height: 50px; border-radius: 12px; font-size: 12px; font-weight: 800; cursor: pointer; }
-.reward-withdrawal-primary { border: 0; background: #d6000f; color: #fff; }
+.reward-withdrawal-primary { border: 0; background: linear-gradient(135deg,#ff731a,#ff3e08); color: #fff; }
 .reward-withdrawal-secondary { border: 1px solid #dadce1; background: #fff; color: #484c54; }
 .reward-withdrawal-primary:disabled,.reward-withdrawal-secondary:disabled { cursor: default; opacity: .48; }
 .reward-withdrawal-heading { display: flex; align-items: flex-start; gap: 12px; padding-right: 45px; }
@@ -654,27 +721,118 @@ a { color: inherit; }
 .customer-cancel-dialog h2 { margin: 0; font-size: 20px; }.customer-cancel-dialog > p { margin: 9px 0 17px; color: #747984; font-size: 11px; line-height: 1.55; }
 .customer-cancel-dialog > div:last-child { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }.customer-cancel-dialog > div:last-child button { min-height: 44px; border: 1px solid #d9dbe0; border-radius: 10px; background: #fff; color: #454951; font-size: 11px; font-weight: 800; cursor: pointer; }.customer-cancel-dialog > div:last-child button:last-child { border-color: #d6000f; background: #d6000f; color: #fff; }
 
-@media (max-width: 599px) {
+/* Exact NAKTA Sushi reward withdrawal presentation. */
+.reward-withdrawal-overlay { z-index: 5200; place-items: center; padding: 20px; background: rgba(20,20,22,.58); }
+.reward-withdrawal-dialog { position: relative; width: min(620px,100%); max-height: calc(100dvh - 40px); overflow-y: auto; border: 1px solid rgba(255,255,255,.8); border-radius: 34px; background: rgba(255,255,255,.98); box-shadow: 0 28px 90px rgba(0,0,0,.25); scrollbar-width: none; }
+.reward-withdrawal-dialog::-webkit-scrollbar { display: none; }
+.reward-withdrawal-close { position: absolute; z-index: 3; right: 22px; top: 22px; width: 42px; height: 42px; display: grid; place-items: center; border: 0; border-radius: 14px; background: #f4f4f5; color: #29292d; }
+.reward-withdrawal-content { padding: 42px 42px 38px; }
+.reward-withdrawal-content > h2,.reward-withdrawal-success h2 { margin: 0; padding-right: 50px; color: #111114; font-size: 32px; line-height: 39px; letter-spacing: -.7px; }
+.reward-withdrawal-subtitle,.reward-withdrawal-heading p { margin: 7px 0 0; color: #8b8b91; font-size: 15px; line-height: 21px; }
+.reward-withdrawal-kinds { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 26px; }
+.reward-kind-card { position: relative; width: auto; height: 150px; min-height: 0; display: flex; flex-direction: column; align-items: flex-start; padding: 22px; overflow: hidden; border: 2px solid transparent; border-radius: 27px; text-align: left; box-shadow: 0 12px 30px rgba(0,0,0,.08); transition: transform .18s ease,border-color .18s ease; }
+.reward-kind-card:hover:not(:disabled) { transform: translateY(-2px); }
+.reward-kind-card:disabled { cursor: default; filter: none; opacity: .35; box-shadow: none; }
+.reward-kind-card.coin { border-color: transparent; background: linear-gradient(135deg,#ff751b 0%,#ff3f08 100%); color: #fff; }
+.reward-kind-card.nft { border-color: transparent; background: linear-gradient(135deg,#f8f4ff 0%,#e9dfff 100%); color: #392b5d; }
+.reward-kind-card.selected { border-color: #161619; box-shadow: 0 12px 30px rgba(0,0,0,.08); }
+.reward-kind-card.nft.selected { border-color: #7a53d4; }
+.reward-kind-card span { font-size: 16px; font-weight: 600; opacity: 1; }
+.reward-kind-card strong { margin-top: auto; font-size: 46px; line-height: 50px; }
+.reward-kind-card i { position: absolute; right: 18px; bottom: 18px; width: 52px; height: 52px; display: grid; place-items: center; border-radius: 17px; background: #fff; color: #7a53d4; box-shadow: 0 8px 22px rgba(85,55,148,.12); font-style: normal; }
+.reward-nft-selector { display: grid; gap: 8px; margin: 24px 0 0; padding: 0; border: 0; }
+.reward-nft-selector legend { margin-bottom: 8px; color: #242428; font-size: 14px; font-weight: 700; }
+.reward-nft-selector label { min-height: 60px; display: flex; align-items: center; gap: 10px; padding: 10px 13px; border: 1px solid #e2ddec; border-radius: 16px; background: #fff; cursor: pointer; }
+.reward-nft-selector label.selected { border-color: #7a53d4; background: #faf8ff; }
+.reward-nft-selector input { accent-color: #7a53d4; }
+.reward-nft-selector span { min-width: 0; }
+.reward-nft-selector b,.reward-nft-selector small { display: block; }
+.reward-nft-selector b { color: #2d2737; font-size: 13px; }
+.reward-nft-selector small { margin-top: 3px; color: #8d859a; font-size: 10px; }
+.reward-withdrawal-form { display: grid; gap: 18px; margin-top: 28px; }
+.reward-withdrawal-form > label { display: grid; gap: 9px; color: #242428; font-size: 14px; line-height: 19px; font-weight: 700; }
+.reward-withdrawal-form > label > input,.reward-wallet-field { width: 100%; height: 62px; min-height: 0; border: 1px solid #dcdce0; border-radius: 19px; outline: 0; background: #fafafb; }
+.reward-withdrawal-form > label > input { padding: 0 17px; color: #242428; font-size: 16px; font-weight: 600; }
+.reward-withdrawal-form input:focus,.reward-wallet-field:focus-within { border-color: #ff5a16; box-shadow: 0 0 0 4px rgba(255,90,22,.1); }
+.reward-withdrawal-form small.invalid { margin-top: -2px; color: #c84837; font-size: 11px; font-weight: 500; }
+.reward-wallet-field { display: flex; align-items: center; overflow: hidden; }
+.reward-wallet-field input { min-width: 0; height: 100%; flex: 1; padding: 0 16px; border: 0; outline: 0; background: transparent; color: #242428; font-family: inherit; font-size: 14px; }
+.reward-wallet-field button { width: 54px; height: 36px; display: grid; flex: 0 0 54px; place-items: center; border: 0; border-left: 1px solid #dfdfe2; background: transparent; color: #29292d; }
+.reward-withdrawal-hint { margin: -7px 0 0; color: #8b8b91; font-size: 12px; line-height: 18px; }
+.reward-withdrawal-selection { margin: 0; padding: 14px 16px; border-radius: 15px; background: #f5f1ff; color: #4f3a78; font-size: 13px; line-height: 19px; font-weight: 700; }
+.reward-withdrawal-error { margin: 0; padding: 11px 13px; border-radius: 12px; background: #fff0ed; color: #bd4432; font-size: 12px; line-height: 18px; white-space: pre-wrap; }
+.reward-withdrawal-primary,.reward-withdrawal-secondary { width: 100%; min-height: 58px; border: 0; border-radius: 19px; font-size: 16px; font-weight: 700; }
+.reward-withdrawal-primary { margin-top: 4px; background: linear-gradient(135deg,#ff731a,#ff3e08); color: #fff; box-shadow: 0 10px 24px rgba(255,75,8,.2); }
+.reward-withdrawal-primary:disabled { cursor: default; opacity: .38; box-shadow: none; }
+.reward-withdrawal-secondary { margin-top: 10px; background: #f4f4f5; color: #303034; }
+.reward-withdrawal-heading { display: grid; grid-template-columns: 44px minmax(0,1fr); align-items: start; gap: 13px; padding-right: 0; }
+.reward-withdrawal-heading > button,.reward-withdrawal-scanner header button { width: 42px; height: 42px; display: grid; flex: initial; place-items: center; border: 0; border-radius: 14px; background: #f4f4f5; color: #29292d; }
+.reward-withdrawal-heading h2 { margin: 0; color: #111114; font-size: 29px; line-height: 36px; }
+.reward-withdrawal-summary { display: block; margin: 28px 0 0; padding: 0 20px; overflow: visible; border: 1px solid #e2e2e5; border-radius: 24px; background: #fcfcfd; box-shadow: 0 8px 26px rgba(0,0,0,.04); }
+.reward-withdrawal-summary > div { min-height: 68px; display: grid; grid-template-columns: minmax(120px,.7fr) minmax(0,1.3fr); align-items: center; gap: 18px; padding: 0; border-top: 1px solid #e6e6e8; }
+.reward-withdrawal-summary > div:first-child { border-top: 0; }
+.reward-withdrawal-summary dt { color: #939398; font-size: 14px; font-weight: 600; }
+.reward-withdrawal-summary dd { min-width: 0; margin: 0; overflow: hidden; color: #19191c; font-size: 14px; font-weight: 700; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+.reward-withdrawal-warning { display: flex; align-items: center; gap: 13px; margin: 22px 0 0; padding: 16px; border-radius: 19px; background: linear-gradient(135deg,#fff6f1,#fff0e9); color: inherit; }
+.reward-withdrawal-warning > span { width: 36px; height: 36px; display: grid; flex: 0 0 36px; place-items: center; border-radius: 50%; background: #ffe3d5; color: #ff5a1f; }
+.reward-withdrawal-warning p { margin: 0; color: #4f4845; font-size: 12px; line-height: 18px; }
+.reward-withdrawal-content > .reward-withdrawal-error { margin-top: 16px; }
+.reward-withdrawal-scanner { min-height: 600px; padding: 30px; background: #121214; color: #fff; }
+.reward-withdrawal-scanner header { display: grid; grid-template-columns: 42px minmax(0,1fr) 42px; align-items: center; gap: 12px; padding-right: 0; }
+.reward-withdrawal-scanner h2 { margin: 0; font-size: 20px; text-align: center; }
+.reward-withdrawal-camera { position: relative; height: 430px; aspect-ratio: auto; margin-top: 28px; overflow: hidden; border-radius: 26px; background: #000; }
+.reward-withdrawal-camera video { width: 100%; height: 100%; object-fit: cover; }
+.reward-withdrawal-camera > span { position: absolute; left: 50%; top: 50%; right: auto; bottom: auto; width: 230px; height: 230px; transform: translate(-50%,-50%); border: 4px solid #fff; border-radius: 28px; box-shadow: 0 0 0 999px rgba(0,0,0,.38); }
+.reward-withdrawal-scanner > p { margin: 18px 0 0; color: #d0d0d4; font-size: 13px; line-height: 19px; text-align: center; }
+.reward-withdrawal-scanner > p.reward-scanner-error { margin-top: 12px; padding: 11px 13px; border-radius: 13px; background: rgba(255,82,54,.16); color: #ffb4a6; }
+.reward-withdrawal-success { min-height: 480px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 45px; text-align: center; }
+.reward-withdrawal-success > span { width: 74px; height: 74px; display: grid; place-items: center; margin: 0; border-radius: 26px; background: linear-gradient(135deg,#ecfff3,#dff7e8); color: #27804f; }
+.reward-withdrawal-success h2 { margin-top: 24px; padding: 0; }
+.reward-withdrawal-success p { max-width: 400px; margin: 12px 0 22px; color: #7d7d83; font-size: 14px; line-height: 21px; }
+.reward-withdrawal-success .reward-withdrawal-primary { max-width: 360px; }
+.reward-cancel-overlay { z-index: 5400; place-items: center; padding: 20px; }
+.reward-cancel-dialog { width: min(430px,100%); padding: 30px; border-radius: 28px; background: #fff; box-shadow: 0 24px 70px rgba(0,0,0,.24); text-align: left; }
+.customer-cancel-dialog > span.reward-cancel-icon { width: 48px; height: 48px; display: grid; place-items: center; margin: 0; border-radius: 16px; background: #fff0ed; color: #c44735; }
+.reward-cancel-dialog h2 { margin: 18px 0 0; color: #1d1d20; font-size: 24px; }
+.reward-cancel-dialog > p { margin: 10px 0 0; color: #77777d; font-size: 13px; line-height: 20px; }
+.reward-cancel-dialog > div:last-child { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 22px; }
+.reward-cancel-dialog > div:last-child button { min-height: 48px; border: 0; border-radius: 15px; background: #f3f3f4; color: #333337; font-size: 13px; font-weight: 700; }
+.reward-cancel-dialog > div:last-child button:last-child { border: 0; background: #c84a37; color: #fff; }
+.reward-cancel-dialog button:disabled { opacity: .5; }
+
+@media (max-width: 720px) {
   .product-reward-badge { top: 135px; }
-  .customer-account-modal,.customer-account-modal:not(.is-authenticated) { width: 100%; }
+  .customer-account-modal:not(.is-authenticated),.customer-account-modal.is-orders { width: 100%; border-radius: 0; }
   .customer-account-close { top: 11px; right: 11px; }
   .customer-login-view { min-height: 100dvh; padding: 80px 25px 45px; }
-  .customer-account-header { min-height: 116px; padding: 24px 62px 18px 17px; }
-  .customer-account-header h2 { max-width: 190px; font-size: 19px; }
-  .customer-account-header > button { display: none; }
-  .customer-account-content { height: calc(100dvh - 180px); padding: 13px; }
-  .customer-reward-balances { grid-template-columns: 1.1fr .9fr; gap: 9px; }
-  .customer-coin-card,.customer-nft-card { min-height: 126px; padding: 15px; border-radius: 20px; }
-  .customer-coin-card strong,.customer-nft-card strong { font-size: 29px; }
-  .customer-coin-card > i,.customer-nft-card > i { width: 44px; height: 44px; flex-basis: 44px; border-radius: 14px; }
-  .customer-nft-card > i .material-icons { font-size: 26px; }
-  .reward-withdrawal-overlay { align-items: end; padding: 0; }
-  .reward-withdrawal-dialog { width: 100%; max-height: 92dvh; border-radius: 24px 24px 0 0; }
-  .reward-withdrawal-content { padding: 25px 17px 18px; }
-  .reward-kind-card { min-height: 116px; padding: 15px; }
-  .reward-kind-card strong { font-size: 25px; }
-  .reward-kind-card i { width: 41px; height: 41px; right: 11px; bottom: 11px; }
-  .reward-withdrawal-summary > div { grid-template-columns: 98px minmax(0,1fr); }
-  .customer-cancel-overlay { align-items: end; padding: 0; }
-  .customer-cancel-dialog { border-radius: 22px 22px 0 0; }
+  .customer-account-content.section-rewards,.customer-account-content.section-account { padding: 16px; }
+  .profile-balance-card { min-height: 138px; padding: 20px; }
+  .profile-balance-card img { width: 68px; height: 68px; }
+  .profile-nft-balance-card { min-height: 122px; padding: 20px; }
+  .profile-nft-balance-card > i { width: 60px; height: 60px; flex-basis: 60px; border-radius: 18px; }
+  .customer-reward-explainer,.customer-reward-section { padding-top: 18px; padding-bottom: 18px; }
+  .reward-withdrawal-overlay { padding: 0; place-items: end stretch; }
+  .reward-withdrawal-dialog { width: 100vw; max-height: 92dvh; border: 0; border-radius: 30px 30px 0 0; }
+  .reward-withdrawal-content { padding: 30px 20px max(30px,calc(env(safe-area-inset-bottom) + 18px)); }
+  .reward-withdrawal-close { right: 18px; top: 18px; }
+  .reward-withdrawal-content > h2,.reward-withdrawal-success h2 { font-size: 28px; line-height: 35px; }
+  .reward-withdrawal-kinds { gap: 10px; margin-top: 23px; }
+  .reward-kind-card { height: 130px; padding: 18px; border-radius: 23px; }
+  .reward-kind-card span { font-size: 14px; }
+  .reward-kind-card strong { font-size: 39px; line-height: 43px; }
+  .reward-kind-card i { right: 13px; bottom: 13px; width: 43px; height: 43px; border-radius: 14px; }
+  .reward-withdrawal-form > label > input,.reward-wallet-field { height: 62px; min-height: 0; border-radius: 19px; }
+  .reward-wallet-field input { height: 100%; }
+  .reward-wallet-field button { height: 36px; }
+  .reward-withdrawal-primary,.reward-withdrawal-secondary { min-height: 58px; border-radius: 19px; }
+  .reward-withdrawal-heading { grid-template-columns: 42px minmax(0,1fr); }
+  .reward-withdrawal-heading h2 { font-size: 24px; line-height: 30px; }
+  .reward-withdrawal-summary { padding: 0 16px; }
+  .reward-withdrawal-summary > div { min-height: 64px; grid-template-columns: .75fr 1.25fr; gap: 12px; }
+  .reward-withdrawal-summary dt,.reward-withdrawal-summary dd { font-size: 12px; }
+  .reward-withdrawal-scanner { min-height: 82dvh; padding: 24px 18px max(24px,env(safe-area-inset-bottom)); }
+  .reward-withdrawal-camera { height: min(56dvh,460px); }
+  .reward-withdrawal-success { min-height: 70dvh; padding: 34px 22px max(34px,env(safe-area-inset-bottom)); }
+  .customer-cancel-overlay,.reward-cancel-overlay { padding: 0; place-items: end stretch; }
+  .customer-cancel-dialog.reward-cancel-dialog { width: 100vw; padding: 28px 20px max(28px,calc(env(safe-area-inset-bottom) + 12px)); border-radius: 28px 28px 0 0; }
 }

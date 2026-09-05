@@ -1,11 +1,27 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  mdiAlertCircleOutline,
+  mdiArrowLeft,
+  mdiBankTransferOut,
+  mdiChevronRight,
+  mdiCogOutline,
+  mdiFish,
+  mdiFoodTakeoutBoxOutline,
+  mdiHexagonMultipleOutline,
+  mdiInformationOutline,
+  mdiLogout,
+  mdiMessageReplyTextOutline,
+  mdiShoppingOutline,
+  mdiStarFourPointsOutline,
+} from "@mdi/js";
+import { Icon } from "@mdi/react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type {
   Customer,
   CustomerProfile,
   CustomerSession,
-  NaktaCoinWithdrawal,
   ProfileOrder,
 } from "../types";
 import RewardsWithdrawalDialog, { type RewardWithdrawalInput } from "./RewardsWithdrawalDialog";
@@ -17,7 +33,8 @@ type Props = {
   onSessionChange?: (active: boolean) => void;
 };
 
-type AccountSection = "rewards" | "orders" | "account";
+type AccountSection = "menu" | "rewards" | "orders" | "account";
+type OrderSection = "active" | "history";
 type CancelTarget = { kind: "coins" | "nft"; id: string; label: string };
 
 const KYRGYZ_PHONE_PREFIX = "+996";
@@ -68,7 +85,7 @@ function fullKyrgyzPhone(digits: string) {
   return `${KYRGYZ_PHONE_PREFIX} ${formatKyrgyzLocalPhone(digits)}`;
 }
 
-function formatDate(value?: string | null) {
+function formatHistoryDate(value?: string | null) {
   if (!value) return "Дата не указана";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Дата не указана";
@@ -76,8 +93,6 @@ function formatDate(value?: string | null) {
     day: "numeric",
     month: "long",
     year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
   }).format(date);
 }
 
@@ -96,9 +111,9 @@ function normalizeProfile(value: Partial<CustomerProfile>, fallbackCustomer: Cus
 
 function OrderCard({ order }: { order: ProfileOrder }) {
   return <article className="customer-order-card">
-    <div><strong>Заказ №{order.orderNumber || order.id}</strong><span className={`customer-status status-${order.status}`}>{orderStatusLabels[order.status] || order.status}</span></div>
-    <p>{formatDate(order.createdAt)}{order.locationName ? ` · ${order.locationName}` : ""}</p>
-    <footer><strong>{numberFormat.format(Number(order.total) || 0)} С</strong>{(order.earnedNaktaCoins || order.naktaCoins) ? <span>+{numberFormat.format(order.earnedNaktaCoins || order.naktaCoins || 0)} NAKTA Coin</span> : null}</footer>
+    <span className={`customer-order-status status-${order.status}`}>{orderStatusLabels[order.status] || order.status}</span>
+    <span className="customer-order-main"><span><b>Заказ №{order.orderNumber || order.id}</b><small>{formatHistoryDate(order.createdAt)} · самовывоз</small></span><strong>{numberFormat.format(Number(order.total) || 0)} С</strong></span>
+    <span className="customer-order-delivery"><i aria-hidden="true"><Icon path={mdiShoppingOutline} size={0.8} /></i><span><b>Самовывоз</b><small>{order.locationAddress || order.locationName || "Адрес уточняется"}</small></span></span>
   </article>;
 }
 
@@ -108,7 +123,8 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
   const [checked, setChecked] = useState(false);
   const [session, setSession] = useState<CustomerSession | null>(null);
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
-  const [section, setSection] = useState<AccountSection>("rewards");
+  const [section, setSection] = useState<AccountSection>("menu");
+  const [orderSection, setOrderSection] = useState<OrderSection>("active");
   const [phone, setPhone] = useState("");
   const [code, setCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
@@ -133,6 +149,7 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
     setCodeSent(false);
     setCode("");
     setMessage(notice);
+    setSection("menu");
     setChecked(true);
     onSessionChange?.(false);
   }, [onSessionChange]);
@@ -233,7 +250,7 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
     setCodeSent(false);
     setCode("");
     setMessage("");
-    setSection("rewards");
+    setSection("menu");
     onSessionChange?.(true);
     await loadProfile(nextSession);
   };
@@ -361,8 +378,7 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
 
   const availableNfts = profile?.nfts.filter((nft) => nft.status === "owned" || nft.status === "failed") || [];
   const nftOperations = profile?.nfts.filter((nft) => nft.status !== "owned" || nft.withdrawalError) || [];
-  const rewardTransactions = profile?.naktaCoinHistory.filter((entry) => !entry.withdrawalId) || [];
-  const allOrders = useMemo(() => [...(profile?.currentOrders || []), ...(profile?.orderHistory || [])], [profile]);
+  const coinHistory = profile?.naktaCoinHistory || [];
   const effectiveCoinNetwork = profile?.coinNetwork || coinNetwork;
   const logout = async () => {
     if (!session || logoutBusy) return;
@@ -389,10 +405,18 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
     }
   };
 
-  return <div className="customer-account-overlay" role="dialog" aria-modal="true" aria-labelledby="customer-account-title">
-    <button className="customer-account-dismiss" type="button" aria-label="Закрыть личный кабинет" disabled={pending} onClick={onClose} />
-    <section className={`customer-account-modal${session ? " is-authenticated" : ""}`}>
-      <button className="customer-account-close" type="button" onClick={onClose} aria-label="Закрыть"><MaterialIcon>close</MaterialIcon></button>
+  const screenTitle = section === "rewards"
+    ? "Баланс"
+    : section === "account"
+      ? "Настройки"
+      : "";
+  const visibleOrders = orderSection === "active" ? profile?.currentOrders || [] : profile?.orderHistory || [];
+  const hasRewardOperations = coinHistory.length > 0 || nftOperations.length > 0;
+
+  return <div className="customer-account-overlay" role="dialog" aria-modal="true" aria-label={session ? "Личный кабинет" : undefined} aria-labelledby={session ? undefined : "customer-account-title"}>
+    <button className="customer-account-dismiss" type="button" tabIndex={-1} aria-label="Закрыть личный кабинет" disabled={pending} onClick={onClose} />
+    <section className={`customer-account-modal${session ? " is-authenticated" : ""}${section === "orders" ? " is-orders" : ""}`}>
+      {!session && <button className="customer-account-close" type="button" onClick={onClose} aria-label="Закрыть"><MaterialIcon>close</MaterialIcon></button>}
 
       {!checked ? <div className="customer-account-loading">Проверяем сессию…</div> : !session ? <div className="customer-login-view">
         <div className="login-circle"><MaterialIcon>key</MaterialIcon></div>
@@ -403,61 +427,70 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
         <div className="login-consent">Продолжая, вы принимаете <a href="/legal">правовую информацию</a>, <a href="/privacy">политику конфиденциальности</a> и <a href="/terms">условия использования</a>.</div>
         {message && <small className="form-message" aria-live="polite">{message}</small>}
       </div> : <>
-        <header className="customer-account-header">
-          <div><small>Личный кабинет</small><h2 id="customer-account-title">{profile?.customer.name || session.customer.name || "Гость ДААНА"}</h2><span>{session.phone}</span></div>
-          <button type="button" disabled={logoutBusy} onClick={() => void logout()}>{logoutBusy ? "Выходим…" : <>Выйти <MaterialIcon>logout</MaterialIcon></>}</button>
+        <header className={`customer-account-screen-header${section === "menu" ? " is-menu" : ""}${section === "orders" ? " is-orders" : ""}`}>
+          <button type="button" onClick={() => { if (section === "menu") onClose(); else setSection("menu"); }} aria-label={section === "menu" ? "Закрыть личный кабинет" : "Вернуться в меню"}><Icon path={mdiArrowLeft} size={1} aria-hidden="true" /></button>
+          <h2 id="customer-account-title">{screenTitle}</h2>
+          <span aria-hidden="true" />
         </header>
-        <nav className="customer-account-tabs" aria-label="Разделы личного кабинета">
-          <button type="button" className={section === "rewards" ? "active" : ""} onClick={() => setSection("rewards")}><MaterialIcon>stars</MaterialIcon><span>Награды</span></button>
-          <button type="button" className={section === "orders" ? "active" : ""} onClick={() => setSection("orders")}><MaterialIcon>receipt_long</MaterialIcon><span>Заказы</span></button>
-          <button type="button" className={section === "account" ? "active" : ""} onClick={() => setSection("account")}><MaterialIcon>person</MaterialIcon><span>Профиль</span></button>
-        </nav>
 
-        <div className="customer-account-content">
+        <div className={`customer-account-content section-${section}`}>
           {profileError && <div className="customer-account-error" role="alert"><span>{profileError}</span><button type="button" onClick={() => void loadProfile(session)}>Повторить</button></div>}
           {profileLoading && !profile && <div className="customer-account-loading">Загружаем профиль…</div>}
 
+          {section === "menu" && <div className="customer-account-menu-view">
+            <section className="customer-account-summary">
+              <div><small>Привет!</small><strong>{session.phone}</strong></div>
+              <button type="button" disabled={logoutBusy} onClick={() => void logout()}>{logoutBusy ? "Выходим…" : <>Выйти <Icon path={mdiLogout} size={0.72} aria-hidden="true" /></>}</button>
+            </section>
+            <nav className="customer-account-menu" aria-label="Разделы личного кабинета">
+              <button type="button" onClick={() => { setOrderSection("active"); setSection("orders"); }}><Icon path={mdiShoppingOutline} size={1} aria-hidden="true" /><b>Мои заказы</b><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></button>
+              <button type="button" onClick={() => setSection("rewards")}><Icon path={mdiStarFourPointsOutline} size={1} aria-hidden="true" /><b>NAKTA Coin и NFT</b><em><span>{numberFormat.format(profile?.naktaCoins || 0)}</span><small>{profile?.nfts.length || 0} NFT</small></em><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></button>
+              <button type="button" onClick={() => setSection("account")}><Icon path={mdiCogOutline} size={1} aria-hidden="true" /><b>Настройки</b><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></button>
+              <a href="/support"><Icon path={mdiMessageReplyTextOutline} size={1} aria-hidden="true" /><b>Поддержка</b><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></a>
+              <a href="/about"><Icon path={mdiInformationOutline} size={1} aria-hidden="true" /><b>О нас</b><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></a>
+            </nav>
+            <footer className="customer-account-menu-footer"><Image src="/assets/icons/logo.svg" alt="Daana Sushi" width={106} height={64} /><a href="/legal">Правовая информация</a><small>Версия 0.1.0</small></footer>
+          </div>}
+
           {profile && section === "rewards" && <div className="customer-rewards-view">
-            <div className="customer-reward-balances">
-              <section className="customer-coin-card"><div><span>Ваш баланс</span><strong>{numberFormat.format(profile.naktaCoins)}</strong><small>NAKTA Coin</small></div><i>NC</i></section>
-              <section className="customer-nft-card"><div><span>Ваши NFT</span><strong>{numberFormat.format(profile.nfts.length)}</strong><small>цифровых наград</small></div><i><MaterialIcon>hexagon</MaterialIcon></i></section>
-            </div>
-            <button className="customer-withdraw-button" type="button" disabled={profile.naktaCoins <= 0 && !availableNfts.length} onClick={() => setWithdrawalOpen(true)}><MaterialIcon>account_balance_wallet</MaterialIcon>Вывести на криптокошелёк</button>
-            <section className="customer-reward-explainer"><MaterialIcon>info</MaterialIcon><div><h3>Как работают награды</h3><p>NAKTA Coin начисляются после завершённых заказов. Награды не тратятся внутри сайта — их можно вывести на свой криптокошелёк.</p></div></section>
+            <section className="profile-balance-card"><div><span>Ваш баланс</span><strong>{numberFormat.format(profile.naktaCoins)}</strong></div><Image src="/nakta-coin.png" alt="NAKTA Coin" width={78} height={78} /></section>
+            <section className="profile-nft-balance-card"><div><span>Ваши NFT</span><strong>{numberFormat.format(profile.nfts.length)}</strong><small>цифровых наград</small></div><i aria-hidden="true"><Icon path={mdiHexagonMultipleOutline} size={1.5} /></i></section>
+            <button className="profile-reward-withdraw-button" type="button" disabled={profile.naktaCoins <= 0 && !availableNfts.length} onClick={() => setWithdrawalOpen(true)}><Icon path={mdiBankTransferOut} size={1} aria-hidden="true" />Вывести</button>
+            <section className="profile-info-card profile-reward-explainer"><h3>Как работают NAKTA Coin и NFT</h3><p>Награды не тратятся внутри сайта. Накопленные коины и NFT можно вывести на свой криптокошелёк.</p></section>
 
-            <section className="customer-reward-section">
-              <header><div><h3>NFT</h3><p>Цифровые награды в вашем профиле</p></div><b>{profile.nfts.length}</b></header>
-              {profile.nfts.length ? <div className="customer-nft-list">{profile.nfts.map((nft) => <article className="customer-nft-item" key={nft.id}>
-                <div className="customer-nft-art">{nft.image ? <img src={nft.image} alt="" /> : <MaterialIcon>hexagon</MaterialIcon>}</div>
-                <div><span><strong>{nft.name}</strong><em className={`status-${nft.status}`}>{rewardStatusLabels[nft.status] || nft.status}</em></span><small>{networkLabels[nft.network] || nft.network} · {formatDate(nft.createdAt)}</small>{nft.walletAddress && <p title={nft.walletAddress}>Кошелёк: {nft.walletAddress}</p>}{nft.withdrawalError && <p className="error">Причина: {nft.withdrawalError}</p>}{nft.status === "pending" && <button type="button" onClick={() => { setCancelError(""); setCancelTarget({ kind: "nft", id: nft.id, label: `NFT «${nft.name}»` }); }}>Отменить вывод</button>}</div>
-              </article>)}</div> : <p className="customer-empty-state">NFT появятся здесь после начисления.</p>}
-            </section>
-
-            <section className="customer-reward-section">
-              <header><div><h3>Заявки на вывод</h3><p>Статусы переводов NAKTA Coin и NFT</p></div></header>
-              {profile.naktaCoinWithdrawals.length || nftOperations.length ? <div className="customer-operation-list">
-                {profile.naktaCoinWithdrawals.map((item: NaktaCoinWithdrawal) => <article key={item.id}><div><strong>Вывод {numberFormat.format(item.amount)} NAKTA Coin</strong><span>{formatDate(item.createdAt)} · {rewardStatusLabels[item.status] || item.status} · сеть {networkLabels[item.network || effectiveCoinNetwork] || item.network || effectiveCoinNetwork}</span><small title={item.walletAddress}>{item.walletAddress}</small>{item.error && <p>Причина: {item.error}</p>}</div><aside><em className={`status-${item.status}`}>{rewardStatusLabels[item.status] || item.status}</em>{item.status === "pending" && <button type="button" onClick={() => { setCancelError(""); setCancelTarget({ kind: "coins", id: item.id, label: `${item.amount} NAKTA Coin` }); }}>Отменить</button>}</aside></article>)}
-                {nftOperations.map((nft) => <article key={`nft-${nft.id}`}><div><strong>Вывод NFT «{nft.name}»</strong><span>{networkLabels[nft.network] || nft.network} · {rewardStatusLabels[nft.status] || nft.status}</span>{nft.walletAddress && <small title={nft.walletAddress}>{nft.walletAddress}</small>}{nft.withdrawalError && <p>Причина: {nft.withdrawalError}</p>}</div><aside><em className={`status-${nft.status}`}>NFT</em>{nft.status === "pending" && <button type="button" onClick={() => { setCancelError(""); setCancelTarget({ kind: "nft", id: nft.id, label: `NFT «${nft.name}»` }); }}>Отменить</button>}</aside></article>)}
-              </div> : <p className="customer-empty-state">Заявок на вывод пока нет.</p>}
-            </section>
-
-            <section className="customer-reward-section">
-              <header><div><h3>История начислений</h3><p>Награды за заказы и ручные корректировки</p></div></header>
-              {rewardTransactions.length ? <div className="customer-coin-history">{rewardTransactions.map((entry) => <article key={entry.id}><div><strong>{entry.description}</strong><span>{formatDate(entry.createdAt)}</span></div><b className={entry.amount < 0 ? "negative" : ""}>{entry.amount > 0 ? "+" : ""}{numberFormat.format(entry.amount)}</b></article>)}</div> : <p className="customer-empty-state">Начислений пока нет.</p>}
+            <section className="profile-info-card profile-reward-history">
+              <h3>История операций</h3>
+              {hasRewardOperations ? <div className="profile-coin-history">
+                {coinHistory.map((entry) => <article className="profile-history-row" key={entry.id}>
+                  <div className="profile-history-main"><span><b>{entry.description}</b><small>{formatHistoryDate(entry.createdAt)}</small></span><strong className={entry.amount < 0 ? "negative" : ""}>{entry.amount > 0 ? "+" : ""}{numberFormat.format(entry.amount)}</strong></div>
+                  {entry.withdrawalReason ? <p className="profile-withdrawal-reason">Причина: {entry.withdrawalReason}</p> : null}
+                  {entry.withdrawalStatus === "pending" && entry.withdrawalId ? <button type="button" className="profile-cancel-withdrawal" onClick={() => { setCancelError(""); setCancelTarget({ kind: "coins", id: entry.withdrawalId!, label: `${Math.abs(entry.amount)} NAKTA Coin` }); }}>Отменить вывод</button> : null}
+                </article>)}
+                {nftOperations.map((nft) => <article className="profile-history-row profile-nft-operation" key={`nft-${nft.id}`}>
+                  <div className="profile-history-main"><span><b>Вывод NFT «{nft.name}»</b><small>{networkLabels[nft.network] || nft.network} · {rewardStatusLabels[nft.status] || nft.status}</small></span><strong className={`nft-status status-${nft.status}`}>NFT</strong></div>
+                  {nft.walletAddress ? <p className="profile-withdrawal-address" title={nft.walletAddress}>Кошелёк: {nft.walletAddress}</p> : null}
+                  {nft.withdrawalError ? <p className="profile-withdrawal-reason">Причина: {nft.withdrawalError}</p> : null}
+                  {nft.status === "pending" ? <button type="button" className="profile-cancel-withdrawal" onClick={() => { setCancelError(""); setCancelTarget({ kind: "nft", id: nft.id, label: `NFT «${nft.name}»` }); }}>Отменить вывод</button> : null}
+                </article>)}
+              </div> : <p>Операций пока нет.</p>}
             </section>
           </div>}
 
           {profile && section === "orders" && <div className="customer-orders-view">
-            <section><header><h3>Активные заказы</h3><b>{profile.currentOrders.length}</b></header>{profile.currentOrders.length ? <div>{profile.currentOrders.map((order) => <OrderCard order={order} key={order.id} />)}</div> : <p className="customer-empty-state">Активных заказов сейчас нет.</p>}</section>
-            <section><header><h3>История заказов</h3><b>{profile.orderHistory.length}</b></header>{profile.orderHistory.length ? <div>{profile.orderHistory.map((order) => <OrderCard order={order} key={order.id} />)}</div> : <p className="customer-empty-state">История заказов пока пуста.</p>}</section>
+            <h2>Мои заказы</h2>
+            <div className="customer-order-tabs" role="tablist" aria-label="Заказы">
+              <button className={orderSection === "active" ? "active" : ""} type="button" role="tab" aria-selected={orderSection === "active"} onClick={() => setOrderSection("active")}>Активные</button>
+              <button className={orderSection === "history" ? "active" : ""} type="button" role="tab" aria-selected={orderSection === "history"} onClick={() => setOrderSection("history")}>История</button>
+            </div>
+            <div className="customer-order-list">{visibleOrders.length ? visibleOrders.map((order) => <OrderCard order={order} key={order.id} />) : <div className="customer-orders-empty"><span className="customer-orders-empty-art" aria-hidden="true"><Icon path={mdiFoodTakeoutBoxOutline} size={3.15} /><Icon path={mdiFish} size={1.55} /></span><p>{orderSection === "active" ? <>Пока здесь пусто,<br />пора сделать первый заказ!</> : "История заказов пока пуста."}</p><button type="button" onClick={onClose}>Меню</button></div>}</div>
           </div>}
 
           {profile && section === "account" && <div className="customer-profile-view">
-            <section><span>Имя</span><strong>{profile.customer.name || "Не указано"}</strong></section>
-            <section><span>Телефон</span><strong>{profile.customer.phone || session.phone}</strong></section>
-            <section><span>Всего заказов</span><strong>{numberFormat.format(allOrders.length)}</strong></section>
-            <nav><a href="/legal">Правовая информация <MaterialIcon>chevron_right</MaterialIcon></a><a href="/privacy">Конфиденциальность <MaterialIcon>chevron_right</MaterialIcon></a><a href="/terms">Условия использования <MaterialIcon>chevron_right</MaterialIcon></a></nav>
-            <button type="button" className="customer-profile-logout" disabled={logoutBusy} onClick={() => void logout()}>{logoutBusy ? "Выходим…" : "Выйти из профиля"}</button>
+            <section className="profile-settings-field"><span>Телефон аккаунта</span><strong>{profile.customer.phone || session.phone}</strong></section>
+            <section className="profile-settings-field"><span>Баланс NAKTA Coin</span><strong>{numberFormat.format(profile.naktaCoins)}</strong></section>
+            <section className="profile-settings-field"><span>Получено NFT</span><strong>{numberFormat.format(profile.nfts.length)}</strong></section>
+            <a className="profile-settings-link" href="/legal">Правовая информация <span>›</span></a>
+            <button type="button" className="profile-logout" disabled={logoutBusy} onClick={() => void logout()}>{logoutBusy ? "Выходим…" : <>Выйти из профиля <span><Icon path={mdiLogout} size={0.9} aria-hidden="true" /></span></>}</button>
           </div>}
         </div>
       </>}
@@ -465,9 +498,9 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
 
     {session && profile && withdrawalOpen && <RewardsWithdrawalDialog coins={profile.naktaCoins} coinNetwork={effectiveCoinNetwork} nfts={profile.nfts} onClose={() => setWithdrawalOpen(false)} onSubmit={submitWithdrawal} />}
 
-    {cancelTarget && <div className="customer-cancel-overlay" role="dialog" aria-modal="true" aria-labelledby="customer-cancel-title">
+    {cancelTarget && <div className="customer-cancel-overlay reward-cancel-overlay" role="dialog" aria-modal="true" aria-labelledby="customer-cancel-title">
       <button className="customer-cancel-dismiss" type="button" aria-label="Закрыть подтверждение" disabled={cancelBusy} onClick={() => setCancelTarget(null)} />
-      <section className="customer-cancel-dialog"><span><MaterialIcon>warning_amber</MaterialIcon></span><h2 id="customer-cancel-title">Отменить вывод?</h2><p>{cancelTarget.kind === "coins" ? `${cancelTarget.label} вернутся на баланс.` : `${cancelTarget.label} снова станет доступен для вывода.`} Отмена возможна только до начала обработки.</p>{cancelError && <div className="customer-account-error" role="alert">{cancelError}</div>}<div><button type="button" disabled={cancelBusy} onClick={() => setCancelTarget(null)}>Не отменять</button><button type="button" disabled={cancelBusy} onClick={() => void cancelWithdrawal()}>{cancelBusy ? "Отменяем…" : "Отменить вывод"}</button></div></section>
+      <section className="customer-cancel-dialog reward-cancel-dialog"><span className="reward-cancel-icon"><Icon path={mdiAlertCircleOutline} size={1.1} aria-hidden="true" /></span><h2 id="customer-cancel-title">Отменить вывод?</h2><p>{cancelTarget.kind === "coins" ? `${cancelTarget.label} вернутся на баланс.` : `${cancelTarget.label} снова станет доступен для вывода.`} Отмена возможна только до начала обработки.</p>{cancelError && <div className="customer-account-error" role="alert">{cancelError}</div>}<div><button type="button" disabled={cancelBusy} onClick={() => setCancelTarget(null)}>Не отменять</button><button type="button" disabled={cancelBusy} onClick={() => void cancelWithdrawal()}>{cancelBusy ? "Отменяем…" : "Отменить вывод"}</button></div></section>
     </div>}
   </div>;
 }
