@@ -28,6 +28,7 @@ import {
   type CustomerIdentity,
 } from "./customer-auth";
 import { closeDatabase, sql } from "./db";
+import { waitForDatabaseConnection } from "./database-readiness";
 import { migrate } from "./migrate";
 import { NikitaOtpError, sendNikitaOtp, verifyNikitaOtp } from "./nikita-otp";
 import { resolveOtpBypassPhone } from "./otp-bypass";
@@ -1715,6 +1716,12 @@ app.use((error: unknown, _request: Request, response: Response, _next: unknown) 
   response.status(500).json({ error: "Внутренняя ошибка сервера" });
 });
 
+await waitForDatabaseConnection(
+  () => sql`SELECT 1`,
+  180_000,
+  2_000,
+  () => console.warn("Database is not ready; retrying connection for up to 3 minutes."),
+);
 await migrate();
 const [databaseState] = await sql`SELECT EXISTS (SELECT 1 FROM products) AS "hasProducts"`;
 if (!databaseState.hasProducts) await seed();
