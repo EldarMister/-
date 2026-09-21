@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { categories } from "./data";
 import { SITE_URL } from "./seo";
 
-const lastModified = new Date("2026-09-05T00:00:00+06:00");
+const lastModified = new Date("2026-09-21T00:00:00+06:00");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const categoryPages: MetadataRoute.Sitemap = categories
@@ -18,6 +18,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   return [
     ...categoryPages,
     { url: `${SITE_URL}/promo`, lastModified, changeFrequency: "weekly", priority: 0.8 },
+    { url: `${SITE_URL}/about`, lastModified, changeFrequency: "monthly", priority: 0.7 },
     { url: `${SITE_URL}/legal`, lastModified, changeFrequency: "monthly", priority: 0.5 },
     { url: `${SITE_URL}/privacy`, lastModified, changeFrequency: "monthly", priority: 0.6 },
     { url: `${SITE_URL}/terms`, lastModified, changeFrequency: "monthly", priority: 0.6 },

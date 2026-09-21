@@ -18,12 +18,15 @@ test("server-renders the catalog and brand metadata", async () => {
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") ?? "", /^text\/html\b/i);
   const html = await response.text();
-  assert.match(html, /<title>Роллы — заказать онлайн \| ДААНА СУШИ<\/title>/i);
+  assert.match(html, /<title>ДААНА СУШИ — роллы и суши на самовывоз<\/title>/i);
   assert.match(html, /<meta name="description" content="[^"]*роллы[^"]*самовывоз/i);
   assert.match(html, /<link rel="canonical" href="https:\/\/daanasushi\.com\/catalog\/1"/i);
   assert.match(html, /property="og:image" content="https:\/\/daanasushi\.com\/og\.png"/i);
   assert.match(html, /"@type":"WebSite"/);
-  assert.match(html, /"@type":"Organization"/);
+  assert.match(html, /"@type":\["Organization","Restaurant"\]/);
+  assert.match(html, /"@type":"CollectionPage"/);
+  assert.match(html, /"@type":"Product"/);
+  assert.match(html, /href="\/catalog\/2"/);
   assert.match(html, /Филадельфия/);
   assert.match(html, /Скидка последний час/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
@@ -48,6 +51,7 @@ test("publishes crawl controls, sitemap and web manifest", async () => {
   const sitemap = await sitemapResponse.text();
   assert.match(sitemap, /https:\/\/daanasushi\.com\/catalog\/1/);
   assert.match(sitemap, /https:\/\/daanasushi\.com\/promo/);
+  assert.match(sitemap, /https:\/\/daanasushi\.com\/about/);
   assert.match(sitemap, /https:\/\/daanasushi\.com\/legal/);
   assert.match(sitemap, /https:\/\/daanasushi\.com\/privacy/);
   assert.match(sitemap, /https:\/\/daanasushi\.com\/terms/);

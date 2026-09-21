@@ -118,16 +118,17 @@ function CategoryTabs({ items, selectedId, onSelect }: { items: Category[]; sele
       <button className="category-arrow category-arrow-left" type="button" aria-label="Предыдущие категории" disabled={!canMoveLeft} onClick={() => move(-1)}><MaterialIcon>chevron_left</MaterialIcon></button>
       <div className="category-scroller" ref={scroller} onScroll={syncArrows} role="tablist">
         {items.filter((category) => category.active).map((category) => (
-          <button
+          <a
             className={category.id === selectedId ? "active" : ""}
+            href={`/catalog/${category.id}`}
             key={category.id}
-            onClick={() => onSelect(category.id)}
+            onClick={(event) => { event.preventDefault(); onSelect(category.id); }}
             role="tab"
             aria-selected={category.id === selectedId}
             aria-controls={`category-panel-${category.id}`}
           >
             {category.name}
-          </button>
+          </a>
         ))}
       </div>
       <button className="category-arrow category-arrow-right" type="button" aria-label="Следующие категории" disabled={!canMoveRight} onClick={() => move(1)}><MaterialIcon>chevron_right</MaterialIcon></button>
@@ -489,6 +490,10 @@ function Footer({ settings }: { settings: SiteSettings }) {
           <div className="footer-contact"><a href={settings.telegram} aria-label="Telegram"><img src="/assets/icons/Telegram_Messenger.png" alt="" /></a></div>
         </div>
         <nav className="footer-legal-links" aria-label="Правовая информация"><a href="/legal">Правовая информация</a><a href="/privacy">Конфиденциальность</a><a href="/terms">Условия использования</a><a href="/payment-rule">Правила оплаты</a><a href="/delete-account">Удаление аккаунта</a><a href="/support">Поддержка</a></nav>
+        <nav className="footer-menu-links" aria-label="Меню ДААНА СУШИ">
+          {seedCategories.filter((category) => category.active).map((category) => <a href={`/catalog/${category.id}`} key={category.id}>{category.name}</a>)}
+          <a href="/promo">Акции</a><a href="/about">О нас</a>
+        </nav>
         <address className="footer-legal">
           <span>Оператор сервиса: {LEGAL_DETAILS.operator}</span>
           <span>ИНН: {LEGAL_DETAILS.inn}</span>

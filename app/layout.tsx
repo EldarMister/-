@@ -41,13 +41,17 @@ const structuredData = [
   },
   {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": ["Organization", "Restaurant"],
     "@id": `${SITE_URL}/#organization`,
     name: SITE_NAME,
+    alternateName: ["Даана Суши", "Daana Sushi", "DAANA SUSHI"],
     legalName: LEGAL_DETAILS.operator,
     url: SITE_URL,
     logo: `${SITE_URL}/assets/icons/favicon.ico`,
     image: SOCIAL_IMAGE,
+    telephone: "+996555506447",
+    servesCuisine: ["Суши", "Роллы", "Японская кухня"],
+    priceRange: "$$",
     taxID: LEGAL_DETAILS.inn,
     identifier: { "@type": "PropertyValue", propertyID: "Регистрационный номер", value: LEGAL_DETAILS.registrationNumber },
     address: {

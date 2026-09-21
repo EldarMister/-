@@ -4,7 +4,7 @@ export const categories: Category[] = [
   { id: 1, name: "Роллы", slug: "rolls", sortOrder: 1, active: true },
   { id: 2, name: "Онигири", slug: "onigiri", sortOrder: 2, active: true },
   { id: 3, name: "Наборы", slug: "sets", sortOrder: 3, active: true },
-  { id: 4, name: "Напитики", slug: "drinks", sortOrder: 4, active: true },
+  { id: 4, name: "Напитки", slug: "drinks", sortOrder: 4, active: true },
   { id: 7, name: "Суширрито", slug: "sushirrito", sortOrder: 5, active: true },
   { id: 5, name: "Дополнительно", slug: "extras", sortOrder: 6, active: true },
 ];

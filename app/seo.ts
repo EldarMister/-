@@ -10,13 +10,14 @@ type PageMetadataOptions = {
   description: string;
   path: string;
   index?: boolean;
+  absoluteTitle?: boolean;
 };
 
-export function createPageMetadata({ title, description, path, index = true }: PageMetadataOptions): Metadata {
+export function createPageMetadata({ title, description, path, index = true, absoluteTitle = false }: PageMetadataOptions): Metadata {
   const canonical = new URL(path, SITE_URL).toString();
   const socialTitle = `${title} | ${SITE_NAME}`;
   return {
-    title,
+    title: absoluteTitle ? { absolute: title } : title,
     description,
     alternates: { canonical },
     robots: index
