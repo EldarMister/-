@@ -10,10 +10,13 @@ import PickupMap from "./PickupMap";
 import type { CartLine, Category, PickupLocation, Product, Promotion } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || (process.env.NODE_ENV === "production" ? "/api" : "http://localhost:4000/api");
+const CONTACT_PHONE_DISPLAY = "+996 503 178 916";
+const CONTACT_PHONE_DIGITS = "996503178916";
 type SiteSettings = { legalName: string; telegram: string };
 type PublicRewardSettings = { coinNetwork?: string };
 type SushiView = "catalog" | "promo" | "order" | "payment" | "privacy";
 type CategoryTransition = { from: number; to: number; direction: "left" | "right"; token: number };
+type HeroTransition = { from: number; to: number; direction: "left" | "right"; token: number };
 
 type SushiAppProps = {
   initialCategoryId?: number;
@@ -79,18 +82,20 @@ function Header({
         <button className="logo-button" onClick={onCatalog} aria-label="На главную">
           <img src="/assets/icons/logo.svg" alt="ДААНА СУШИ" />
         </button>
-        <button className="store-selector" onClick={onLocation}>
+        <button className={`store-selector ${location ? "has-location" : ""}`} onClick={onLocation}>
           <MaterialIcon>storefront</MaterialIcon>
           <span>{location?.name || "ВЫБЕРИТЕ ТОЧКУ"}</span>
           <MaterialIcon>arrow_drop_down</MaterialIcon>
         </button>
         <div className="header-actions">
-          <button className="header-action" onClick={onPromo}>
-            <img className="header-action-icon promo-icon" src="/assets/icons/promo.svg" alt="" /><span>Акции</span>
-          </button>
-          <button className="header-action" onClick={onLogin}>
-            <img className="header-action-icon login-icon" src="/assets/icons/account.svg" alt="" /><span>{customerLoggedIn ? "Кабинет" : "Войти"}</span>
-          </button>
+          <div className="header-links">
+            <button className="header-action" onClick={onPromo}>
+              <img className="header-action-icon promo-icon" src="/assets/icons/promo.svg" alt="" /><span>Акции</span>
+            </button>
+            <button className="header-action" onClick={onLogin}>
+              <img className="header-action-icon login-icon" src="/assets/icons/account.svg" alt="" /><span>{customerLoggedIn ? "Кабинет" : "Войти"}</span>
+            </button>
+          </div>
           <button className={`cart-button ${cartOpen ? "active" : ""}`} onClick={onCart} onMouseEnter={onCartPreviewEnter} onMouseLeave={onCartPreviewLeave} aria-label="Корзина">
             <img src="/assets/icons/cart.svg" alt="" />
             {cartCount > 0 && <span className="cart-badge">{cartCount}</span>}
@@ -105,13 +110,30 @@ function Header({
 function CategoryTabs({ items, selectedId, onSelect }: { items: Category[]; selectedId: number; onSelect: (id: number) => void }) {
   const scroller = useRef<HTMLDivElement>(null);
   const [canMoveLeft, setCanMoveLeft] = useState(false);
-  const [canMoveRight, setCanMoveRight] = useState(true);
-  const syncArrows = () => {
+  const [canMoveRight, setCanMoveRight] = useState(false);
+  const syncArrows = useCallback(() => {
     const element = scroller.current;
     if (!element) return;
     setCanMoveLeft(element.scrollLeft > 2);
     setCanMoveRight(element.scrollLeft + element.clientWidth < element.scrollWidth - 2);
-  };
+  }, []);
+  useEffect(() => {
+    const element = scroller.current;
+    if (!element) return;
+    const frame = window.requestAnimationFrame(() => {
+      const active = element.querySelector<HTMLElement>('[aria-selected="true"]');
+      if (active) {
+        const centered = active.offsetLeft - (element.clientWidth - active.offsetWidth) / 2;
+        element.scrollTo({ left: Math.max(0, centered), behavior: "smooth" });
+      }
+      syncArrows();
+    });
+    window.addEventListener("resize", syncArrows);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", syncArrows);
+    };
+  }, [items, selectedId, syncArrows]);
   const move = (direction: number) => scroller.current?.scrollBy({ left: direction * 180, behavior: "smooth" });
   return (
     <nav className="category-nav" aria-label="Категории меню">
@@ -163,9 +185,9 @@ function ProductCard({ product, quantity, onDecrease, onIncrease }: { product: P
       <div className="product-card-inner">
         <img src={product.image} alt={product.name} loading="lazy" />
         {(product.naktaCoins || 0) > 0 && <span className="product-reward-badge"><b>+{product.naktaCoins}</b> NAKTA Coin</span>}
-        <h2>{product.name}</h2>
+        <h2><span>{product.name}</span></h2>
         <div className="product-card-buy">
-          <div className="price-pill">{product.price} С</div>
+          <div className="price-pill">{product.price * Math.max(quantity, 1)} С</div>
           <QuantityControl quantity={quantity} onDecrease={onDecrease} onIncrease={onIncrease} />
         </div>
       </div>
@@ -173,23 +195,76 @@ function ProductCard({ product, quantity, onDecrease, onIncrease }: { product: P
   );
 }
 
-function HeroCarousel({ onOpen }: { onOpen: () => void }) {
-  const slides = [
-    { image: "/assets/promos/1734418347433.webp", alt: "Скидка в день рождения 15%" },
-    { image: "/assets/promos/1766921524730.webp", alt: "Скидка последний час 20%" },
-  ];
+function HeroCarousel({ promotions, onOpen }: { promotions: Promotion[]; onOpen: () => void }) {
+  const slides = useMemo(() => {
+    const activePromotions = promotions.filter((promotion) => promotion.active).sort((left, right) => left.sortOrder - right.sortOrder);
+    return (activePromotions.length ? activePromotions : seedPromotions).map((promotion) => ({ image: promotion.image, alt: promotion.title }));
+  }, [promotions]);
   const [active, setActive] = useState(1);
-  useEffect(() => {
-    const timer = window.setInterval(() => setActive((current) => (current + 1) % slides.length), 5000);
-    return () => window.clearInterval(timer);
+  const [paused, setPaused] = useState(false);
+  const [transition, setTransition] = useState<HeroTransition | null>(null);
+  const activeRef = useRef(1);
+  const transitionTimer = useRef<number | null>(null);
+  const pointerStart = useRef<number | null>(null);
+  const swiped = useRef(false);
+  const move = useCallback((delta: number) => {
+    if (slides.length < 2) return;
+    const from = activeRef.current % slides.length;
+    const to = (from + delta + slides.length) % slides.length;
+    if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
+    activeRef.current = to;
+    setActive(to);
+    setTransition({ from, to, direction: delta > 0 ? "left" : "right", token: Date.now() });
+    transitionTimer.current = window.setTimeout(() => setTransition(null), 300);
   }, [slides.length]);
-  const move = (delta: number) => setActive((current) => (current + delta + slides.length) % slides.length);
+  useEffect(() => {
+    if (paused || slides.length < 2) return;
+    const timer = window.setInterval(() => move(1), 5000);
+    return () => window.clearInterval(timer);
+  }, [move, paused, slides.length]);
+  useEffect(() => () => {
+    if (transitionTimer.current) window.clearTimeout(transitionTimer.current);
+  }, []);
+  const current = active % slides.length;
+  const openPromotion = (event: React.MouseEvent<HTMLButtonElement>) => {
+    if (swiped.current) {
+      event.preventDefault();
+      swiped.current = false;
+      return;
+    }
+    onOpen();
+  };
   return (
-    <div className="hero-promo" role="group" aria-label="Акции">
+    <div
+      className={`hero-promo ${transition ? `is-transitioning slide-${transition.direction}` : ""}`}
+      role="group"
+      aria-label="Акции"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onPointerDown={(event) => { pointerStart.current = event.clientX; swiped.current = false; }}
+      onPointerUp={(event) => {
+        if (pointerStart.current === null) return;
+        const distance = event.clientX - pointerStart.current;
+        pointerStart.current = null;
+        if (Math.abs(distance) > 40) { swiped.current = true; move(distance < 0 ? 1 : -1); }
+      }}
+      onPointerCancel={() => { pointerStart.current = null; }}
+    >
       <span className="visually-hidden">Скидка последний час</span>
-      <button className="hero-slide" onClick={onOpen} aria-label={slides[active].alt}>
-        <img src={slides[active].image} alt={slides[active].alt} />
-      </button>
+      {transition ? (
+        <>
+          <button className="hero-slide hero-slide-outgoing" key={`hero-from-${transition.token}`} onClick={openPromotion} aria-hidden="true" tabIndex={-1}>
+            <img src={slides[transition.from].image} alt="" />
+          </button>
+          <button className="hero-slide hero-slide-incoming" key={`hero-to-${transition.token}`} onClick={openPromotion} aria-label={slides[transition.to].alt}>
+            <img src={slides[transition.to].image} alt={slides[transition.to].alt} />
+          </button>
+        </>
+      ) : (
+        <button className="hero-slide" onClick={openPromotion} aria-label={slides[current].alt}>
+          <img src={slides[current].image} alt={slides[current].alt} />
+        </button>
+      )}
       <button className="hero-arrow hero-arrow-left" onClick={() => move(-1)} aria-label="Предыдущая акция"><MaterialIcon>chevron_left</MaterialIcon></button>
       <button className="hero-arrow hero-arrow-right" onClick={() => move(1)} aria-label="Следующая акция"><MaterialIcon>chevron_right</MaterialIcon></button>
     </div>
@@ -221,21 +296,23 @@ function PromotionFlipCard({ promotion }: { promotion: Promotion }) {
   );
 }
 
-function CatalogPanel({ categoryId, className = "", products, cart, onChangeQuantity, onOpenPromo, hidden = false }: {
+function CatalogPanel({ categories, categoryId, className = "", products, promotions, cart, onChangeQuantity, onOpenPromo, hidden = false }: {
+  categories: Category[];
   categoryId: number;
   className?: string;
   products: Product[];
+  promotions: Promotion[];
   cart: Record<number, number>;
   onChangeQuantity: (id: number, delta: number) => void;
   onOpenPromo: () => void;
   hidden?: boolean;
 }) {
   const visibleProducts = products.filter((product) => product.categoryId === categoryId && product.active);
-  const categoryName = seedCategories.find((category) => category.id === categoryId)?.name || "Меню";
+  const categoryName = categories.find((category) => category.id === categoryId)?.name || "Меню";
   return (
     <section className={`product-grid category-panel category-${categoryId} ${className}`} id={`category-panel-${categoryId}`} role="tabpanel" aria-hidden={hidden || undefined}>
       <h1 className="visually-hidden">{categoryName} — меню ДААНА СУШИ</h1>
-      <div className="product-slot hero-slot"><HeroCarousel onOpen={onOpenPromo} /></div>
+      <div className="product-slot hero-slot"><HeroCarousel promotions={promotions} onOpen={onOpenPromo} /></div>
       {visibleProducts.map((product) => (
         <div className="product-slot card-slot" key={product.id}>
           <ProductCard product={product} quantity={cart[product.id] || 0} onDecrease={() => onChangeQuantity(product.id, -1)} onIncrease={() => onChangeQuantity(product.id, 1)} />
@@ -272,7 +349,7 @@ function CartPanel({ lines, onCheckout, onDecrease, onEnter, onIncrease, onLeave
               </div>
             ))}
           </div>
-          <button className="cart-total" onClick={onCheckout}><span>Сумма заказа:</span><strong>{total} р</strong></button>
+          <button className="cart-total" onClick={onCheckout}><span>Сумма заказа:</span><strong>{total} С</strong></button>
         </>
       )}
     </aside>
@@ -311,7 +388,7 @@ function LocationOption({ item, selected, onSelect }: { item: PickupLocation; se
   );
 }
 
-function LocationModal({ current, items, onSelect }: { current: PickupLocation | null; items: PickupLocation[]; onSelect: (location: PickupLocation) => void }) {
+function LocationModal({ closing, current, items, onSelect }: { closing: boolean; current: PickupLocation | null; items: PickupLocation[]; onSelect: (location: PickupLocation) => void }) {
   const [selectedId, setSelectedId] = useState<number | "">(current?.id || "");
   const [userPosition, setUserPosition] = useState<MapPosition | null>(null);
   const chooseLocation = useCallback((item: PickupLocation) => setSelectedId(item.id), []);
@@ -321,7 +398,7 @@ function LocationModal({ current, items, onSelect }: { current: PickupLocation |
   }, [items, userPosition]);
   const selected = orderedItems.find((location) => location.id === selectedId) || null;
   return (
-    <div className="modal-backdrop" role="presentation">
+    <div className={`modal-backdrop ${closing ? "is-closing" : ""}`} role="presentation">
       <section className="modal-card location-modal" role="dialog" aria-modal="true" aria-labelledby="location-title">
         <h2 id="location-title" className="visually-hidden">Выберите точку, где вы заберете заказ</h2>
         <div className="location-top-row">
@@ -480,6 +557,15 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
   );
 }
 
+function ContactChannels({ className }: { className: string }) {
+  return (
+    <span className={className}>
+      <a className="contact-channel whatsapp" href={`https://wa.me/${CONTACT_PHONE_DIGITS}`} aria-label={`WhatsApp ${CONTACT_PHONE_DISPLAY}`} title={`WhatsApp: ${CONTACT_PHONE_DISPLAY}`}><MaterialIcon>phone_in_talk</MaterialIcon></a>
+      <a className="contact-channel phone" href={`tel:+${CONTACT_PHONE_DIGITS}`} aria-label={`Позвонить ${CONTACT_PHONE_DISPLAY}`} title={`Позвонить: ${CONTACT_PHONE_DISPLAY}`}><MaterialIcon>phone</MaterialIcon></a>
+    </span>
+  );
+}
+
 function Footer({ settings }: { settings: SiteSettings }) {
   return (
     <footer className="site-footer">
@@ -487,19 +573,14 @@ function Footer({ settings }: { settings: SiteSettings }) {
         <div className="footer-top">
           <div className="footer-brand"><img src="/assets/icons/logo.svg" alt="ДААНА СУШИ" /><span>ДААНА СУШИ © 2026 {settings.legalName}</span></div>
           <a className="footer-payment" href="/payment-rule">*правила оплаты на сайте*</a>
-          <div className="footer-contact"><a href={settings.telegram} aria-label="Telegram"><img src="/assets/icons/Telegram_Messenger.png" alt="" /></a></div>
+          <div className="footer-contact">
+            <span className="footer-contact-label">Связаться с нами</span>
+            <ContactChannels className="footer-contact-icons" />
+          </div>
         </div>
-        <nav className="footer-legal-links" aria-label="Правовая информация"><a href="/legal">Правовая информация</a><a href="/privacy">Конфиденциальность</a><a href="/terms">Условия использования</a><a href="/payment-rule">Правила оплаты</a><a href="/delete-account">Удаление аккаунта</a><a href="/support">Поддержка</a></nav>
-        <nav className="footer-menu-links" aria-label="Меню ДААНА СУШИ">
-          {seedCategories.filter((category) => category.active).map((category) => <a href={`/catalog/${category.id}`} key={category.id}>{category.name}</a>)}
-          <a href="/promo">Акции</a><a href="/about">О нас</a>
-        </nav>
-        <address className="footer-legal">
-          <span>Оператор сервиса: {LEGAL_DETAILS.operator}</span>
-          <span>ИНН: {LEGAL_DETAILS.inn}</span>
-          <span>Регистрационный номер: {LEGAL_DETAILS.registrationNumber}</span>
-          <span>Адрес: {LEGAL_DETAILS.address}</span>
-        </address>
+        <div className="footer-privacy"><a href="/privacy">Политика обработки персональных данных</a></div>
+        <div className="footer-recaptcha"><a href="/legal">Правовая информация</a> · <a href="/terms">Условия использования</a> · <a href="/delete-account">Удаление аккаунта</a></div>
+        <address className="visually-hidden">Оператор: {LEGAL_DETAILS.operator}. ИНН: {LEGAL_DETAILS.inn}. Регистрационный номер: {LEGAL_DETAILS.registrationNumber}. Адрес: {LEGAL_DETAILS.address}.</address>
       </div>
     </footer>
   );
@@ -512,11 +593,11 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   const [cartOpen, setCartOpen] = useState(false);
   const [location, setLocation] = useState<PickupLocation | null>(null);
   const [locationOpen, setLocationOpen] = useState(false);
+  const [locationClosing, setLocationClosing] = useState(false);
   const [loginOpen, setLoginOpen] = useState(false);
   const [customerLoggedIn, setCustomerLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
-  const [geoNoticeOpen, setGeoNoticeOpen] = useState(false);
   const [headerHidden, setHeaderHidden] = useState(false);
   const [categoryList, setCategoryList] = useState<Category[]>(seedCategories);
   const [productList, setProductList] = useState<Product[]>(seedProducts);
@@ -525,13 +606,17 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ legalName: LEGAL_DETAILS.operator, telegram: "https://t.me/BIG_REST_TEAM" });
   const [coinNetwork, setCoinNetwork] = useState("polygon");
   const [categoryTransition, setCategoryTransition] = useState<CategoryTransition | null>(null);
+  const cartOpenTimer = useRef<number | null>(null);
   const cartCloseTimer = useRef<number | null>(null);
-  const geoNoticeTimer = useRef<number | null>(null);
+  const locationCloseTimer = useRef<number | null>(null);
   const categoryTransitionTimer = useRef<number | null>(null);
   const customerAuthGenerationRef = useRef(0);
 
   useEffect(() => () => {
     if (categoryTransitionTimer.current) window.clearTimeout(categoryTransitionTimer.current);
+    if (cartOpenTimer.current) window.clearTimeout(cartOpenTimer.current);
+    if (cartCloseTimer.current) window.clearTimeout(cartCloseTimer.current);
+    if (locationCloseTimer.current) window.clearTimeout(locationCloseTimer.current);
   }, []);
 
   useEffect(() => {
@@ -575,11 +660,10 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
         } else {
           localStorage.removeItem("sushi-location");
           setLocationOpen(true);
-          setGeoNoticeOpen(true);
         }
       }
-      else { setLocationOpen(true); setGeoNoticeOpen(true); }
-    } catch { setLocationOpen(true); setGeoNoticeOpen(true); }
+      else { setLocationOpen(true); }
+    } catch { setLocationOpen(true); }
     void Promise.allSettled([
       fetch(`${API_URL}/catalog`).then((response) => response.ok ? response.json() : Promise.reject()),
       fetch(`${API_URL}/locations`).then((response) => response.ok ? response.json() : Promise.reject()),
@@ -599,13 +683,11 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
           if (!restoredLocation) {
             localStorage.removeItem("sushi-location");
             setLocationOpen(true);
-            setGeoNoticeOpen(true);
           }
         }
       } else if (savedLocationId !== null && !seedLocations.some((item) => item.id === savedLocationId)) {
         localStorage.removeItem("sushi-location");
         setLocationOpen(true);
-        setGeoNoticeOpen(true);
       }
       if (promotionsResult.status === "fulfilled") setPromotionList(promotionsResult.value);
       if (settingsResult.status === "fulfilled") {
@@ -620,16 +702,27 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
 
   useEffect(() => {
     let previousY = window.scrollY;
+    let direction: "up" | "down" = "down";
+    let directionAnchor = previousY;
     const onScroll = () => {
       const currentY = window.scrollY;
-      if (currentY <= 8) setHeaderHidden(false);
-      else if (currentY > previousY && currentY > 72) setHeaderHidden(true);
-      else if (currentY < previousY) setHeaderHidden(false);
+      const nextDirection = currentY >= previousY ? "down" : "up";
+      if (nextDirection !== direction) directionAnchor = previousY;
+      if (currentY <= 250 || nextDirection === "up") setHeaderHidden(false);
+      else if (currentY - directionAnchor > 100) setHeaderHidden(true);
+      direction = nextDirection;
       previousY = currentY;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    if (!mobileMenuOpen && !locationOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [locationOpen, mobileMenuOpen]);
 
   useEffect(() => {
     const syncRoute = () => {
@@ -669,20 +762,48 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   const navigatePromo = () => { setView("promo"); setHeaderHidden(false); setCartOpen(false); window.history.pushState({}, "", "/promo"); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const navigateOrder = () => { setView("order"); setHeaderHidden(false); setCartOpen(false); window.history.pushState({}, "", "/order"); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const navigatePayment = () => { setView("payment"); setHeaderHidden(false); setCartOpen(false); setMobileMenuOpen(false); window.history.pushState({}, "", "/payment-rule"); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const saveLocation = (chosen: PickupLocation) => { setLocation(chosen); localStorage.setItem("sushi-location", String(chosen.id)); setLocationOpen(false); };
-  const openLocation = () => {
-    setLocationOpen(true); setGeoNoticeOpen(true);
-    if (geoNoticeTimer.current) window.clearTimeout(geoNoticeTimer.current);
-    geoNoticeTimer.current = window.setTimeout(() => setGeoNoticeOpen(false), 5000);
+  const saveLocation = (chosen: PickupLocation) => {
+    setLocation(chosen);
+    localStorage.setItem("sushi-location", String(chosen.id));
+    if (!locationOpen) return;
+    setLocationClosing(true);
+    if (locationCloseTimer.current) window.clearTimeout(locationCloseTimer.current);
+    locationCloseTimer.current = window.setTimeout(() => {
+      setLocationOpen(false);
+      setLocationClosing(false);
+      locationCloseTimer.current = null;
+    }, 300);
   };
-  const keepCartPreview = () => { if (cartCloseTimer.current) window.clearTimeout(cartCloseTimer.current); if (lines.length) setCartOpen(true); };
-  const closeCartPreview = () => { if (cartCloseTimer.current) window.clearTimeout(cartCloseTimer.current); cartCloseTimer.current = window.setTimeout(() => setCartOpen(false), 140); };
-
+  const openLocation = () => { setLocationClosing(false); setLocationOpen(true); };
+  const keepCartPreview = () => {
+    if (cartCloseTimer.current) window.clearTimeout(cartCloseTimer.current);
+    if (!lines.length || cartOpen || cartOpenTimer.current) return;
+    cartOpenTimer.current = window.setTimeout(() => {
+      setCartOpen(true);
+      cartOpenTimer.current = null;
+    }, 400);
+  };
+  const closeCartPreview = () => {
+    if (cartOpenTimer.current) { window.clearTimeout(cartOpenTimer.current); cartOpenTimer.current = null; }
+    if (cartCloseTimer.current) window.clearTimeout(cartCloseTimer.current);
+    cartCloseTimer.current = window.setTimeout(() => setCartOpen(false), 200);
+  };
   return (
     <div className={`site-shell ${headerHidden ? "header-hidden" : ""} ${view}-view`}>
       <Header cartCount={cartCount} cartOpen={cartOpen} customerLoggedIn={customerLoggedIn} location={location} menuOpen={mobileMenuOpen} onCart={navigateOrder} onCartPreviewEnter={keepCartPreview} onCartPreviewLeave={closeCartPreview} onCatalog={() => navigateCategory(1)} onLocation={openLocation} onLogin={() => setLoginOpen(true)} onMenu={() => setMobileMenuOpen((open) => !open)} onPromo={navigatePromo} />
       <CategoryTabs items={categoryList} selectedId={view === "catalog" ? categoryId : 0} onSelect={navigateCategory} />
-      {mobileMenuOpen && <><button className="mobile-menu-scrim" onClick={() => setMobileMenuOpen(false)} aria-label="Закрыть меню" /><aside className="mobile-menu-panel" aria-label="Главное меню"><nav><button onClick={() => { setMobileMenuOpen(false); navigateCategory(1); }}><MaterialIcon>restaurant_menu</MaterialIcon><span>Блюда</span></button><button onClick={() => { setMobileMenuOpen(false); navigatePromo(); }}><MaterialIcon>card_giftcard</MaterialIcon><span>Акции</span></button><button onClick={navigatePayment}><MaterialIcon>receipt_long</MaterialIcon><span>Оплата</span></button><button onClick={() => { setMobileMenuOpen(false); setLoginOpen(true); }}><MaterialIcon>login</MaterialIcon><span>Кабинет</span></button></nav><div className="mobile-menu-brand"><span className="mobile-brand-mark" /><strong>ДААНА СУШИ — ЭТО КОГДА<br />УДОБНО И ВКУСНО</strong></div><div className="mobile-menu-contact"><a href={siteSettings.telegram} aria-label="Telegram"><img src="/assets/icons/Telegram_Messenger.png" alt="" /></a></div></aside></>}
+      <button className={`mobile-menu-scrim ${mobileMenuOpen ? "is-open" : ""}`} onClick={() => setMobileMenuOpen(false)} aria-label="Закрыть меню" aria-hidden={!mobileMenuOpen} tabIndex={mobileMenuOpen ? 0 : -1} />
+      <aside className={`mobile-menu-panel ${mobileMenuOpen ? "is-open" : ""}`} aria-label="Главное меню" aria-hidden={!mobileMenuOpen} inert={!mobileMenuOpen ? true : undefined}>
+        <nav>
+          <button onClick={() => { setMobileMenuOpen(false); navigateCategory(1); }}><MaterialIcon>restaurant_menu</MaterialIcon><span>Блюда</span></button>
+          <button onClick={() => { setMobileMenuOpen(false); navigatePromo(); }}><MaterialIcon>card_giftcard</MaterialIcon><span>Акции</span></button>
+          <button onClick={navigatePayment}><MaterialIcon>receipt_long</MaterialIcon><span>Оплата</span></button>
+          <button onClick={() => { setMobileMenuOpen(false); setLoginOpen(true); }}><MaterialIcon>login</MaterialIcon><span>Кабинет</span></button>
+        </nav>
+        <div className="mobile-menu-brand"><span className="mobile-brand-mark" /><strong>ДААНА СУШИ — ЭТО КОГДА<br />УДОБНО И ВКУСНО</strong></div>
+        <div className="mobile-menu-contact"><span>Связаться с нами</span><ContactChannels className="mobile-menu-contact-icons" /></div>
+      </aside>
+      {view === "catalog" && <button className="mobile-wordmark" onClick={() => navigateCategory(1)} aria-label="На главную"><img src="/assets/icons/logo.svg" alt="ДААНА СУШИ" /></button>}
       {cartOpen && <CartPanel lines={lines} onCheckout={navigateOrder} onEnter={keepCartPreview} onLeave={closeCartPreview} onDecrease={(id) => changeQuantity(id, -1)} onIncrease={(id) => changeQuantity(id, 1)} onRemove={(id) => setCart((current) => ({ ...current, [id]: 0 }))} />}
       <main className={`site-main ${view === "order" ? "order-main" : ""} ${view === "payment" || view === "privacy" ? "legal-main" : ""}`}>
         {view === "promo" ? (
@@ -702,18 +823,17 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
           <div className={`category-transition-shell ${categoryTransition ? `is-transitioning slide-${categoryTransition.direction}` : ""}`}>
             {categoryTransition ? (
               <>
-                <CatalogPanel key={`from-${categoryTransition.token}`} categoryId={categoryTransition.from} className="category-panel-outgoing" products={productList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} hidden />
-                <CatalogPanel key={`to-${categoryTransition.token}`} categoryId={categoryTransition.to} className="category-panel-incoming" products={productList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} />
+                <CatalogPanel key={`from-${categoryTransition.token}`} categories={categoryList} categoryId={categoryTransition.from} className="category-panel-outgoing" products={productList} promotions={promotionList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} hidden />
+                <CatalogPanel key={`to-${categoryTransition.token}`} categories={categoryList} categoryId={categoryTransition.to} className="category-panel-incoming" products={productList} promotions={promotionList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} />
               </>
             ) : (
-              <CatalogPanel categoryId={categoryId} products={productList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} />
+              <CatalogPanel categories={categoryList} categoryId={categoryId} products={productList} promotions={promotionList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} />
             )}
           </div>
         )}
       </main>
       <Footer settings={siteSettings} />
-      {geoNoticeOpen && <div className="geo-notice" role="status"><span>Для удобства нахождения ближайшего магазина разрешите сайту определять ваше местоположение.</span><button onClick={() => setGeoNoticeOpen(false)} aria-label="Закрыть"><MaterialIcon>close</MaterialIcon></button></div>}
-      {locationOpen && <LocationModal current={location} items={locationList} onSelect={saveLocation} />}
+      {locationOpen && <LocationModal closing={locationClosing} current={location} items={locationList} onSelect={saveLocation} />}
       {loginOpen && <CustomerAccountModal apiUrl={API_URL} coinNetwork={coinNetwork} onClose={() => setLoginOpen(false)} onSessionChange={handleCustomerSessionChange} />}
       {orderNumber && <div className="modal-backdrop"><section className="modal-card success-modal"><MaterialIcon>check_circle</MaterialIcon><h2>Заказ принят</h2><p>Номер вашего заказа: <strong>{orderNumber}</strong></p><button className="primary-button" onClick={() => setOrderNumber("")}>Хорошо</button></section></div>}
     </div>

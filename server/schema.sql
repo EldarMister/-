@@ -18,12 +18,16 @@ CREATE INDEX IF NOT EXISTS idx_admin_sessions_expiry ON admin_sessions(expires_a
 CREATE TABLE IF NOT EXISTS categories (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
+  slug TEXT NOT NULL,
   sort_order INTEGER NOT NULL DEFAULT 0,
   active BOOLEAN NOT NULL DEFAULT TRUE,
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE categories ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+ALTER TABLE categories DROP CONSTRAINT IF EXISTS categories_slug_key;
+CREATE UNIQUE INDEX IF NOT EXISTS idx_categories_live_slug ON categories(slug) WHERE deleted_at IS NULL;
 
 CREATE TABLE IF NOT EXISTS products (
   id INTEGER PRIMARY KEY,
@@ -50,6 +54,8 @@ CREATE TABLE IF NOT EXISTS pickup_locations (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE pickup_locations ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
 
 CREATE TABLE IF NOT EXISTS promotions (
   id INTEGER PRIMARY KEY,
@@ -332,4 +338,22 @@ BEGIN
 
     INSERT INTO app_migrations (key) VALUES ('2026-09-03-kyrgyz-pickup-map');
   END IF;
+END $$;
+
+CREATE OR REPLACE FUNCTION notify_admin_change() RETURNS TRIGGER AS $$
+BEGIN
+  PERFORM pg_notify('admin_changes', TG_TABLE_NAME);
+  RETURN NULL;
+END;
+$$ LANGUAGE plpgsql;
+
+DO $$
+DECLARE table_name TEXT;
+BEGIN
+  FOREACH table_name IN ARRAY ARRAY['orders', 'order_items', 'categories', 'products', 'pickup_locations', 'promotions', 'site_settings', 'customers', 'nakta_coin_transactions', 'nakta_coin_withdrawals', 'account_nfts', 'customer_reward_adjustments']
+  LOOP
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'admin_change' AND tgrelid = table_name::regclass) THEN
+      EXECUTE format('CREATE TRIGGER admin_change AFTER INSERT OR UPDATE OR DELETE ON %I FOR EACH STATEMENT EXECUTE FUNCTION notify_admin_change()', table_name);
+    END IF;
+  END LOOP;
 END $$;

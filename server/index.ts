@@ -30,6 +30,7 @@ import {
 import { closeDatabase, sql } from "./db";
 import { waitForDatabaseConnection } from "./database-readiness";
 import { migrate } from "./migrate";
+import { closeAdminEvents, startAdminEvents, streamAdminEvents } from "./admin-events";
 import { NikitaOtpError, sendNikitaOtp, verifyNikitaOtp } from "./nikita-otp";
 import { resolveOtpBypassPhone } from "./otp-bypass";
 import { resolveCorsOrigins } from "./cors-origins";
@@ -748,13 +749,13 @@ app.get("/api/health", async (_request, response) => {
 });
 
 app.get("/api/catalog", async (_request, response) => {
-  const categoryRows = await sql`SELECT id, name, slug, sort_order AS "sortOrder", active FROM categories WHERE active = TRUE ORDER BY sort_order, id`;
-  const productRows = await sql`SELECT id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins" FROM products WHERE active = TRUE ORDER BY category_id, sort_order, id`;
+  const categoryRows = await sql`SELECT id, name, slug, sort_order AS "sortOrder", active FROM categories WHERE active = TRUE AND deleted_at IS NULL ORDER BY sort_order, id`;
+  const productRows = await sql`SELECT p.id, p.category_id AS "categoryId", p.name, p.price, p.image, p.active, p.sort_order AS "sortOrder", p.nakta_coins AS "naktaCoins" FROM products p JOIN categories c ON c.id = p.category_id WHERE p.active = TRUE AND c.active = TRUE AND c.deleted_at IS NULL ORDER BY p.category_id, p.sort_order, p.id`;
   response.json({ categories: categoryRows, products: productRows });
 });
 
 app.get("/api/locations", async (_request, response) => {
-  const rows = await sql`SELECT id, name, address, phone, hours, opens_at AS "opensAt", latitude, longitude, active FROM pickup_locations WHERE active = TRUE ORDER BY id`;
+  const rows = await sql`SELECT id, name, address, phone, hours, opens_at AS "opensAt", latitude, longitude, active FROM pickup_locations WHERE active = TRUE AND deleted_at IS NULL ORDER BY id`;
   response.json(rows);
 });
 
@@ -857,7 +858,7 @@ app.post("/api/orders", orderClientLimiter, orderLimiter, async (request, respon
   }
   const ids = [...requested.keys()];
   if (!ids.length) return response.status(400).json({ error: "Корзина пуста" });
-  const available = await sql`SELECT id, name, price, nakta_coins AS "naktaCoins" FROM products WHERE active = TRUE AND id IN ${sql(ids)}`;
+  const available = await sql`SELECT p.id, p.name, p.price, p.nakta_coins AS "naktaCoins" FROM products p JOIN categories c ON c.id = p.category_id WHERE p.active = TRUE AND c.active = TRUE AND c.deleted_at IS NULL AND p.id IN ${sql(ids)}`;
   if (available.length !== ids.length) return response.status(409).json({ error: "Некоторые позиции больше недоступны" });
   const orderLines = available.map((product) => {
     const quantity = requested.get(product.id) || 1;
@@ -891,6 +892,18 @@ app.post("/api/orders", orderClientLimiter, orderLimiter, async (request, respon
   }
   const orderNumber = `ST-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 90 + 10)}`;
   const order = await sql.begin(async (tx) => {
+    const [location] = await tx`
+      SELECT id FROM pickup_locations
+      WHERE id = ${locationId} AND active = TRUE AND deleted_at IS NULL
+      FOR SHARE
+    `;
+    if (!location) throw new ApiError(409, "Точка самовывоза больше недоступна. Выберите другую точку");
+    const liveProducts = await tx`
+      SELECT p.id FROM products p JOIN categories c ON c.id = p.category_id
+      WHERE p.id IN ${tx(ids)} AND p.active = TRUE AND c.active = TRUE AND c.deleted_at IS NULL
+      FOR SHARE OF c, p
+    `;
+    if (liveProducts.length !== ids.length) throw new ApiError(409, "Некоторые позиции больше недоступны");
     const normalizedPhone = customerPhone.replace(/\D/g, "");
     const [customer] = await tx`
       INSERT INTO customers (phone, name)
@@ -1102,6 +1115,7 @@ app.post("/api/admin/logout", requireTrustedAdminOrigin, async (request, respons
 });
 
 app.use("/api/admin", requireAdmin, requireTrustedAdminOrigin);
+app.get("/api/admin/events", streamAdminEvents);
 
 app.get("/api/admin/session", (_request, response) => {
   response.setHeader("Cache-Control", "no-store");
@@ -1156,41 +1170,51 @@ app.post("/api/admin/yandex-map-link", geocodeLimiter, async (request, response)
 });
 
 app.get("/api/admin/dashboard", async (_request, response) => {
-  const [stats] = await sql`SELECT (SELECT COUNT(*)::int FROM orders WHERE created_at >= CURRENT_DATE) AS "ordersToday", (SELECT COALESCE(SUM(total),0)::int FROM orders WHERE created_at >= CURRENT_DATE AND status <> 'cancelled') AS "revenueToday", (SELECT COUNT(*)::int FROM products WHERE active = TRUE) AS products, (SELECT COUNT(*)::int FROM orders WHERE status IN ('new','confirmed','preparing')) AS "activeOrders"`;
+  const [stats] = await sql`SELECT (SELECT COUNT(*)::int FROM orders WHERE created_at >= CURRENT_DATE) AS "ordersToday", (SELECT COALESCE(SUM(total),0)::int FROM orders WHERE created_at >= CURRENT_DATE AND status <> 'cancelled') AS "revenueToday", (SELECT COUNT(*)::int FROM products p JOIN categories c ON c.id = p.category_id WHERE p.active = TRUE AND c.active = TRUE AND c.deleted_at IS NULL) AS products, (SELECT COUNT(*)::int FROM orders WHERE status IN ('new','confirmed','preparing')) AS "activeOrders"`;
   response.json(stats);
 });
 
-app.get("/api/admin/categories", async (_request, response) => response.json(await sql`SELECT id, name, slug, sort_order AS "sortOrder", active FROM categories ORDER BY sort_order, id`));
+app.get("/api/admin/categories", async (_request, response) => response.json(await sql`SELECT id, name, slug, sort_order AS "sortOrder", active FROM categories WHERE deleted_at IS NULL ORDER BY sort_order, id`));
 app.post("/api/admin/categories", async (request, response) => {
   const [created] = await sql`INSERT INTO categories (id, name, slug, sort_order, active) VALUES ((SELECT COALESCE(MAX(id),0)+1 FROM categories), ${String(request.body.name || "Новая категория")}, ${String(request.body.slug || `category-${Date.now()}`)}, ${numberValue(request.body.sortOrder)}, ${booleanValue(request.body.active)}) RETURNING id, name, slug, sort_order AS "sortOrder", active`;
   response.status(201).json(created);
 });
 app.put("/api/admin/categories/:id", async (request, response) => {
-  const [updated] = await sql`UPDATE categories SET name=${String(request.body.name)}, slug=${String(request.body.slug)}, sort_order=${numberValue(request.body.sortOrder)}, active=${booleanValue(request.body.active)}, updated_at=NOW() WHERE id=${numberValue(request.params.id)} RETURNING id, name, slug, sort_order AS "sortOrder", active`;
+  const [updated] = await sql`UPDATE categories SET name=${String(request.body.name)}, slug=${String(request.body.slug)}, sort_order=${numberValue(request.body.sortOrder)}, active=${booleanValue(request.body.active)}, updated_at=NOW() WHERE id=${numberValue(request.params.id)} AND deleted_at IS NULL RETURNING id, name, slug, sort_order AS "sortOrder", active`;
   if (updated) response.json(updated);
   else response.status(404).json({ error: "Категория не найдена" });
 });
 app.delete("/api/admin/categories/:id", async (request, response) => {
-  try { await sql`DELETE FROM categories WHERE id=${numberValue(request.params.id)}`; response.status(204).end(); } catch { response.status(409).json({ error: "Сначала перенесите или удалите товары категории" }); }
+  const [deleted] = await sql`UPDATE categories SET active = FALSE, deleted_at = COALESCE(deleted_at, NOW()), updated_at = NOW() WHERE id = ${numberValue(request.params.id)} RETURNING id`;
+  if (!deleted) { response.status(404).json({ error: "Категория не найдена" }); return; }
+  response.status(204).end();
 });
 
 app.get("/api/admin/products", async (_request, response) => response.json(await sql`SELECT id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins" FROM products ORDER BY category_id, sort_order, id`));
 app.post("/api/admin/products", async (request, response) => {
   const naktaCoins = integerValue(request.body.naktaCoins);
   if (naktaCoins < 0 || naktaCoins > 1_000_000) throw new ApiError(400, "Награда товара должна быть целым числом от 0 до 1 000 000");
-  const [created] = await sql`INSERT INTO products (id, category_id, name, price, image, active, sort_order, nakta_coins) VALUES ((SELECT COALESCE(MAX(id),0)+1 FROM products), ${numberValue(request.body.categoryId)}, ${String(request.body.name || "Новый товар")}, ${numberValue(request.body.price)}, ${String(request.body.image || "")}, ${booleanValue(request.body.active)}, ${numberValue(request.body.sortOrder)}, ${naktaCoins}) RETURNING id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins"`;
+  const [created] = await sql.begin(async (tx) => {
+    const [category] = await tx`SELECT id FROM categories WHERE id = ${numberValue(request.body.categoryId)} AND deleted_at IS NULL FOR SHARE`;
+    if (!category) throw new ApiError(409, "Выберите существующую категорию");
+    return tx`INSERT INTO products (id, category_id, name, price, image, active, sort_order, nakta_coins) VALUES ((SELECT COALESCE(MAX(id),0)+1 FROM products), ${numberValue(request.body.categoryId)}, ${String(request.body.name || "Новый товар")}, ${numberValue(request.body.price)}, ${String(request.body.image || "")}, ${booleanValue(request.body.active)}, ${numberValue(request.body.sortOrder)}, ${naktaCoins}) RETURNING id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins"`;
+  });
   response.status(201).json(created);
 });
 app.put("/api/admin/products/:id", async (request, response) => {
   const naktaCoins = request.body.naktaCoins === undefined ? null : integerValue(request.body.naktaCoins, -1);
   if (naktaCoins !== null && (naktaCoins < 0 || naktaCoins > 1_000_000)) throw new ApiError(400, "Награда товара должна быть целым числом от 0 до 1 000 000");
-  const [updated] = await sql`UPDATE products SET category_id=${numberValue(request.body.categoryId)}, name=${String(request.body.name)}, price=${numberValue(request.body.price)}, image=${String(request.body.image)}, active=${booleanValue(request.body.active)}, sort_order=${numberValue(request.body.sortOrder)}, nakta_coins=COALESCE(${naktaCoins}, nakta_coins), updated_at=NOW() WHERE id=${numberValue(request.params.id)} RETURNING id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins"`;
+  const [updated] = await sql.begin(async (tx) => {
+    const [category] = await tx`SELECT id FROM categories WHERE id = ${numberValue(request.body.categoryId)} AND deleted_at IS NULL FOR SHARE`;
+    if (!category) throw new ApiError(409, "Выберите существующую категорию");
+    return tx`UPDATE products SET category_id=${numberValue(request.body.categoryId)}, name=${String(request.body.name)}, price=${numberValue(request.body.price)}, image=${String(request.body.image)}, active=${booleanValue(request.body.active)}, sort_order=${numberValue(request.body.sortOrder)}, nakta_coins=COALESCE(${naktaCoins}, nakta_coins), updated_at=NOW() WHERE id=${numberValue(request.params.id)} RETURNING id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins"`;
+  });
   if (updated) response.json(updated);
   else response.status(404).json({ error: "Товар не найден" });
 });
 app.delete("/api/admin/products/:id", async (request, response) => { await sql`DELETE FROM products WHERE id=${numberValue(request.params.id)}`; response.status(204).end(); });
 
-app.get("/api/admin/locations", async (_request, response) => response.json(await sql`SELECT id, name, address, phone, hours, opens_at AS "opensAt", latitude, longitude, active FROM pickup_locations ORDER BY id`));
+app.get("/api/admin/locations", async (_request, response) => response.json(await sql`SELECT id, name, address, phone, hours, opens_at AS "opensAt", latitude, longitude, active FROM pickup_locations WHERE deleted_at IS NULL ORDER BY id`));
 app.post("/api/admin/locations", async (request, response) => {
   const coordinates = locationCoordinates(request.body);
   if (!coordinates) { response.status(400).json({ error: "Укажите корректные широту и долготу" }); return; }
@@ -1200,11 +1224,19 @@ app.post("/api/admin/locations", async (request, response) => {
 app.put("/api/admin/locations/:id", async (request, response) => {
   const coordinates = locationCoordinates(request.body);
   if (!coordinates) { response.status(400).json({ error: "Укажите корректные широту и долготу" }); return; }
-  const [updated] = await sql`UPDATE pickup_locations SET name=${String(request.body.name)},address=${String(request.body.address)},phone=${String(request.body.phone)},hours=${String(request.body.hours)},opens_at=${String(request.body.opensAt)},latitude=${coordinates.latitude},longitude=${coordinates.longitude},active=${booleanValue(request.body.active)},updated_at=NOW() WHERE id=${numberValue(request.params.id)} RETURNING id,name,address,phone,hours,opens_at AS "opensAt",latitude,longitude,active`;
+  const [updated] = await sql`UPDATE pickup_locations SET name=${String(request.body.name)},address=${String(request.body.address)},phone=${String(request.body.phone)},hours=${String(request.body.hours)},opens_at=${String(request.body.opensAt)},latitude=${coordinates.latitude},longitude=${coordinates.longitude},active=${booleanValue(request.body.active)},updated_at=NOW() WHERE id=${numberValue(request.params.id)} AND deleted_at IS NULL RETURNING id,name,address,phone,hours,opens_at AS "opensAt",latitude,longitude,active`;
   if (updated) response.json(updated);
   else response.status(404).json({ error: "Точка не найдена" });
 });
-app.delete("/api/admin/locations/:id", async (request, response) => { try { await sql`DELETE FROM pickup_locations WHERE id=${numberValue(request.params.id)}`; response.status(204).end(); } catch { response.status(409).json({ error: "Точка используется в заказах" }); } });
+app.delete("/api/admin/locations/:id", async (request, response) => {
+  // Keep the row so existing orders retain their pickup name and address.
+  const [deleted] = await sql`
+    UPDATE pickup_locations SET active = FALSE, deleted_at = COALESCE(deleted_at, NOW()), updated_at = NOW()
+    WHERE id = ${numberValue(request.params.id)} RETURNING id
+  `;
+  if (!deleted) { response.status(404).json({ error: "Точка не найдена" }); return; }
+  response.status(204).end();
+});
 
 app.get("/api/admin/promotions", async (_request, response) => response.json(await sql`SELECT id,title,description,image,active,sort_order AS "sortOrder" FROM promotions ORDER BY sort_order,id`));
 app.post("/api/admin/promotions", async (request, response) => {
@@ -1726,8 +1758,9 @@ await migrate();
 const [databaseState] = await sql`SELECT EXISTS (SELECT 1 FROM products) AS "hasProducts"`;
 if (!databaseState.hasProducts) await seed();
 else await syncAdminPassword();
+await startAdminEvents();
 const server = app.listen(port, apiHost, () => console.log(`DAANA SUSHI API: http://${apiHost}:${port}/api`));
 
 for (const signal of ["SIGINT", "SIGTERM"] as const) {
-  process.on(signal, () => server.close(async () => { await closeDatabase(); process.exit(0); }));
+  process.on(signal, () => { closeAdminEvents(); server.close(async () => { await closeDatabase(); process.exit(0); }); });
 }

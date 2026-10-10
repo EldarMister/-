@@ -84,11 +84,14 @@ const gateway = createServer((incoming, outgoing) => {
     response.pipe(outgoing);
   });
   upstream.once("error", (error) => {
+    if (outgoing.destroyed) return;
     console.error("Gateway error:", error.message);
     if (!outgoing.headersSent) outgoing.writeHead(502, { "Content-Type": "application/json; charset=utf-8" });
     outgoing.end(JSON.stringify({ error: "Сервис временно недоступен" }));
   });
   incoming.pipe(upstream);
+  // Release long-lived event streams as soon as the browser disconnects.
+  outgoing.once("close", () => upstream.destroy());
 });
 
 function shutdown(exitCode = 0) {

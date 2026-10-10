@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useCallback, useMemo, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { hasValidCoordinates, type LocationGeocodeResult, type MapPosition } from "../locationUtils";
 import PickupMap from "../PickupMap";
 import type { PickupLocation } from "../types";
@@ -57,6 +57,13 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
   const [addressConfirmed, setAddressConfirmed] = useState(false);
   const [editorSession, setEditorSession] = useState(0);
   const [error, setError] = useState("");
+  const [deleting, setDeleting] = useState<PickupLocation | null>(null);
+  const [removing, setRemoving] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const deleteDialogRef = useRef<HTMLDialogElement>(null);
+  useEffect(() => {
+    if (deleting) deleteDialogRef.current?.showModal();
+  }, [deleting]);
   const editingLatitude = editing?.latitude;
   const editingLongitude = editing?.longitude;
   const editingId = editing?.id;
@@ -139,14 +146,21 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
     }
   };
 
-  const remove = async (location: PickupLocation) => {
-    if (!window.confirm(`Удалить точку «${location.name}»?`)) return;
+  const remove = async (event: FormEvent) => {
+    event.preventDefault();
+    if (!deleting || removing) return;
+    setRemoving(true);
+    setDeleteError("");
     setError("");
     try {
-      await request(`locations/${location.id}`, { method: "DELETE" });
+      await request(`locations/${deleting.id}`, { method: "DELETE" });
+      if (editing?.id === deleting.id) setEditing(null);
+      setDeleting(null);
       await onRefresh();
     } catch (removeError) {
-      setError(removeError instanceof Error ? removeError.message : "Не удалось удалить точку");
+      setDeleteError(removeError instanceof Error ? removeError.message : "Не удалось удалить точку");
+    } finally {
+      setRemoving(false);
     }
   };
 
@@ -280,13 +294,26 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
                 <td>{location.active ? "На сайте" : "Скрыта"}</td>
                 <td className="row-actions">
                   <button type="button" onClick={() => startEditingLocation(location)}>Изменить</button>
-                  <button type="button" className="danger" onClick={() => void remove(location)}>Удалить</button>
+                  <button type="button" className="danger" disabled={removing} onClick={() => { setDeleting(location); setDeleteError(""); }}>Удалить</button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      {deleting ? (
+        <dialog ref={deleteDialogRef} className="admin-action-dialog location-delete-dialog" aria-labelledby="location-delete-title" aria-describedby="location-delete-description" onCancel={(event) => { if (removing) event.preventDefault(); else setDeleting(null); }}>
+          <header><h2 id="location-delete-title">Удалить точку «{deleting.name}»?</h2></header>
+          <form onSubmit={remove}>
+            <p id="location-delete-description">Точка исчезнет с сайта и из списка управления. Ранее оформленные заказы сохранятся.</p>
+            {deleteError ? <div className="admin-error" role="alert">{deleteError}</div> : null}
+            <div>
+              <button type="button" disabled={removing} onClick={() => setDeleting(null)}>Отмена</button>
+              <button type="submit" className="danger-solid" disabled={removing}>{removing ? "Удаление…" : "Удалить"}</button>
+            </div>
+          </form>
+        </dialog>
+      ) : null}
     </section>
   );
 }
