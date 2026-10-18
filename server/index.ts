@@ -164,7 +164,7 @@ type VerificationChallenge =
 const verificationChallenges = new Map<string, VerificationChallenge>();
 const verificationRequestsInFlight = new Set<string>();
 const kyrgyzPhonePattern = /^996\d{9}$/;
-const verificationLifetimeMs = 10 * 60 * 1000;
+const verificationLifetimeMs = 5 * 60 * 1000;
 const verificationResendDelayMs = 60 * 1000;
 const maxVerificationAttempts = 5;
 const otpBypassPhone = resolveOtpBypassPhone(process.env.OTP_BYPASS_PHONE);
@@ -786,16 +786,14 @@ app.post("/api/auth/request-code", otpClientLimiter, otpRequestLimiter, otpServi
     return response.status(429).json({ error: "Код уже отправляется. Подождите несколько секунд" });
   }
   verificationRequestsInFlight.add(phone);
-  const apiKey = String(process.env.NIKITA_OTP_API_KEY || "").trim();
+  const smsConfigured = Boolean(process.env.NIKITA_SMS_LOGIN || process.env.NIKITA_SMS_PASSWORD || process.env.NIKITA_OTP_API_KEY);
   try {
-    if (apiKey) {
+    if (smsConfigured || process.env.NODE_ENV === "production") {
       const transactionId = randomUUID().replaceAll("-", "");
-      const token = await sendNikitaOtp(apiKey, phone, transactionId);
+      const token = await sendNikitaOtp(phone, transactionId);
       verificationChallenges.set(phone, { mode: "nikita", token, requestedAt: now, expiresAt: now + verificationLifetimeMs, attempts: 0 });
       return response.json({ sent: true });
     }
-    if (process.env.NODE_ENV === "production") return response.status(503).json({ error: "Отправка SMS ещё не настроена" });
-
     const code = "0000";
     verificationChallenges.set(phone, { mode: "development", code, requestedAt: now, expiresAt: now + verificationLifetimeMs, attempts: 0 });
     return response.json({ sent: true, devCode: code });
@@ -824,9 +822,7 @@ app.post("/api/auth/verify-code", otpVerifyLimiter, async (request, response) =>
 
   try {
     if (challenge.mode === "nikita") {
-      const apiKey = String(process.env.NIKITA_OTP_API_KEY || "").trim();
-      if (!apiKey) return response.status(503).json({ error: "Проверка SMS временно недоступна" });
-      await verifyNikitaOtp(apiKey, challenge.token, code);
+      await verifyNikitaOtp(challenge.token, code);
     } else if (challenge.code !== code) {
       challenge.attempts += 1;
       return response.status(400).json({ error: "Неверный код" });
