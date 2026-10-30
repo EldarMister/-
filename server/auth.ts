@@ -2,6 +2,7 @@ import { createHash, randomUUID } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
 import { SignJWT, jwtVerify } from "jose";
 import { sql } from "./db";
+import { effectivePermissions, type AdminRole } from "./admin-permissions";
 
 const DEVELOPMENT_JWT_SECRET = "development-only-change-this-secret";
 const ADMIN_SESSION_TTL_SECONDS = 2 * 60 * 60;
@@ -78,33 +79,41 @@ export function clearAdminSessionCookie(response: Response) {
   );
 }
 
-export async function requireAdmin(request: Request, response: Response, next: NextFunction) {
+export async function authenticatedAdmin(request: Request) {
   const token = cookieValue(request, ADMIN_SESSION_COOKIE);
-  if (!token) return response.status(401).json({ error: "Требуется вход в админку" });
+  if (!token) return null;
   try {
     const verified = await jwtVerify(token, secret);
     if (verified.payload.role !== "admin") throw new Error("Invalid role");
     const adminId = Number(verified.payload.sub);
     if (!Number.isSafeInteger(adminId) || adminId < 1) throw new Error("Invalid subject");
     const [session] = await sql`
-      SELECT token_hash
-      FROM admin_sessions
-      WHERE token_hash = ${createHash("sha256").update(token).digest("hex")}
-        AND admin_user_id = ${adminId}
-        AND expires_at > NOW()
+      SELECT u.id,u.name,u.email,u.role,u.permission_overrides,u.active
+      FROM admin_sessions s JOIN admin_users u ON u.id=s.admin_user_id
+      WHERE s.token_hash = ${createHash("sha256").update(token).digest("hex")}
+        AND s.admin_user_id = ${adminId} AND u.active=TRUE
+        AND s.expires_at > NOW()
       LIMIT 1
     `;
     if (!session) throw new Error("Revoked session");
-    response.locals.admin = { id: adminId, name: verified.payload.name };
-    next();
+    const role=session.role as AdminRole;
+    return {id:adminId,name:String(session.name),email:String(session.email),active:true,role,overrides:session.permission_overrides as Record<string,boolean|null>,permissions:effectivePermissions(role,session.permission_overrides)};
   } catch {
-    response.status(401).json({ error: "Сессия истекла" });
+    return null;
   }
+}
+
+export async function requireAdmin(request: Request, response: Response, next: NextFunction) {
+  const user=await authenticatedAdmin(request);
+  if (!user) return response.status(401).json({error:"Сессия истекла. Войдите снова"});
+  response.locals.admin=user;
+  next();
 }
 
 export async function revokeCurrentAdminSession(request: Request) {
   const token = cookieValue(request, ADMIN_SESSION_COOKIE);
   if (!token) return false;
+  await sql`DELETE FROM admin_push_subscriptions WHERE session_token_hash=${createHash("sha256").update(token).digest("hex")}`;
   const removed = await sql`
     DELETE FROM admin_sessions
     WHERE token_hash = ${createHash("sha256").update(token).digest("hex")}
@@ -112,3 +121,5 @@ export async function revokeCurrentAdminSession(request: Request) {
   `;
   return removed.length > 0;
 }
+
+export function currentAdminSessionHash(request:Request){const token=cookieValue(request,ADMIN_SESSION_COOKIE);return token?createHash("sha256").update(token).digest("hex"):"";}

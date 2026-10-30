@@ -1,5 +1,8 @@
 "use client";
 
+import Localized from "../i18n/Localized";
+
+
 import type { MouseEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -16,7 +19,7 @@ export function InfoBackLink() {
     router.back();
   }
 
-  return (
+  return <Localized>{(
     <Link
       aria-label="Вернуться назад"
       className={styles.back}
@@ -27,5 +30,5 @@ export function InfoBackLink() {
         <path d="M19 12H5m6 6-6-6 6-6" />
       </svg>
     </Link>
-  );
+  )}</Localized>;
 }

@@ -85,12 +85,12 @@ test("real API keeps reward accrual and withdrawals atomic and idempotent", {
   await call(`/admin/orders/${order.id}/status`, {
     cookie: adminCookie,
     method: "PATCH",
-    body: JSON.stringify({ status: "completed" }),
+    body: JSON.stringify({ status: "completed", expectedStatus: "new" }),
   });
   await call(`/admin/orders/${order.id}/status`, {
     cookie: adminCookie,
     method: "PATCH",
-    body: JSON.stringify({ status: "completed" }),
+    body: JSON.stringify({ status: "completed", expectedStatus: "new" }),
   });
 
   await call("/auth/request-code", {

@@ -26,6 +26,16 @@ function connectionHeaderTokens(value: string | string[] | undefined) {
   return new Set(joined.split(",").map((entry) => entry.trim().toLowerCase()).filter(Boolean));
 }
 
+function publicRequestHost(value: string | undefined) {
+  if (!value || /[\s,@\\/?#]/.test(value)) return undefined;
+  try {
+    const parsed = new URL(`http://${value}`);
+    return parsed.hostname ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
 function normalizedRemoteAddress(value: string | undefined) {
   if (!value) return "127.0.0.1";
   const ipv4Mapped = value.match(/^::ffff:(\d{1,3}(?:\.\d{1,3}){3})$/i);
@@ -132,6 +142,10 @@ export function buildProxyHeaders(
     result[normalizedName] = value;
   }
   result.host = `127.0.0.1:${targetPort}`;
+  // The incoming Host is the public request authority. Client-supplied forwarding
+  // headers are discarded above, and only the loopback upstream trusts this value.
+  const publicHost = publicRequestHost(incoming.host);
+  if (publicHost) result["x-forwarded-host"] = publicHost;
   result["x-forwarded-for"] = trustedClientAddress(
     incoming,
     remoteAddress,

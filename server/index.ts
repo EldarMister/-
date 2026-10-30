@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { randomUUID } from "node:crypto";
-import { mkdir } from "node:fs/promises";
-import { dirname, extname, join } from "node:path";
+import { mkdir, readFile, unlink } from "node:fs/promises";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import bcrypt from "bcryptjs";
 import cors from "cors";
@@ -13,6 +13,7 @@ import { seed } from "./seed";
 import { syncAdminPassword } from "./admin-account";
 import {
   clearAdminSessionCookie,
+  authenticatedAdmin,
   createAdminToken,
   requireAdmin,
   revokeCurrentAdminSession,
@@ -30,10 +31,12 @@ import {
 import { closeDatabase, sql } from "./db";
 import { waitForDatabaseConnection } from "./database-readiness";
 import { migrate } from "./migrate";
+import { parseProductDetails, productDetailColumns } from "./product-details";
+import type { ProductDetails } from "../app/productDetails";
 import { closeAdminEvents, startAdminEvents, streamAdminEvents } from "./admin-events";
 import { NikitaOtpError, sendNikitaOtp, verifyNikitaOtp } from "./nikita-otp";
 import { resolveOtpBypassPhone } from "./otp-bypass";
-import { resolveCorsOrigins } from "./cors-origins";
+import { isTrustedAdminOrigin, resolveCorsOrigins } from "./cors-origins";
 import {
   opaqueClientRateLimitKey,
   opaquePhoneRateLimitKey,
@@ -54,6 +57,13 @@ import {
   shouldAccrueOrderRewards,
 } from "./rewards";
 import { resolveYandexMapLink, YandexMapLinkError } from "./yandex-map-link";
+import { effectivePermissions, hasPermission, requireAdminPermission } from "./admin-permissions";
+import adminStaffRouter from "./admin-staff";
+import adminPushRouter from "./admin-push";
+import adminNotificationsRouter from "./admin-notifications";
+import adminAnalyticsRouter from "./admin-analytics";
+import { csvCell, orderFilter } from "./admin-order-filters";
+import adminSchedulesRouter, { isLocationOpen } from "./admin-schedules";
 
 const app = express();
 const port = Number(process.env.PORT || 4000);
@@ -164,7 +174,7 @@ type VerificationChallenge =
 const verificationChallenges = new Map<string, VerificationChallenge>();
 const verificationRequestsInFlight = new Set<string>();
 const kyrgyzPhonePattern = /^996\d{9}$/;
-const verificationLifetimeMs = 10 * 60 * 1000;
+const verificationLifetimeMs = 5 * 60 * 1000;
 const verificationResendDelayMs = 60 * 1000;
 const maxVerificationAttempts = 5;
 const otpBypassPhone = resolveOtpBypassPhone(process.env.OTP_BYPASS_PHONE);
@@ -172,7 +182,7 @@ const otpBypassPhone = resolveOtpBypassPhone(process.env.OTP_BYPASS_PHONE);
 function requireTrustedAdminOrigin(request: Request, response: Response, next: NextFunction) {
   if (["GET", "HEAD", "OPTIONS"].includes(request.method)) return next();
   const origin = request.headers.origin?.trim();
-  if (origin && !corsOrigins.includes(origin)) {
+  if (!isTrustedAdminOrigin(origin, request.protocol, request.host, corsOrigins)) {
     response.status(403).json({ error: "Источник административного запроса не разрешён" });
     return;
   }
@@ -201,7 +211,7 @@ async function createAuthenticatedCustomer(phone: string, response: Response) {
 const upload = multer({
   storage: multer.diskStorage({
     destination: uploadsDirectory,
-    filename: (_request, file, callback) => callback(null, `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${extname(file.originalname).toLowerCase()}`),
+    filename: (_request, file, callback) => callback(null, `${randomUUID()}${({"image/png":".png","image/jpeg":".jpg","image/webp":".webp"} as Record<string,string>)[file.mimetype] || ".bin"}`),
   }),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_request, file, callback) => callback(null, ["image/jpeg", "image/png", "image/webp"].includes(file.mimetype)),
@@ -569,7 +579,10 @@ async function adminCustomerDetail(phone: string) {
       COUNT(orders.id) FILTER (WHERE orders.status = 'completed')::int AS "completedOrders",
       COALESCE(SUM(orders.total) FILTER (WHERE orders.status = 'completed'), 0)::bigint AS revenue,
       COALESCE(MAX(orders.created_at), customers.created_at) AS "lastOrderAt",
-      customers.nakta_coins AS "naktaCoins"
+      customers.nakta_coins AS "naktaCoins",
+      (SELECT COUNT(*)::int FROM account_nfts WHERE customer_id=customers.id) AS "nftCount",
+      (SELECT COUNT(*)::int FROM account_nfts WHERE customer_id=customers.id AND status='owned') AS "availableNftCount",
+      (SELECT COUNT(*)::int FROM account_nfts WHERE customer_id=customers.id AND status IN ('pending','submitted')) AS "pendingNftCount"
     FROM customers
     LEFT JOIN orders ON orders.customer_id = customers.id
     WHERE customers.phone = ${phone}
@@ -580,7 +593,6 @@ async function adminCustomerDetail(phone: string) {
   const [orders, nfts, adjustments] = await Promise.all([
     sql`
       SELECT orders.id, orders.order_number AS "orderNumber", orders.total, orders.status,
-        'pickup'::text AS "deliveryType", 'cash'::text AS "paymentMethod",
         locations.address, orders.created_at AS "createdAt"
       FROM orders
       LEFT JOIN pickup_locations locations ON locations.id = orders.location_id
@@ -603,8 +615,6 @@ async function adminCustomerDetail(phone: string) {
       LIMIT 100
     `,
   ]);
-  const availableNftCount = nfts.filter((nft) => nft.status === "owned").length;
-  const pendingNftCount = nfts.filter((nft) => ["pending", "submitted"].includes(nft.status)).length;
 
   return {
     phone: String(summary.phone),
@@ -615,9 +625,9 @@ async function adminCustomerDetail(phone: string) {
     revenue: Number(summary.revenue),
     lastOrderAt: summary.lastOrderAt,
     naktaCoins: Number(summary.naktaCoins),
-    nftCount: nfts.length,
-    availableNftCount,
-    pendingNftCount,
+    nftCount: Number(summary.nftCount),
+    availableNftCount:Number(summary.availableNftCount),
+    pendingNftCount:Number(summary.pendingNftCount),
     orders: orders.map((order) => ({
       ...order,
       id: String(order.id),
@@ -637,6 +647,13 @@ async function adminCustomerDetail(phone: string) {
       balanceAfter: Number(adjustment.balanceAfter),
     })),
   };
+}
+
+function permittedCustomerFields(data:Record<string,unknown>,user:Parameters<typeof hasPermission>[0]){
+  const allowedOrders=hasPermission(user,"orders.view");const allowedLoyalty=hasPermission(user,"loyalty.view");
+  const orderKeys=["ordersCount","completedOrders","revenue","lastOrderAt","orders"];
+  const rewardKeys=["naktaCoins","nftCount","pendingNftCount","availableNftCount","adjustments","nfts"];
+  return Object.fromEntries(Object.entries(data).filter(([key])=>(allowedOrders||!orderKeys.includes(key))&&(allowedLoyalty||!rewardKeys.includes(key))));
 }
 
 function locationCoordinates(body: unknown) {
@@ -750,7 +767,7 @@ app.get("/api/health", async (_request, response) => {
 
 app.get("/api/catalog", async (_request, response) => {
   const categoryRows = await sql`SELECT id, name, slug, sort_order AS "sortOrder", active FROM categories WHERE active = TRUE AND deleted_at IS NULL ORDER BY sort_order, id`;
-  const productRows = await sql`SELECT p.id, p.category_id AS "categoryId", p.name, p.price, p.image, p.active, p.sort_order AS "sortOrder", p.nakta_coins AS "naktaCoins" FROM products p JOIN categories c ON c.id = p.category_id WHERE p.active = TRUE AND c.active = TRUE AND c.deleted_at IS NULL ORDER BY p.category_id, p.sort_order, p.id`;
+  const productRows = await sql`SELECT p.id, p.category_id AS "categoryId", p.name, p.price, p.image, p.active, p.sort_order AS "sortOrder", p.nakta_coins AS "naktaCoins", ${productDetailColumns} FROM products p JOIN categories c ON c.id = p.category_id WHERE p.active = TRUE AND p.deleted_at IS NULL AND c.active = TRUE AND c.deleted_at IS NULL ORDER BY p.category_id, p.sort_order, p.id`;
   response.json({ categories: categoryRows, products: productRows });
 });
 
@@ -786,16 +803,14 @@ app.post("/api/auth/request-code", otpClientLimiter, otpRequestLimiter, otpServi
     return response.status(429).json({ error: "Код уже отправляется. Подождите несколько секунд" });
   }
   verificationRequestsInFlight.add(phone);
-  const apiKey = String(process.env.NIKITA_OTP_API_KEY || "").trim();
+  const smsConfigured = Boolean(process.env.NIKITA_SMS_LOGIN || process.env.NIKITA_SMS_PASSWORD || process.env.NIKITA_OTP_API_KEY);
   try {
-    if (apiKey) {
+    if (smsConfigured || process.env.NODE_ENV === "production") {
       const transactionId = randomUUID().replaceAll("-", "");
-      const token = await sendNikitaOtp(apiKey, phone, transactionId);
+      const token = await sendNikitaOtp(phone, transactionId);
       verificationChallenges.set(phone, { mode: "nikita", token, requestedAt: now, expiresAt: now + verificationLifetimeMs, attempts: 0 });
       return response.json({ sent: true });
     }
-    if (process.env.NODE_ENV === "production") return response.status(503).json({ error: "Отправка SMS ещё не настроена" });
-
     const code = "0000";
     verificationChallenges.set(phone, { mode: "development", code, requestedAt: now, expiresAt: now + verificationLifetimeMs, attempts: 0 });
     return response.json({ sent: true, devCode: code });
@@ -824,9 +839,7 @@ app.post("/api/auth/verify-code", otpVerifyLimiter, async (request, response) =>
 
   try {
     if (challenge.mode === "nikita") {
-      const apiKey = String(process.env.NIKITA_OTP_API_KEY || "").trim();
-      if (!apiKey) return response.status(503).json({ error: "Проверка SMS временно недоступна" });
-      await verifyNikitaOtp(apiKey, challenge.token, code);
+      await verifyNikitaOtp(challenge.token, code);
     } else if (challenge.code !== code) {
       challenge.attempts += 1;
       return response.status(400).json({ error: "Неверный код" });
@@ -858,13 +871,14 @@ app.post("/api/orders", orderClientLimiter, orderLimiter, async (request, respon
   }
   const ids = [...requested.keys()];
   if (!ids.length) return response.status(400).json({ error: "Корзина пуста" });
-  const available = await sql`SELECT p.id, p.name, p.price, p.nakta_coins AS "naktaCoins" FROM products p JOIN categories c ON c.id = p.category_id WHERE p.active = TRUE AND c.active = TRUE AND c.deleted_at IS NULL AND p.id IN ${sql(ids)}`;
+  const available = await sql`SELECT p.id, p.name, p.price,p.category_id AS "categoryId",c.name AS "categoryName", p.nakta_coins AS "naktaCoins" FROM products p JOIN categories c ON c.id = p.category_id WHERE p.active = TRUE AND p.deleted_at IS NULL AND c.active = TRUE AND c.deleted_at IS NULL AND p.id IN ${sql(ids)}`;
   if (available.length !== ids.length) return response.status(409).json({ error: "Некоторые позиции больше недоступны" });
   const orderLines = available.map((product) => {
     const quantity = requested.get(product.id) || 1;
     return {
       id: Number(product.id),
       name: String(product.name),
+      categoryId:Number(product.categoryId),categoryName:String(product.categoryName),
       price: Number(product.price),
       quantity,
       lineTotal: Number(product.price) * quantity,
@@ -898,12 +912,14 @@ app.post("/api/orders", orderClientLimiter, orderLimiter, async (request, respon
       FOR SHARE
     `;
     if (!location) throw new ApiError(409, "Точка самовывоза больше недоступна. Выберите другую точку");
+    if(await isLocationOpen(tx,locationId)===false)throw new ApiError(409,"Точка самовывоза сейчас закрыта. Выберите другую точку или дождитесь открытия");
     const liveProducts = await tx`
-      SELECT p.id FROM products p JOIN categories c ON c.id = p.category_id
-      WHERE p.id IN ${tx(ids)} AND p.active = TRUE AND c.active = TRUE AND c.deleted_at IS NULL
+      SELECT p.id,p.name,p.price,p.nakta_coins,p.category_id,c.name AS category_name FROM products p JOIN categories c ON c.id = p.category_id
+      WHERE p.id IN ${tx(ids)} AND p.active = TRUE AND p.deleted_at IS NULL AND c.active = TRUE AND c.deleted_at IS NULL
       FOR SHARE OF c, p
     `;
     if (liveProducts.length !== ids.length) throw new ApiError(409, "Некоторые позиции больше недоступны");
+    if(liveProducts.some(p=>{const line=orderLines.find(item=>item.id===Number(p.id));return !line||line.price!==p.price||line.name!==p.name||line.categoryId!==p.category_id||line.categoryName!==p.category_name||line.naktaCoinsReward!==p.nakta_coins*line.quantity;}))throw new ApiError(409,"Меню изменилось во время оформления. Обновите корзину и повторите заказ");
     const normalizedPhone = customerPhone.replace(/\D/g, "");
     const [customer] = await tx`
       INSERT INTO customers (phone, name)
@@ -912,8 +928,9 @@ app.post("/api/orders", orderClientLimiter, orderLimiter, async (request, respon
       RETURNING id
     `;
     const [created] = await tx`INSERT INTO orders (order_number, customer_id, customer_name, customer_phone, location_id, comment, total) VALUES (${orderNumber}, ${customer.id}, ${customerName}, ${customerPhone}, ${locationId}, ${String(request.body.comment || "").slice(0, 1000)}, ${total}) RETURNING id, order_number AS "orderNumber", status, total, created_at AS "createdAt"`;
+    await tx`INSERT INTO order_status_history(order_id,to_status,actor_name) VALUES (${created.id},'new','Клиент')`;
     for (const product of orderLines) {
-      await tx`INSERT INTO order_items (order_id, product_id, product_name, unit_price, quantity, line_total, nakta_coins_reward) VALUES (${created.id}, ${product.id}, ${product.name}, ${product.price}, ${product.quantity}, ${product.lineTotal}, ${product.naktaCoinsReward})`;
+      await tx`INSERT INTO order_items (order_id, product_id, product_name, unit_price, quantity, line_total, nakta_coins_reward,category_id_snapshot,category_name_snapshot) VALUES (${created.id}, ${product.id}, ${product.name}, ${product.price}, ${product.quantity}, ${product.lineTotal}, ${product.naktaCoinsReward},${product.categoryId},${product.categoryName})`;
     }
     return created;
   });
@@ -1099,27 +1116,61 @@ app.post("/api/auth/nfts/:id/withdrawal/cancel", requireCustomer, rewardLimiter,
 });
 
 app.post("/api/admin/login", authLimiter, async (request, response) => {
-  const [user] = await sql`SELECT id, password_hash, name FROM admin_users ORDER BY id LIMIT 1`;
+  const email=String(request.body.email||"").trim().toLowerCase();
+  const [user] = email ? await sql`SELECT * FROM admin_users WHERE lower(email)=${email} AND active=TRUE LIMIT 1` : await sql`SELECT * FROM admin_users WHERE active=TRUE AND role='OWNER' ORDER BY id LIMIT 1`;
   if (!user || !(await bcrypt.compare(String(request.body.password || ""), user.password_hash))) return response.status(401).json({ error: "Неверный пароль" });
-  const publicUser = { id: Number(user.id), name: String(user.name) };
+  const publicUser = { id: Number(user.id), name: String(user.name), email:String(user.email),role:user.role,active:true,permissions:effectivePermissions(user.role,user.permission_overrides),overrides:user.permission_overrides };
   setAdminSessionCookie(response, await createAdminToken(publicUser));
+  await sql`INSERT INTO admin_audit_log(admin_user_id,actor_name,action) VALUES (${publicUser.id},${publicUser.name},'session.login')`;
   response.setHeader("Cache-Control", "no-store");
   response.json({ authenticated: true, user: publicUser, expiresInSeconds: 2 * 60 * 60 });
 });
 
 app.post("/api/admin/logout", requireTrustedAdminOrigin, async (request, response) => {
+  const user=await authenticatedAdmin(request);
   await revokeCurrentAdminSession(request);
+  if(user)await sql`INSERT INTO admin_audit_log(admin_user_id,actor_name,action) VALUES (${user.id},${user.name},'session.logout')`;
   clearAdminSessionCookie(response);
   response.setHeader("Cache-Control", "no-store");
   response.json({ loggedOut: true });
 });
 
 app.use("/api/admin", requireAdmin, requireTrustedAdminOrigin);
+app.use("/api/admin", requireAdminPermission);
+app.use("/api/admin", (request,response,next)=>{
+  const resource=request.path.split("/").filter(Boolean)[0];
+  if(["POST","PUT","PATCH"].includes(request.method) && ["products","categories","locations","promotions"].includes(resource)){
+    const name=String(request.body[resource==="promotions"?"title":"name"]||"").trim();
+    if(!name||name.length>200)return response.status(400).json({error:"Укажите название от 1 до 200 символов"});
+    request.body[resource==="promotions"?"title":"name"]=name;
+    for(const key of ["price","sortOrder","naktaCoins"]){
+      if(request.body[key]!==undefined && (!Number.isSafeInteger(Number(request.body[key])) || Number(request.body[key])<0 || Number(request.body[key])>2147483647))return response.status(400).json({error:"Цена, порядок и награда должны быть неотрицательными целыми числами"});
+    }
+  }
+  if(request.method!=="GET" && resource!=="staff" && resource!=="push" && resource!=="notifications"){
+    const actor=response.locals.admin;
+    const details=Object.fromEntries(Object.entries(request.body||{}).filter(([key])=>["name","title","price","active","sortOrder","categoryId","naktaCoins","asset","delta","reason"].includes(key)).map(([key,value])=>[key,typeof value==="string"?value.slice(0,240):value]));
+    response.on("finish",()=>{if(response.statusCode<400)void sql`INSERT INTO admin_audit_log(admin_user_id,actor_name,action,target,details) VALUES (${actor.id},${actor.name},${`${request.method} ${resource}`},${request.path.slice(0,240)},${sql.json(details as never)})`.catch(()=>console.warn("Admin audit write failed"));});
+  }
+  next();
+});
+app.use("/api/admin/staff",adminStaffRouter);
+app.use("/api/admin/push",adminPushRouter);
+app.use("/api/admin/notifications",adminNotificationsRouter);
+app.use("/api/admin/analytics",adminAnalyticsRouter);
+app.use("/api/admin/schedules",adminSchedulesRouter);
 app.get("/api/admin/events", streamAdminEvents);
 
 app.get("/api/admin/session", (_request, response) => {
   response.setHeader("Cache-Control", "no-store");
   response.json({ authenticated: true, user: response.locals.admin });
+});
+
+app.get("/api/admin/audit",async(request,response)=>{
+  const limit=Math.min(100,Math.max(1,integerValue(request.query.limit,30)));const offset=Math.max(0,integerValue(request.query.offset));
+  const items=await sql`SELECT id,actor_name AS "actorName",action,target,details,created_at AS "createdAt" FROM admin_audit_log ORDER BY created_at DESC,id DESC LIMIT ${limit} OFFSET ${offset}`;
+  const [count]=await sql`SELECT COUNT(*)::int AS total,MIN(created_at) AS "collectedSince" FROM admin_audit_log`;
+  response.json({items,total:count.total,collectedSince:count.collectedSince,limit,offset});
 });
 
 app.get("/api/admin/geocode", geocodeLimiter, async (request, response) => {
@@ -1170,17 +1221,28 @@ app.post("/api/admin/yandex-map-link", geocodeLimiter, async (request, response)
 });
 
 app.get("/api/admin/dashboard", async (_request, response) => {
-  const [stats] = await sql`SELECT (SELECT COUNT(*)::int FROM orders WHERE created_at >= CURRENT_DATE) AS "ordersToday", (SELECT COALESCE(SUM(total),0)::int FROM orders WHERE created_at >= CURRENT_DATE AND status <> 'cancelled') AS "revenueToday", (SELECT COUNT(*)::int FROM products p JOIN categories c ON c.id = p.category_id WHERE p.active = TRUE AND c.active = TRUE AND c.deleted_at IS NULL) AS products, (SELECT COUNT(*)::int FROM orders WHERE status IN ('new','confirmed','preparing')) AS "activeOrders"`;
+  const user=response.locals.admin;const stats:Record<string,unknown>={ordersToday:null,revenueToday:null,activeOrders:null,products:null};
+  if(hasPermission(user,"orders.view")){
+    const [orders]=await sql`SELECT COUNT(*) FILTER (WHERE created_at >= (date_trunc('day',NOW() AT TIME ZONE 'Asia/Bishkek') AT TIME ZONE 'Asia/Bishkek'))::int AS "ordersToday",COUNT(*) FILTER(WHERE status IN ('new','confirmed','preparing','ready'))::int AS "activeOrders" FROM orders`;Object.assign(stats,orders);
+    if(hasPermission(user,"analytics.view")){const [row]=await sql`SELECT COALESCE(SUM(total),0)::bigint AS revenue FROM orders WHERE status='completed' AND created_at >= (date_trunc('day',NOW() AT TIME ZONE 'Asia/Bishkek') AT TIME ZONE 'Asia/Bishkek')`;stats.revenueToday=Number(row.revenue);}
+  }
+  if(hasPermission(user,"products.view")){const [row]=await sql`SELECT COUNT(*)::int AS count FROM products p JOIN categories c ON c.id=p.category_id WHERE p.active AND c.active AND p.deleted_at IS NULL AND c.deleted_at IS NULL`;stats.products=row.count;}
   response.json(stats);
 });
 
-app.get("/api/admin/categories", async (_request, response) => response.json(await sql`SELECT id, name, slug, sort_order AS "sortOrder", active FROM categories WHERE deleted_at IS NULL ORDER BY sort_order, id`));
+app.get("/api/admin/categories", async (request, response) => {
+  if(request.query.limit===undefined)return response.json(await sql`SELECT id, name, slug, sort_order AS "sortOrder", active FROM categories WHERE deleted_at IS NULL ORDER BY sort_order, id`);
+  const limit=Math.min(100,Math.max(1,integerValue(request.query.limit,24)));const offset=Math.max(0,integerValue(request.query.offset));const search=String(request.query.search||"").slice(0,120);const active=String(request.query.active||"all");
+  const filter=sql`deleted_at IS NULL AND (${search===""} OR name ILIKE ${`%${search}%`}) AND (${active==="all"} OR active=${active==="true"||active==="active"})`;
+  const items=await sql`SELECT id,name,slug,sort_order AS "sortOrder",active FROM categories WHERE ${filter} ORDER BY sort_order,id LIMIT ${limit} OFFSET ${offset}`;const [count]=await sql`SELECT COUNT(*)::int AS total FROM categories WHERE ${filter}`;
+  response.json({items,total:count.total,limit,offset});
+});
 app.post("/api/admin/categories", async (request, response) => {
-  const [created] = await sql`INSERT INTO categories (id, name, slug, sort_order, active) VALUES ((SELECT COALESCE(MAX(id),0)+1 FROM categories), ${String(request.body.name || "Новая категория")}, ${String(request.body.slug || `category-${Date.now()}`)}, ${numberValue(request.body.sortOrder)}, ${booleanValue(request.body.active)}) RETURNING id, name, slug, sort_order AS "sortOrder", active`;
+  const [created] = await sql`INSERT INTO categories (id, name, slug, sort_order, active) VALUES ((SELECT COALESCE(MAX(id),0)+1 FROM categories), ${String(request.body.name || "Новая категория")}, ${String(request.body.slug || `category-${randomUUID()}`)}, ${numberValue(request.body.sortOrder)}, ${booleanValue(request.body.active)}) RETURNING id, name, slug, sort_order AS "sortOrder", active`;
   response.status(201).json(created);
 });
 app.put("/api/admin/categories/:id", async (request, response) => {
-  const [updated] = await sql`UPDATE categories SET name=${String(request.body.name)}, slug=${String(request.body.slug)}, sort_order=${numberValue(request.body.sortOrder)}, active=${booleanValue(request.body.active)}, updated_at=NOW() WHERE id=${numberValue(request.params.id)} AND deleted_at IS NULL RETURNING id, name, slug, sort_order AS "sortOrder", active`;
+  const [updated] = await sql`UPDATE categories SET name=${String(request.body.name)}, sort_order=${numberValue(request.body.sortOrder)}, active=${booleanValue(request.body.active)}, updated_at=NOW() WHERE id=${numberValue(request.params.id)} AND deleted_at IS NULL RETURNING id, name, slug, sort_order AS "sortOrder", active`;
   if (updated) response.json(updated);
   else response.status(404).json({ error: "Категория не найдена" });
 });
@@ -1190,14 +1252,30 @@ app.delete("/api/admin/categories/:id", async (request, response) => {
   response.status(204).end();
 });
 
-app.get("/api/admin/products", async (_request, response) => response.json(await sql`SELECT id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins" FROM products ORDER BY category_id, sort_order, id`));
+app.get("/api/admin/products/options",async(request,response)=>{
+  const search=String(request.query.search||"").slice(0,120);
+  const selectedId=integerValue(request.query.selectedId);
+  const items=await sql`SELECT id,name,active FROM categories WHERE deleted_at IS NULL AND (${search===""} OR name ILIKE ${`%${search}%`} OR id=${selectedId}) ORDER BY (id=${selectedId}) DESC,sort_order,id LIMIT 100`;
+  response.json({categories:items});
+});
+app.get("/api/admin/products", async (request, response) => {
+  if(request.query.limit===undefined)return response.json(await sql`SELECT id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins", ${productDetailColumns} FROM products WHERE deleted_at IS NULL ORDER BY category_id, sort_order, id`);
+  const limit=Math.min(100,Math.max(1,integerValue(request.query.limit,24)));const offset=Math.max(0,integerValue(request.query.offset));
+  const search=String(request.query.search||"").trim().slice(0,120);const categoryId=integerValue(request.query.categoryId);const missingCategory=request.query.categoryId==="missing";const visibility=String(request.query.visibility||"all");
+  const filter=sql`p.deleted_at IS NULL AND (${search===""} OR p.name ILIKE ${`%${search}%`}) AND ((${missingCategory} AND c.deleted_at IS NOT NULL) OR (${!missingCategory} AND (${categoryId===0} OR p.category_id=${categoryId}))) AND (${visibility==="all"} OR (${visibility==="visible"} AND p.active AND c.active AND c.deleted_at IS NULL) OR (${visibility==="hidden"} AND (NOT p.active OR NOT c.active OR c.deleted_at IS NOT NULL)))`;
+  const [items,counts]=await Promise.all([sql`SELECT p.id,p.category_id AS "categoryId",c.name AS "categoryName",(c.active AND c.deleted_at IS NULL) AS "categoryActive",p.name,p.price,p.image,p.active,p.sort_order AS "sortOrder",p.nakta_coins AS "naktaCoins", ${productDetailColumns} FROM products p JOIN categories c ON c.id=p.category_id WHERE ${filter} ORDER BY p.category_id,p.sort_order,p.id LIMIT ${limit} OFFSET ${offset}`,sql`SELECT COUNT(*)::int AS total FROM products p JOIN categories c ON c.id=p.category_id WHERE ${filter}`]);
+  response.json({items,total:counts[0].total,limit,offset});
+});
 app.post("/api/admin/products", async (request, response) => {
+  const details = parseProductDetails(request.body);
   const naktaCoins = integerValue(request.body.naktaCoins);
   if (naktaCoins < 0 || naktaCoins > 1_000_000) throw new ApiError(400, "Награда товара должна быть целым числом от 0 до 1 000 000");
   const [created] = await sql.begin(async (tx) => {
     const [category] = await tx`SELECT id FROM categories WHERE id = ${numberValue(request.body.categoryId)} AND deleted_at IS NULL FOR SHARE`;
     if (!category) throw new ApiError(409, "Выберите существующую категорию");
-    return tx`INSERT INTO products (id, category_id, name, price, image, active, sort_order, nakta_coins) VALUES ((SELECT COALESCE(MAX(id),0)+1 FROM products), ${numberValue(request.body.categoryId)}, ${String(request.body.name || "Новый товар")}, ${numberValue(request.body.price)}, ${String(request.body.image || "")}, ${booleanValue(request.body.active)}, ${numberValue(request.body.sortOrder)}, ${naktaCoins}) RETURNING id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins"`;
+    return tx`INSERT INTO products (id, category_id, name, price, image, active, sort_order, nakta_coins, ingredients, serving, weight_unit, weight, calories, protein, fat, carbohydrates)
+      VALUES ((SELECT COALESCE(MAX(id),0)+1 FROM products), ${numberValue(request.body.categoryId)}, ${String(request.body.name || "Новый товар")}, ${numberValue(request.body.price)}, ${String(request.body.image || "")}, ${booleanValue(request.body.active)}, ${numberValue(request.body.sortOrder)}, ${naktaCoins}, ${details.ingredients}, ${details.serving}, ${details.weightUnit}, ${details.weight}, ${details.calories}, ${details.protein}, ${details.fat}, ${details.carbohydrates})
+      RETURNING id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins", ${productDetailColumns}`;
   });
   response.status(201).json(created);
 });
@@ -1205,16 +1283,35 @@ app.put("/api/admin/products/:id", async (request, response) => {
   const naktaCoins = request.body.naktaCoins === undefined ? null : integerValue(request.body.naktaCoins, -1);
   if (naktaCoins !== null && (naktaCoins < 0 || naktaCoins > 1_000_000)) throw new ApiError(400, "Награда товара должна быть целым числом от 0 до 1 000 000");
   const [updated] = await sql.begin(async (tx) => {
+    const [existing] = await tx<ProductDetails[]>`SELECT ${productDetailColumns} FROM products WHERE id=${numberValue(request.params.id)} AND deleted_at IS NULL FOR UPDATE`;
+    if (!existing) return [];
+    const details = parseProductDetails(request.body, existing);
     const [category] = await tx`SELECT id FROM categories WHERE id = ${numberValue(request.body.categoryId)} AND deleted_at IS NULL FOR SHARE`;
     if (!category) throw new ApiError(409, "Выберите существующую категорию");
-    return tx`UPDATE products SET category_id=${numberValue(request.body.categoryId)}, name=${String(request.body.name)}, price=${numberValue(request.body.price)}, image=${String(request.body.image)}, active=${booleanValue(request.body.active)}, sort_order=${numberValue(request.body.sortOrder)}, nakta_coins=COALESCE(${naktaCoins}, nakta_coins), updated_at=NOW() WHERE id=${numberValue(request.params.id)} RETURNING id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins"`;
+    return tx`UPDATE products SET category_id=${numberValue(request.body.categoryId)}, name=${String(request.body.name)}, price=${numberValue(request.body.price)}, image=${String(request.body.image)}, active=${booleanValue(request.body.active)}, sort_order=${numberValue(request.body.sortOrder)}, nakta_coins=COALESCE(${naktaCoins}, nakta_coins),
+      ingredients=${details.ingredients}, serving=${details.serving}, weight_unit=${details.weightUnit}, weight=${details.weight}, calories=${details.calories}, protein=${details.protein}, fat=${details.fat}, carbohydrates=${details.carbohydrates}, updated_at=NOW()
+      WHERE id=${numberValue(request.params.id)} AND deleted_at IS NULL RETURNING id, category_id AS "categoryId", name, price, image, active, sort_order AS "sortOrder", nakta_coins AS "naktaCoins", ${productDetailColumns}`;
   });
   if (updated) response.json(updated);
   else response.status(404).json({ error: "Товар не найден" });
 });
-app.delete("/api/admin/products/:id", async (request, response) => { await sql`DELETE FROM products WHERE id=${numberValue(request.params.id)}`; response.status(204).end(); });
+app.delete("/api/admin/products/:id", async (request, response) => {
+  // Retain the row so seed data and reused IDs cannot restore a deleted product.
+  const [deleted] = await sql`
+    UPDATE products SET active = FALSE, deleted_at = COALESCE(deleted_at, NOW()), updated_at = NOW()
+    WHERE id = ${numberValue(request.params.id)} RETURNING id
+  `;
+  if (!deleted) { response.status(404).json({ error: "Товар не найден" }); return; }
+  response.status(204).end();
+});
 
-app.get("/api/admin/locations", async (_request, response) => response.json(await sql`SELECT id, name, address, phone, hours, opens_at AS "opensAt", latitude, longitude, active FROM pickup_locations WHERE deleted_at IS NULL ORDER BY id`));
+app.get("/api/admin/locations", async (request, response) => {
+  if(request.query.limit===undefined)return response.json(await sql`SELECT id, name, address, phone, hours, opens_at AS "opensAt", latitude, longitude, active FROM pickup_locations WHERE deleted_at IS NULL ORDER BY id`);
+  const limit=Math.min(100,Math.max(1,integerValue(request.query.limit,24)));const offset=Math.max(0,integerValue(request.query.offset));const search=String(request.query.search||"").slice(0,120);const active=String(request.query.active||"all");
+  const filter=sql`deleted_at IS NULL AND (${search===""} OR name ILIKE ${`%${search}%`} OR address ILIKE ${`%${search}%`}) AND (${active==="all"} OR active=${active==="true"||active==="active"})`;
+  const items=await sql`SELECT id,name,address,phone,hours,opens_at AS "opensAt",latitude,longitude,active FROM pickup_locations WHERE ${filter} ORDER BY id LIMIT ${limit} OFFSET ${offset}`;const [count]=await sql`SELECT COUNT(*)::int AS total FROM pickup_locations WHERE ${filter}`;
+  response.json({items,total:count.total,limit,offset});
+});
 app.post("/api/admin/locations", async (request, response) => {
   const coordinates = locationCoordinates(request.body);
   if (!coordinates) { response.status(400).json({ error: "Укажите корректные широту и долготу" }); return; }
@@ -1238,7 +1335,13 @@ app.delete("/api/admin/locations/:id", async (request, response) => {
   response.status(204).end();
 });
 
-app.get("/api/admin/promotions", async (_request, response) => response.json(await sql`SELECT id,title,description,image,active,sort_order AS "sortOrder" FROM promotions ORDER BY sort_order,id`));
+app.get("/api/admin/promotions", async (request, response) => {
+  if(request.query.limit===undefined)return response.json(await sql`SELECT id,title,description,image,active,sort_order AS "sortOrder" FROM promotions ORDER BY sort_order,id`);
+  const limit=Math.min(100,Math.max(1,integerValue(request.query.limit,24)));const offset=Math.max(0,integerValue(request.query.offset));const search=String(request.query.search||"").slice(0,120);const active=String(request.query.active||"all");
+  const filter=sql`(${search===""} OR title ILIKE ${`%${search}%`}) AND (${active==="all"} OR active=${active==="true"||active==="active"})`;
+  const items=await sql`SELECT id,title,description,image,active,sort_order AS "sortOrder" FROM promotions WHERE ${filter} ORDER BY sort_order,id LIMIT ${limit} OFFSET ${offset}`;const [count]=await sql`SELECT COUNT(*)::int AS total FROM promotions WHERE ${filter}`;
+  response.json({items,total:count.total,limit,offset});
+});
 app.post("/api/admin/promotions", async (request, response) => {
   const [created] = await sql`INSERT INTO promotions (id,title,description,image,active,sort_order) VALUES ((SELECT COALESCE(MAX(id),0)+1 FROM promotions),${String(request.body.title || "Новая акция")},${String(request.body.description || "")},${String(request.body.image || "")},${booleanValue(request.body.active)},${numberValue(request.body.sortOrder)}) RETURNING id,title,description,image,active,sort_order AS "sortOrder"`;
   response.status(201).json(created);
@@ -1249,11 +1352,39 @@ app.put("/api/admin/promotions/:id", async (request, response) => {
 });
 app.delete("/api/admin/promotions/:id", async (request, response) => { await sql`DELETE FROM promotions WHERE id=${numberValue(request.params.id)}`; response.status(204).end(); });
 
-app.get("/api/admin/orders", async (_request, response) => {
-  const orders = await sql`SELECT o.id,o.order_number AS "orderNumber",o.customer_name AS "customerName",o.customer_phone AS "customerPhone",o.status,o.comment,o.total,o.created_at AS "createdAt",l.name AS "locationName",l.address AS "locationAddress" FROM orders o JOIN pickup_locations l ON l.id=o.location_id ORDER BY o.created_at DESC LIMIT 500`;
+app.get(["/api/admin/orders/filters","/api/admin/orders/options"],async(_request,response)=>{
+  response.json({locations:await sql`SELECT id,name FROM pickup_locations WHERE deleted_at IS NULL ORDER BY name`});
+});
+app.get("/api/admin/orders/summary",async(_request,response)=>{
+  const [counts]=await sql`SELECT COUNT(*) FILTER (WHERE status='new')::int AS "newOrders",COUNT(*) FILTER (WHERE status NOT IN ('completed','cancelled'))::int AS "activeOrders" FROM orders`;
+  response.json(counts);
+});
+app.get("/api/admin/orders/export",async(request,response)=>{
+  const filter=orderFilter(request.query);
+  const rows=await sql`SELECT o.order_number,o.customer_name,o.customer_phone,o.status,o.total,o.created_at,l.name AS location FROM orders o JOIN pickup_locations l ON l.id=o.location_id WHERE ${filter} ORDER BY o.created_at DESC,o.id DESC LIMIT 50001`;
+  if(rows.length>50000)throw new ApiError(413,"Для экспорта выберите период с количеством заказов не более 50 000");
+  const labels:Record<string,string>={new:"Новый",confirmed:"Подтверждён",preparing:"Готовится",ready:"Готов",completed:"Выдан",cancelled:"Отменён"};
+  const lines=[["Заказ","Клиент","Телефон","Статус","Сумма, С","Дата","Точка"].map(csvCell).join(";"),...rows.map(row=>[row.order_number,row.customer_name,row.customer_phone,labels[row.status]||row.status,row.total,new Date(row.created_at).toISOString(),row.location].map(csvCell).join(";"))];
+  response.setHeader("Content-Type","text/csv; charset=utf-8");response.setHeader("Content-Disposition",'attachment; filename="orders.csv"');response.send("\uFEFF"+lines.join("\r\n"));
+});
+app.get("/api/admin/orders/:id",async(request,response)=>{
+  const [order]=await sql`SELECT o.id,o.order_number AS "orderNumber",o.customer_name AS "customerName",o.customer_phone AS "customerPhone",o.status,o.comment,o.total,o.created_at AS "createdAt",o.updated_at AS "updatedAt",l.name AS "locationName",l.address AS "locationAddress" FROM orders o JOIN pickup_locations l ON l.id=o.location_id WHERE o.id=${integerValue(request.params.id)}`;
+  if(!order)return response.status(404).json({error:"Заказ не найден"});
+  const items=await sql`SELECT product_name AS "productName",unit_price AS "unitPrice",quantity,line_total AS "lineTotal" FROM order_items WHERE order_id=${order.id} ORDER BY id`;
+  const history=await sql`SELECT from_status AS "fromStatus",to_status AS "toStatus",actor_name AS "actorName",created_at AS "createdAt" FROM order_status_history WHERE order_id=${order.id} ORDER BY created_at,id`;
+  response.json({...order,items,history});
+});
+app.get("/api/admin/orders", async (request, response) => {
+  const paginated=request.query.paginate!==undefined || request.query.limit!==undefined;
+  const limit=Math.min(paginated?100:500,Math.max(1,integerValue(request.query.limit,paginated?25:500)));const offset=Math.max(0,integerValue(request.query.offset));
+  const filter=orderFilter(request.query);
+  const orders = await sql`SELECT o.id,o.order_number AS "orderNumber",o.customer_name AS "customerName",o.customer_phone AS "customerPhone",o.status,o.comment,o.total,o.created_at AS "createdAt",o.updated_at AS "updatedAt",o.location_id AS "locationId",l.name AS "locationName",l.address AS "locationAddress" FROM orders o JOIN pickup_locations l ON l.id=o.location_id WHERE ${filter} ORDER BY o.created_at DESC,o.id DESC LIMIT ${limit} OFFSET ${offset}`;
   const orderIds = orders.map((order) => order.id);
   const items = orderIds.length ? await sql`SELECT order_id AS "orderId",product_name AS "productName",unit_price AS "unitPrice",quantity,line_total AS "lineTotal",nakta_coins_reward AS "naktaCoinsReward" FROM order_items WHERE order_id IN ${sql(orderIds)} ORDER BY id` : [];
-  response.json(orders.map((order) => ({ ...order, items: items.filter((item) => item.orderId === order.id) })));
+  const result=orders.map((order) => ({ ...order, items: items.filter((item) => item.orderId === order.id) }));
+  if(!paginated)return response.json(result);
+  const [count]=await sql`SELECT COUNT(*)::int AS total FROM orders o WHERE ${filter}`;
+  response.json({items:result,total:count.total,limit,offset});
 });
 app.patch("/api/admin/orders/:id/status", async (request, response) => {
   const status = String(request.body.status || "");
@@ -1273,6 +1404,10 @@ app.patch("/api/admin/orders/:id/status", async (request, response) => {
       const [unchanged] = await tx`SELECT id, order_number AS "orderNumber", status, updated_at AS "updatedAt" FROM orders WHERE id = ${orderId}`;
       return unchanged;
     }
+    const expectedStatus=request.body.expectedStatus;
+    if(typeof expectedStatus!=="string"||expectedStatus!==current.status)throw new ApiError(409,"Заказ уже изменён другим сотрудником. Обновите карточку и повторите действие");
+    await tx`INSERT INTO order_status_history(order_id,admin_user_id,actor_name,from_status,to_status) VALUES (${orderId},${response.locals.admin.id},${response.locals.admin.name},${current.status},${status})`;
+    await tx`INSERT INTO admin_audit_log(admin_user_id,actor_name,action,target,details) VALUES (${response.locals.admin.id},${response.locals.admin.name},'orders.status',${String(orderId)},${tx.json({from:current.status,to:status})})`;
 
     const firstCompletion = shouldAccrueOrderRewards(
       String(current.status),
@@ -1384,7 +1519,7 @@ app.get("/api/admin/loyalty/overview", async (_request, response) => {
       SELECT COUNT(*) FILTER (WHERE nakta_coins > 0)::int AS "rewardedProducts",
         COALESCE(SUM(nakta_coins), 0)::bigint AS "coinsPerFullMenu"
       FROM products
-      WHERE active = TRUE
+      WHERE active = TRUE AND deleted_at IS NULL
     `,
     sql`
       SELECT COALESCE(SUM(amount), 0)::bigint AS "issuedCoins", COUNT(*)::int AS transactions
@@ -1452,7 +1587,7 @@ app.get("/api/admin/customers", async (request, response) => {
       LEFT JOIN orders ON orders.customer_id = customers.id
       WHERE ${search === ""} OR customers.phone ILIKE ${pattern} OR COALESCE(customers.name, '') ILIKE ${pattern}
       GROUP BY customers.id
-      ORDER BY MAX(orders.created_at) DESC NULLS LAST, customers.created_at DESC
+      ORDER BY CASE WHEN ${hasPermission(response.locals.admin,"orders.view")} THEN MAX(orders.created_at) END DESC NULLS LAST, customers.created_at DESC
       LIMIT ${limit} OFFSET ${offset}
     `,
     sql`
@@ -1470,7 +1605,7 @@ app.get("/api/admin/customers", async (request, response) => {
       naktaCoins: Number(row.naktaCoins),
       nftCount: Number(row.nftCount),
       pendingNftCount: Number(row.pendingNftCount),
-    })),
+    })).map(row=>permittedCustomerFields(row,response.locals.admin)),
     total: Number(totals[0]?.total || 0),
     limit,
     offset,
@@ -1482,7 +1617,24 @@ app.get("/api/admin/customers/:phone", async (request, response) => {
   if (!phone) throw new ApiError(400, "Укажите телефон в формате +996");
   const detail = await adminCustomerDetail(phone);
   if (!detail) throw new ApiError(404, "Пользователь не найден");
-  response.json(detail);
+  response.json(permittedCustomerFields(detail,response.locals.admin));
+});
+
+app.get("/api/admin/customers/:phone/orders",async(request,response)=>{
+  const phone=normalizedCustomerPhone(request.params.phone);if(!phone)throw new ApiError(400,"Укажите телефон в формате +996");
+  const limit=Math.min(100,Math.max(1,integerValue(request.query.limit,20)));const offset=Math.max(0,integerValue(request.query.offset));
+  const filter=sql`customer_phone=${phone} OR customer_id=(SELECT id FROM customers WHERE phone=${phone})`;
+  const items=await sql`SELECT order_number AS "orderNumber",status,total,created_at AS "createdAt" FROM orders WHERE ${filter} ORDER BY created_at DESC,id DESC LIMIT ${limit} OFFSET ${offset}`;
+  const [count]=await sql`SELECT COUNT(*)::int AS total FROM orders WHERE ${filter}`;response.json({items,total:count.total,limit,offset});
+});
+
+app.patch("/api/admin/customers/:phone",async(request,response)=>{
+  const phone=normalizedCustomerPhone(request.params.phone);const name=String(request.body.name||"").trim();
+  if(!phone||!name||name.length>120)throw new ApiError(400,"Укажите имя от 1 до 120 символов");
+  const forbidden=["naktaCoins","role","permissions","phone","nftCount"];
+  if(forbidden.some(key=>key in request.body))throw new ApiError(400,"Эти поля нельзя изменить через карточку клиента");
+  const [row]=await sql`UPDATE customers SET name=${name},updated_at=NOW() WHERE phone=${phone} RETURNING phone,name`;
+  if(!row)throw new ApiError(404,"Клиент не найден");response.json(row);
 });
 
 app.post("/api/admin/customers/:phone/rewards/adjust", async (request, response) => {
@@ -1559,31 +1711,36 @@ app.post("/api/admin/customers/:phone/rewards/adjust", async (request, response)
 
   const detail = await adminCustomerDetail(phone);
   if (!detail) throw new ApiError(404, "Пользователь не найден");
-  response.json(detail);
+  response.json(permittedCustomerFields(detail,response.locals.admin));
 });
 
 app.get("/api/admin/coin-withdrawals", async (request, response) => {
   const status = request.query.status === undefined ? "" : String(request.query.status);
   const supported = new Set(["pending", "submitted", "withdrawn", "failed", "cancelled"]);
   if (status && !supported.has(status)) throw new ApiError(400, "Неизвестный статус заявки");
+  const paginated=request.query.limit!==undefined;const limit=Math.min(paginated?100:200,Math.max(1,integerValue(request.query.limit,paginated?25:200)));const offset=Math.max(0,integerValue(request.query.offset));const search=String(request.query.search||"").trim().slice(0,120);
+  const filter=sql`(${status===""} OR withdrawals.status=${status}) AND (${search===""} OR customers.phone ILIKE ${`%${search}%`} OR COALESCE(customers.name,'') ILIKE ${`%${search}%`})`;
   const rows = await sql<(DatabaseCoinWithdrawal & { phone: string; customer_name: string | null })[]>`
     SELECT withdrawals.*, customers.phone, customers.name AS customer_name
     FROM nakta_coin_withdrawals withdrawals
     INNER JOIN customers ON customers.id = withdrawals.customer_id
-    WHERE ${status === ""} OR withdrawals.status = ${status}
+    WHERE ${filter}
     ORDER BY CASE withdrawals.status
       WHEN 'pending' THEN 0 WHEN 'failed' THEN 1 WHEN 'cancelled' THEN 2
       WHEN 'submitted' THEN 3 ELSE 4 END,
       CASE WHEN withdrawals.status IN ('pending', 'submitted') THEN withdrawals.created_at END ASC NULLS LAST,
       CASE WHEN withdrawals.status NOT IN ('pending', 'submitted') THEN withdrawals.created_at END DESC NULLS LAST
-    LIMIT 200
+    LIMIT ${limit} OFFSET ${offset}
   `;
-  response.json(rows.map((row) => ({
+  const items=rows.map((row) => ({
     ...publicCoinWithdrawal(row),
     phone: row.phone,
     customerName: row.customer_name,
     regionSlug: "default",
-  })));
+  }));
+  if(!paginated)return response.json(items);
+  const [count]=await sql`SELECT COUNT(*)::int AS total FROM nakta_coin_withdrawals withdrawals JOIN customers ON customers.id=withdrawals.customer_id WHERE ${filter}`;
+  response.json({items,total:count.total,limit,offset});
 });
 
 app.patch("/api/admin/coin-withdrawals/:id", async (request, response) => {
@@ -1644,25 +1801,30 @@ app.get("/api/admin/nft-withdrawals", async (request, response) => {
   const status = request.query.status === undefined ? "" : String(request.query.status);
   const supported = new Set(["owned", "pending", "submitted", "withdrawn", "failed"]);
   if (status && !supported.has(status)) throw new ApiError(400, "Неизвестный статус NFT");
+  const paginated=request.query.limit!==undefined;const limit=Math.min(paginated?100:200,Math.max(1,integerValue(request.query.limit,paginated?25:200)));const offset=Math.max(0,integerValue(request.query.offset));const search=String(request.query.search||"").trim().slice(0,120);const withdrawalsOnly=request.query.withdrawalsOnly==="true";
+  const filter=sql`(${status===""} OR nfts.status=${status}) AND (${!withdrawalsOnly} OR nfts.status<>'owned') AND (${search===""} OR customers.phone ILIKE ${`%${search}%`} OR COALESCE(customers.name,'') ILIKE ${`%${search}%`})`;
   const rows = await sql<(DatabaseNft & { phone: string; customer_name: string | null })[]>`
     SELECT nfts.*, customers.phone, customers.name AS customer_name
     FROM account_nfts nfts
     INNER JOIN customers ON customers.id = nfts.customer_id
-    WHERE ${status === ""} OR nfts.status = ${status}
+    WHERE ${filter}
     ORDER BY CASE nfts.status
       WHEN 'pending' THEN 0 WHEN 'failed' THEN 1 WHEN 'submitted' THEN 2
       WHEN 'owned' THEN 3 ELSE 4 END,
       CASE WHEN nfts.status IN ('pending', 'submitted')
         THEN COALESCE(nfts.withdrawal_requested_at, nfts.created_at) END ASC NULLS LAST,
       CASE WHEN nfts.status NOT IN ('pending', 'submitted') THEN nfts.created_at END DESC NULLS LAST
-    LIMIT 200
+    LIMIT ${limit} OFFSET ${offset}
   `;
-  response.json(rows.map((row) => ({
+  const items=rows.map((row) => ({
     ...publicNft(row),
     phone: row.phone,
     customerName: row.customer_name,
     regionSlug: "default",
-  })));
+  }));
+  if(!paginated)return response.json(items);
+  const [count]=await sql`SELECT COUNT(*)::int AS total FROM account_nfts nfts JOIN customers ON customers.id=nfts.customer_id WHERE ${filter}`;
+  response.json({items,total:count.total,limit,offset});
 });
 
 app.patch("/api/admin/nft-withdrawals/:id", async (request, response) => {
@@ -1716,16 +1878,35 @@ app.patch("/api/admin/nft-withdrawals/:id", async (request, response) => {
 
 app.get("/api/admin/settings", async (_request, response) => {
   const rows = await sql`SELECT key,value,updated_at AS "updatedAt" FROM site_settings ORDER BY key`;
-  response.json(rows);
+  response.json(rows.filter(row=>row.key==="rewards"?hasPermission(response.locals.admin,"loyalty.view"):hasPermission(response.locals.admin,"settings.view")));
 });
 app.put("/api/admin/settings/:key", async (request, response) => {
   const key = String(request.params.key);
-  const value = key === "rewards" ? normalizeRewardSettings(request.body.value) : request.body.value ?? {};
-  const [updated] = await sql`INSERT INTO site_settings (key,value) VALUES (${key},${sql.json(value)}) ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value,updated_at=NOW() RETURNING key,value,updated_at AS "updatedAt"`;
+  const submitted=request.body.value;
+  if(!submitted||typeof submitted!=="object"||Array.isArray(submitted))throw new ApiError(400,"Передайте настройки в правильном формате");
+  let value=key==="rewards"?normalizeRewardSettings(submitted):submitted;
+  if(key==="general"){
+    if(typeof submitted.legalName!=="string"||!submitted.legalName.trim()||submitted.legalName.trim().length>200)throw new ApiError(400,"Укажите название оператора от 1 до 200 символов");
+    if(typeof submitted.telegram!=="string"||submitted.telegram.length>1000)throw new ApiError(400,"Укажите HTTPS-ссылку Telegram или оставьте поле пустым");
+    const telegram=submitted.telegram.trim();
+    if(telegram){let link:URL;try{link=new URL(telegram);}catch{throw new ApiError(400,"Укажите корректную HTTPS-ссылку Telegram");}if(link.protocol!=="https:"||link.username||link.password||!link.hostname)throw new ApiError(400,"Ссылка Telegram должна использовать HTTPS без имени пользователя и пароля");}
+    value={legalName:submitted.legalName.trim(),telegram};
+  }
+  const updated=await sql.begin(async tx=>{
+    const [existing]=await tx`SELECT value FROM site_settings WHERE key=${key} FOR UPDATE`;
+    if(!["general","rewards"].includes(key)&&!existing)throw new ApiError(400,"Такая настройка не поддерживается");
+    const storedValue=key==="general"?{...(existing?.value||{}),...value}:value;
+    const [row] = await tx`INSERT INTO site_settings (key,value) VALUES (${key},${tx.json(storedValue)}) ON CONFLICT (key) DO UPDATE SET value=EXCLUDED.value,updated_at=NOW() RETURNING key,value,updated_at AS "updatedAt"`;
+    await tx`INSERT INTO admin_audit_log(admin_user_id,actor_name,action,target,details) VALUES (${response.locals.admin.id},${response.locals.admin.name},'settings.edit',${key},${tx.json({fields:Object.keys(value||{}).slice(0,50)})})`;
+    return row;
+  });
   response.json(updated);
 });
-app.post("/api/admin/upload", upload.single("file"), (request: Request, response: Response) => {
+app.post("/api/admin/upload", upload.single("file"), async (request: Request, response: Response) => {
   if (!request.file) return response.status(400).json({ error: "Поддерживаются PNG, JPG и WebP до 5 МБ" });
+  const bytes=await readFile(request.file.path);
+  const detected=bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))?"image/png":bytes[0]===255&&bytes[1]===216&&bytes[2]===255?"image/jpeg":bytes.subarray(0,4).toString("ascii")==="RIFF"&&bytes.subarray(8,12).toString("ascii")==="WEBP"?"image/webp":"";
+  if(detected!==request.file.mimetype){await unlink(request.file.path);return response.status(400).json({error:"Файл не является изображением PNG, JPG или WebP"});}
   response.status(201).json({ url: `/uploads/${request.file.filename}` });
 });
 
@@ -1735,7 +1916,10 @@ app.use((error: unknown, _request: Request, response: Response, _next: unknown) 
     response.status(error.status).json({ error: error.message });
     return;
   }
+  const expectedError=error as {status?:number;message?:string};
+  if(expectedError.status && expectedError.status>=400 && expectedError.status<500){response.status(expectedError.status).json({error:expectedError.message});return;}
   const databaseError = error as { code?: string };
+  if(databaseError?.code==="LIMIT_FILE_SIZE"){response.status(413).json({error:"Размер изображения не должен превышать 5 МБ"});return;}
   if (databaseError?.code === "23505") {
     response.status(409).json({ error: "Такая запись уже существует" });
     return;

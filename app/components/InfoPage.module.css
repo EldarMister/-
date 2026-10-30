@@ -257,3 +257,5 @@
     line-height: 21px;
   }
 }
+.language { display: flex; justify-content: flex-end; padding: 14px 24px 0; }
+@media(max-width:640px) { .language { padding: 12px 20px 0; } }

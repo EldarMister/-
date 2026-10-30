@@ -46,3 +46,7 @@ yarn-error.log*
 /.devserver.err.log
 /.apiserver.log
 /.apiserver.err.log
+/.playwright-mcp/
+
+/reference/shadcn-dashboard-landing-template/
+/admin-test-artifacts/

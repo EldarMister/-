@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
+import { LanguageProvider } from "./i18n/LanguageProvider";
+import { LANGUAGE_COOKIE, localeTag, resolveLocale } from "./i18n/locales";
 import "./globals.css";
+import "./components/ProductDetailsModal.css";
 import { LEGAL_DETAILS } from "./legalDetails";
 import { DEFAULT_DESCRIPTION, SITE_NAME, SITE_URL, SOCIAL_IMAGE } from "./seo";
 
@@ -64,11 +68,12 @@ const structuredData = [
   },
 ];
 
-export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+export default async function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const locale = resolveLocale((await cookies()).get(LANGUAGE_COOKIE)?.value);
   return (
-    <html lang="ru-KG">
+    <html lang={localeTag(locale)}>
       <body>
-        {children}
+        <LanguageProvider initialLocale={locale}>{children}</LanguageProvider>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, "\\u003c") }} />
       </body>
     </html>

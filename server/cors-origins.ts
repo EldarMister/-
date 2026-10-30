@@ -1,5 +1,25 @@
 const LOCAL_DEVELOPMENT_ORIGIN = "http://localhost:3000";
 
+export function isTrustedAdminOrigin(
+  origin: string | undefined,
+  requestProtocol: string,
+  requestHost: string | undefined,
+  configuredOrigins: string[],
+) {
+  if (!origin) return true;
+  try {
+    const parsedOrigin = new URL(origin);
+    if (!["http:", "https:"].includes(parsedOrigin.protocol) || parsedOrigin.origin !== origin) return false;
+    if (configuredOrigins.includes(origin)) return true;
+    if (!requestHost || !["http", "https"].includes(requestProtocol) || /[\s,\\]/.test(requestHost)) return false;
+    const requestUrl = new URL(`${requestProtocol}://${requestHost}`);
+    if (requestUrl.username || requestUrl.password || requestUrl.pathname !== "/" || requestUrl.search || requestUrl.hash) return false;
+    return origin === requestUrl.origin;
+  } catch {
+    return false;
+  }
+}
+
 export function resolveCorsOrigins(
   configuredOrigins: string | undefined,
   environment: string | undefined,

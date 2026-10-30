@@ -1,0 +1,650 @@
+{
+  "5 сентября 2026 года": [
+    "2026-жылдын 5-сентябры",
+    "5 September 2026",
+    "2026 жылғы 5 қыркүйек",
+    "2026-yil 5-sentabr"
+  ],
+  "Дата вступления в силу:": [
+    "Күчүнө кирген күнү:",
+    "Effective date:",
+    "Күшіне енген күні:",
+    "Kuchga kirgan sana:"
+  ],
+  "Оплата, отмена и возврат": [
+    "Төлөм, жокко чыгаруу жана кайтаруу",
+    "Payment, cancellation and refunds",
+    "Төлем, бас тарту және қайтару",
+    "To‘lov, bekor qilish va qaytarish"
+  ],
+  "Сайт": [
+    "Сайт",
+    "The website",
+    "Сайт",
+    "Sayt"
+  ],
+  "принимает заявку на приготовление заказа. Оплата на сайте не проводится: покупатель рассчитывается при получении заказа способом, доступным в выбранной точке.": [
+    "буйрутманы даярдоого өтүнмө кабыл алат. Сайтта төлөм жүргүзүлбөйт: сатып алуучу буйрутманы алууда тандалган пунктта жеткиликтүү ыкма менен төлөйт.",
+    "accepts requests to prepare orders. No payment is processed on the site: customers pay on collection using a method available at the selected store.",
+    "тапсырысты дайындауға өтінім қабылдайды. Сайтта төлем жүргізілмейді: сатып алушы тапсырысты алғанда таңдалған пунктте қолжетімді тәсілмен төлейді.",
+    "buyurtmani tayyorlash uchun ariza qabul qiladi. Saytda to‘lov amalga oshirilmaydi: xaridor buyurtmani olayotganda tanlangan punktda mavjud usul bilan to‘laydi."
+  ],
+  "Как оформить и оплатить заказ": [
+    "Кантип буйрутма берүү жана төлөө керек",
+    "How to order and pay",
+    "Қалай тапсырыс беру және төлеу керек",
+    "Qanday buyurtma berish va to‘lash"
+  ],
+  "Выберите товары и точку получения, затем проверьте состав и итоговую стоимость корзины.": [
+    "Товарларды жана алып кетүү пунктун тандап, себеттин курамын жана жалпы баасын текшериңиз.",
+    "Choose your items and pickup store, then check the cart contents and total price.",
+    "Тауарлар мен алып кету пунктін таңдап, себет құрамы мен жалпы құнын тексеріңіз.",
+    "Mahsulotlar va olib ketish punktini tanlang, so‘ng savat tarkibi va umumiy narxini tekshiring."
+  ],
+  "Укажите имя, действующий номер телефона, желаемое время и комментарий, если он нужен.": [
+    "Атыңызды, иштеп жаткан телефон номерин, каалаган убакытты жана керек болсо комментарийди көрсөтүңүз.",
+    "Enter your name, a working phone number, preferred time and any notes.",
+    "Атыңызды, қолданыстағы телефон нөмірін, қалаған уақытты және қажет болса түсініктемені көрсетіңіз.",
+    "Ismingiz, ishlayotgan telefon raqamingiz, kerakli vaqt va zarur bo‘lsa izohni kiriting."
+  ],
+  "Отправьте заказ и дождитесь его подтверждения. Сотрудник может связаться с вами, чтобы уточнить наличие, время или детали заказа.": [
+    "Буйрутманы жөнөтүп, ырастоону күтүңүз. Кызматкер товар бар-жогун, убакытты же буйрутманын деталдарын тактоо үчүн байланышышы мүмкүн.",
+    "Submit the order and wait for confirmation. A staff member may contact you to clarify availability, timing or order details.",
+    "Тапсырысты жіберіп, расталуын күтіңіз. Қызметкер тауардың бар-жоғын, уақытты не тапсырыс мәліметтерін нақтылау үшін хабарласуы мүмкін.",
+    "Buyurtmani yuboring va tasdiqlanishini kuting. Xodim mahsulot mavjudligi, vaqt yoki buyurtma tafsilotlarini aniqlashtirish uchun bog‘lanishi mumkin."
+  ],
+  "Оплатите подтверждённую сумму при получении. Доступный способ расчёта можно заранее уточнить в": [
+    "Ырасталган сумманы буйрутманы алууда төлөңүз. Жеткиликтүү төлөм ыкмасын алдын ала бул жерден тактасаңыз болот:",
+    "Pay the confirmed amount on collection. You can check available payment methods in advance with",
+    "Расталған соманы тапсырысты алғанда төлеңіз. Қолжетімді төлем тәсілін алдын ала мына жерден нақтылауға болады:",
+    "Tasdiqlangan summani buyurtmani olayotganda to‘lang. Mavjud to‘lov usulini oldindan quyidagidan aniqlashtirishingiz mumkin:"
+  ],
+  "поддержке": [
+    "колдоо кызматынан",
+    "support",
+    "қолдау қызметінен",
+    "yordam xizmatidan"
+  ],
+  "ДААНА СУШИ не запрашивает на сайте номер банковской карты, срок её действия, CVV/CVC-код или код подтверждения банковской операции и не сохраняет такие реквизиты.": [
+    "ДААНА СУШИ сайтта банк картасынын номерин, жарактуулук мөөнөтүн, CVV/CVC кодун же банк операциясынын ырастоо кодун сурабайт жана мындай реквизиттерди сактабайт.",
+    "DAANA SUSHI does not request or store your card number, expiry date, CVV/CVC or bank transaction verification code on the site.",
+    "ДААНА СУШИ сайтта банк картасының нөмірін, жарамдылық мерзімін, CVV/CVC кодын не банк операциясын растау кодын сұрамайды және мұндай деректемелерді сақтамайды.",
+    "DAANA SUSHI saytda bank karta raqami, amal qilish muddati, CVV/CVC-kod yoki bank amaliyotini tasdiqlash kodini so‘ramaydi va bunday rekvizitlarni saqlamaydi."
+  ],
+  "Изменение и отмена": [
+    "Өзгөртүү жана жокко чыгаруу",
+    "Changes and cancellation",
+    "Өзгерту және бас тарту",
+    "O‘zgartirish va bekor qilish"
+  ],
+  "Если заказ нужно изменить или отменить, обратитесь в": [
+    "Буйрутманы өзгөртүү же жокко чыгаруу керек болсо, бул жерге кайрылыңыз:",
+    "To change or cancel an order, contact",
+    "Тапсырысты өзгерту не одан бас тарту қажет болса, мына жерге хабарласыңыз:",
+    "Buyurtmani o‘zgartirish yoki bekor qilish kerak bo‘lsa, murojaat qiling:"
+  ],
+  "поддержку": [
+    "колдоо кызматына",
+    "support",
+    "қолдау қызметіне",
+    "yordam xizmatiga"
+  ],
+  "как можно раньше. Возможность изменения или отмены зависит от того, началось ли приготовление заказа и были ли понесены фактические расходы.": [
+    "мүмкүн болушунча эрте. Өзгөртүү же жокко чыгаруу мүмкүнчүлүгү буйрутманы даярдоо башталганына жана иш жүзүндөгү чыгымдарга жараша болот.",
+    "as early as possible. Changes or cancellation depend on whether preparation has started and actual costs have been incurred.",
+    "мүмкіндігінше ертерек. Өзгерту немесе бас тарту мүмкіндігі дайындаудың басталғанына және нақты шығындарға байланысты.",
+    "imkon qadar ertaroq. O‘zgartirish yoki bekor qilish imkoniyati tayyorlash boshlanganiga va amaldagi xarajatlarga bog‘liq."
+  ],
+  "Качество и возврат": [
+    "Сапат жана кайтаруу",
+    "Quality and refunds",
+    "Сапа және қайтару",
+    "Sifat va qaytarish"
+  ],
+  "При проблеме с составом, комплектностью или качеством сообщите номер заказа и описание ситуации; по возможности приложите фотографию. Обращение рассматривается с учётом обстоятельств и применимого законодательства. Если после оплаты при получении согласован возврат денежных средств, его способ и срок зависят от первоначального способа расчёта и обслуживающей платёжной организации.": [
+    "Курамы, толуктугу же сапаты боюнча маселе болсо, буйрутманын номерин жана жагдайдын сүрөттөмөсүн бериңиз; мүмкүн болсо сүрөт тиркеңиз. Кайрылуу жагдайларга жана колдонулуучу мыйзамга ылайык каралат. Алганда төлөгөндөн кийин акчаны кайтаруу макулдашылса, анын ыкмасы жана мөөнөтү баштапкы төлөм ыкмасына жана тейлөөчү төлөм уюмуна жараша болот.",
+    "If there is a problem with contents, completeness or quality, provide the order number and describe the issue; attach a photo if possible. Enquiries are reviewed in light of the circumstances and applicable law. If a refund is agreed after payment on collection, its method and timing depend on the original payment method and payment provider.",
+    "Құрамы, толықтығы не сапасы бойынша мәселе болса, тапсырыс нөмірі мен жағдайдың сипаттамасын беріңіз; мүмкін болса фотосурет тіркеңіз. Өтініш жағдайлар мен қолданылатын заңнамаға сәйкес қаралады. Алғанда төлегеннен кейін ақшаны қайтару келісілсе, оның тәсілі мен мерзімі бастапқы төлем тәсілі мен қызмет көрсететін төлем ұйымына байланысты.",
+    "Tarkib, to‘liqlik yoki sifat bo‘yicha muammo bo‘lsa, buyurtma raqami va vaziyat tavsifini yuboring; imkon bo‘lsa surat ilova qiling. Murojaat holat va amaldagi qonunchilikka muvofiq ko‘rib chiqiladi. Olishda to‘langandan keyin pulni qaytarishga kelishilsa, usuli va muddati dastlabki to‘lov usuli va to‘lov tashkilotiga bog‘liq."
+  ],
+  "Реквизиты оператора": [
+    "Оператордун реквизиттери",
+    "Operator details",
+    "Оператордың деректемелері",
+    "Operator rekvizitlari"
+  ],
+  "Политика конфиденциальности": [
+    "Купуялык саясаты",
+    "Privacy policy",
+    "Құпиялық саясаты",
+    "Maxfiylik siyosati"
+  ],
+  "Настоящая политика описывает обработку данных при использовании сайта": [
+    "Бул саясат төмөнкү сайтты колдонууда маалыматтарды иштетүүнү сүрөттөйт:",
+    "This policy describes data processing when using",
+    "Бұл саясат мына сайтты пайдалану кезіндегі деректерді өңдеуді сипаттайды:",
+    "Ushbu siyosat quyidagi saytdan foydalanishda ma’lumotlarni qayta ishlashni tavsiflaydi:"
+  ],
+  "и связанных функций ДААНА СУШИ (далее — «Сервис»). Оператором Сервиса является": [
+    "жана ДААНА СУШИнин байланыштуу функцияларын (мындан ары — «Кызмат»). Кызматтын оператору —",
+    "and related DAANA SUSHI features (the “Service”). The Service operator is",
+    "және ДААНА СУШИ-дің байланысты функцияларын (бұдан әрі — «Қызмет»). Қызмет операторы —",
+    "va DAANA SUSHI’ning tegishli funksiyalarini (keyingi o‘rinlarda — «Xizmat»). Xizmat operatori —"
+  ],
+  "1. Какие данные обрабатываются": [
+    "1. Кайсы маалыматтар иштетилет",
+    "1. Data we process",
+    "1. Қандай деректер өңделеді",
+    "1. Qaysi ma’lumotlar qayta ishlanadi"
+  ],
+  "Данные аккаунта и входа:": [
+    "Аккаунт жана кирүү маалыматтары:",
+    "Account and sign-in data:",
+    "Аккаунт және кіру деректері:",
+    "Akkaunt va kirish ma’lumotlari:"
+  ],
+  "номер телефона, сведения о подтверждении номера, идентификаторы и защищённые данные сессии.": [
+    "телефон номери, номерди ырастоо жөнүндө маалымат, идентификаторлор жана сессиянын корголгон маалыматтары.",
+    "phone number, verification information, identifiers and protected session data.",
+    "телефон нөмірі, нөмірді растау туралы ақпарат, идентификаторлар мен қорғалған сессия деректері.",
+    "telefon raqami, raqamni tasdiqlash ma’lumotlari, identifikatorlar va himoyalangan seans ma’lumotlari."
+  ],
+  "Данные заказа:": [
+    "Буйрутма маалыматтары:",
+    "Order data:",
+    "Тапсырыс деректері:",
+    "Buyurtma ma’lumotlari:"
+  ],
+  "имя получателя, номер телефона, выбранная точка получения, состав и стоимость заказа, желаемое время, комментарий, история и статус заказов.": [
+    "алуучунун аты, телефон номери, тандалган алып кетүү пункту, буйрутманын курамы жана баасы, каалаган убакыт, комментарий, буйрутмалардын тарыхы жана статусу.",
+    "recipient name, phone number, pickup store, order contents and price, preferred time, notes, order history and status.",
+    "алушының аты, телефон нөмірі, таңдалған алып кету пункті, тапсырыс құрамы мен құны, қалаған уақыт, түсініктеме, тапсырыстар тарихы мен мәртебесі.",
+    "oluvchining ismi, telefon raqami, tanlangan olib ketish punkti, buyurtma tarkibi va narxi, kerakli vaqt, izoh, buyurtmalar tarixi va holati."
+  ],
+  "Данные программы наград:": [
+    "Сыйлык программасынын маалыматтары:",
+    "Rewards programme data:",
+    "Сыйақы бағдарламасының деректері:",
+    "Mukofot dasturi ma’lumotlari:"
+  ],
+  "баланс NAKTA Coin, история начислений, списаний и корректировок, полученные NFT, связанные заказы, параметры награды и статусы операций.": [
+    "NAKTA Coin балансы, эсептөө, сарптоо жана оңдоолордун тарыхы, алынган NFTлер, байланыштуу буйрутмалар, сыйлыктын параметрлери жана операциялардын статустары.",
+    "NAKTA Coin balance, accrual, deduction and adjustment history, received NFTs, related orders, reward parameters and transaction statuses.",
+    "NAKTA Coin балансы, есептеу, есептен шығару және түзету тарихы, алынған NFT-лер, байланысты тапсырыстар, сыйақы параметрлері мен операциялар мәртебелері.",
+    "NAKTA Coin balansi, hisoblash, yechish va tuzatish tarixi, olingan NFTlar, tegishli buyurtmalar, mukofot parametrlari va amaliyotlar holati."
+  ],
+  "Данные вывода наград:": [
+    "Сыйлыктарды чыгаруу маалыматтары:",
+    "Reward withdrawal data:",
+    "Сыйақыны шығару деректері:",
+    "Mukofot chiqarish ma’lumotlari:"
+  ],
+  "адрес криптокошелька, выбранный актив и сеть, сумма, даты, статус заявки, хеш транзакции и сообщение об ошибке, если операция не выполнена.": [
+    "криптокапчыктын дареги, тандалган актив жана тармак, сумма, даталар, өтүнмөнүн статусу, транзакциянын хеши жана операция аткарылбаса ката жөнүндө билдирүү.",
+    "crypto wallet address, selected asset and network, amount, dates, request status, transaction hash and error message if unsuccessful.",
+    "криптоәмиян мекенжайы, таңдалған актив пен желі, сома, күндер, өтінім мәртебесі, транзакция хеші және орындалмаған операцияның қате хабарламасы.",
+    "kriptohamyon manzili, tanlangan aktiv va tarmoq, summa, sanalar, ariza holati, tranzaksiya xeshi va amaliyot bajarilmasa xato xabari."
+  ],
+  "Данные местоположения:": [
+    "Жайгашкан жердин маалыматтары:",
+    "Location data:",
+    "Орналасқан жер деректері:",
+    "Joylashuv ma’lumotlari:"
+  ],
+  "координаты устройства только после разрешения пользователя и только при использовании функции поиска ближайшей точки. Местоположение не добавляется к заказу и не отслеживается в фоне.": [
+    "түзмөктүн координаттары колдонуучу уруксат бергенден кийин жана эң жакын пунктту издөө функциясында гана колдонулат. Жайгашкан жер буйрутмага кошулбайт жана фондо көзөмөлдөнбөйт.",
+    "device coordinates only with your permission and when finding the nearest store. Location is not added to your order or tracked in the background.",
+    "құрылғы координаттары тек пайдаланушының рұқсатынан кейін және жақын пунктті іздеу функциясында қолданылады. Орналасқан жер тапсырысқа қосылмайды және фонда бақыланбайды.",
+    "qurilma koordinatalari faqat foydalanuvchi ruxsati bilan va eng yaqin punktni qidirishda ishlatiladi. Joylashuv buyurtmaga qo‘shilmaydi va fonda kuzatilmaydi."
+  ],
+  "Технические данные:": [
+    "Техникалык маалыматтар:",
+    "Technical data:",
+    "Техникалық деректер:",
+    "Texnik ma’lumotlar:"
+  ],
+  "IP-адрес, дата и время запроса, тип браузера и устройства, журналы безопасности и сведения об ошибках, которые могут обрабатываться сервером и инфраструктурой.": [
+    "IP дарек, суроо-талаптын күнү жана убактысы, браузердин жана түзмөктүн түрү, сервер жана инфраструктура иштетиши мүмкүн болгон коопсуздук журналдары жана каталар жөнүндө маалыматтар.",
+    "IP address, request date and time, browser and device type, security logs and error information that may be processed by the server and infrastructure.",
+    "IP мекенжайы, сұрау күні мен уақыты, браузер мен құрылғы түрі, сервер мен инфрақұрылым өңдеуі мүмкін қауіпсіздік журналдары мен қате мәліметтері.",
+    "IP-manzil, so‘rov sanasi va vaqti, brauzer va qurilma turi, server va infratuzilma qayta ishlashi mumkin bo‘lgan xavfsizlik jurnallari va xato ma’lumotlari."
+  ],
+  "Сервис не запрашивает и не хранит номер банковской карты, срок её действия и CVV/CVC-код. На сайте не используются рекламные SDK, данные не продаются и не применяются для стороннего рекламного профилирования.": [
+    "Кызмат банк картасынын номерин, жарактуулук мөөнөтүн жана CVV/CVC кодун сурабайт жана сактабайт. Сайтта жарнама SDKлары колдонулбайт, маалыматтар сатылбайт жана үчүнчү тараптардын жарнамалык профилдештирүүсүнө колдонулбайт.",
+    "The Service does not request or store card numbers, expiry dates or CVV/CVC codes. The site uses no advertising SDKs; data is neither sold nor used for third-party advertising profiling.",
+    "Қызмет банк картасының нөмірін, жарамдылық мерзімін және CVV/CVC кодын сұрамайды не сақтамайды. Сайтта жарнамалық SDK қолданылмайды, деректер сатылмайды және үшінші тараптың жарнамалық профилдеуіне пайдаланылмайды.",
+    "Xizmat bank karta raqami, amal qilish muddati va CVV/CVC-kodini so‘ramaydi va saqlamaydi. Saytda reklama SDKlari ishlatilmaydi, ma’lumotlar sotilmaydi va uchinchi tomon reklamaviy profillashi uchun qo‘llanmaydi."
+  ],
+  "2. Для чего нужны данные": [
+    "2. Маалыматтар эмне үчүн керек",
+    "2. Why we use data",
+    "2. Деректер не үшін қажет",
+    "2. Ma’lumotlar nima uchun kerak"
+  ],
+  "для регистрации, подтверждения номера, входа и защиты аккаунта;": [
+    "каттоо, номерди ырастоо, кирүү жана аккаунтту коргоо үчүн;",
+    "registration, number verification, sign-in and account protection;",
+    "тіркелу, нөмірді растау, кіру және аккаунтты қорғау үшін;",
+    "ro‘yxatdan o‘tish, raqamni tasdiqlash, kirish va akkauntni himoyalash uchun;"
+  ],
+  "для приёма, приготовления, выдачи и сопровождения заказа;": [
+    "буйрутманы кабыл алуу, даярдоо, берүү жана коштоо үчүн;",
+    "accepting, preparing, handing over and supporting orders;",
+    "тапсырысты қабылдау, дайындау, беру және сүйемелдеу үшін;",
+    "buyurtmani qabul qilish, tayyorlash, topshirish va kuzatib borish uchun;"
+  ],
+  "для отображения истории заказов и работы поддержки;": [
+    "буйрутмалардын тарыхын көрсөтүү жана колдоо кызматы үчүн;",
+    "displaying order history and providing support;",
+    "тапсырыстар тарихын көрсету және қолдау қызметі үшін;",
+    "buyurtmalar tarixini ko‘rsatish va yordam xizmati uchun;"
+  ],
+  "для расчёта, начисления и учёта NAKTA Coin и NFT;": [
+    "NAKTA Coin жана NFTни эсептөө, берүү жана эсепке алуу үчүн;",
+    "calculating, awarding and recording NAKTA Coin and NFTs;",
+    "NAKTA Coin және NFT есептеу, беру және есепке алу үшін;",
+    "NAKTA Coin va NFT hisoblash, berish va hisobga olish uchun;"
+  ],
+  "для создания, проверки, отмены и исполнения заявок на вывод наград;": [
+    "сыйлыктарды чыгаруу өтүнмөлөрүн түзүү, текшерүү, жокко чыгаруу жана аткаруу үчүн;",
+    "creating, reviewing, cancelling and fulfilling reward withdrawal requests;",
+    "сыйақыны шығару өтінімдерін жасау, тексеру, жою және орындау үшін;",
+    "mukofot chiqarish arizalarini yaratish, tekshirish, bekor qilish va bajarish uchun;"
+  ],
+  "для предотвращения злоупотреблений, диагностики ошибок и исполнения требований закона.": [
+    "кыянаттыкты алдын алуу, каталарды аныктоо жана мыйзам талаптарын аткаруу үчүн.",
+    "preventing abuse, diagnosing errors and complying with legal requirements.",
+    "теріс пайдалануды болдырмау, қателерді анықтау және заң талаптарын орындау үшін.",
+    "suiiste’molning oldini olish, xatolarni aniqlash va qonun talablarini bajarish uchun."
+  ],
+  "3. Геолокация и Яндекс Карты": [
+    "3. Геолокация жана Яндекс Карталар",
+    "3. Geolocation and Yandex Maps",
+    "3. Геолокация және Яндекс Карталар",
+    "3. Geolokatsiya va Yandex Xaritalar"
+  ],
+  "Браузер запрашивает геолокацию только после действия пользователя. От разрешения можно отказаться и выбрать точку вручную. При загрузке карты и использовании геолокации Яндекс может получать координаты, IP-адрес и технические сведения в соответствии со своими условиями. ДААНА СУШИ использует результат, чтобы показать карту и ближайшие точки получения.": [
+    "Браузер геолокацияны колдонуучунун аракетинен кийин гана сурайт. Уруксат бербей, пунктту кол менен тандоого болот. Картаны жүктөөдө жана геолокацияны колдонууда Яндекс өз шарттарына ылайык координаттарды, IP даректи жана техникалык маалыматтарды алышы мүмкүн. ДААНА СУШИ натыйжаны картаны жана жакынкы алып кетүү пункттарын көрсөтүү үчүн колдонот.",
+    "Your browser requests location access only after your action. You may decline and choose a store manually. When loading maps or using geolocation, Yandex may receive coordinates, IP addresses and technical information under its own terms. DAANA SUSHI uses the result to show the map and nearby pickup stores.",
+    "Браузер геолокацияны тек пайдаланушы әрекетінен кейін сұрайды. Рұқсат бермей, пунктті қолмен таңдауға болады. Картаны жүктеу және геолокацияны пайдалану кезінде Яндекс өз шарттарына сәйкес координаттарды, IP мекенжайын және техникалық мәліметтерді алуы мүмкін. ДААНА СУШИ нәтижені карта мен жақын алып кету пункттерін көрсету үшін қолданады.",
+    "Brauzer geolokatsiyani faqat foydalanuvchi harakatidan keyin so‘raydi. Ruxsat bermasdan punktni qo‘lda tanlash mumkin. Xaritani yuklash va geolokatsiyadan foydalanishda Yandex o‘z shartlariga muvofiq koordinatalar, IP-manzil va texnik ma’lumotlarni olishi mumkin. DAANA SUSHI natijani xarita va yaqin olib ketish punktlarini ko‘rsatish uchun ishlatadi."
+  ],
+  "4. Кому могут передаваться данные": [
+    "4. Кимге маалыматтар берилиши мүмкүн",
+    "4. Who may receive data",
+    "4. Деректер кімге берілуі мүмкін",
+    "4. Ma’lumotlar kimga berilishi mumkin"
+  ],
+  "В объёме, необходимом для соответствующей цели, данные могут обрабатываться или передаваться:": [
+    "Тиешелүү максат үчүн зарыл болгон көлөмдө маалыматтар төмөнкүлөр тарабынан иштетилиши же аларга берилиши мүмкүн:",
+    "To the extent necessary for the relevant purpose, data may be processed by or shared with:",
+    "Тиісті мақсатқа қажетті көлемде деректер мына тараптармен өңделуі немесе оларға берілуі мүмкін:",
+    "Tegishli maqsad uchun zarur hajmda ma’lumotlar quyidagilar tomonidan qayta ishlanishi yoki ularga berilishi mumkin:"
+  ],
+  "сотрудникам и исполнителям ДААНА СУШИ, которые принимают, готовят, выдают и сопровождают заказ;": [
+    "буйрутманы кабыл алган, даярдаган, берген жана коштогон ДААНА СУШИ кызматкерлерине жана аткаруучуларына;",
+    "DAANA SUSHI staff and contractors who accept, prepare, hand over and support orders;",
+    "тапсырысты қабылдайтын, дайындайтын, беретін және сүйемелдейтін ДААНА СУШИ қызметкерлері мен орындаушыларына;",
+    "buyurtmani qabul qiladigan, tayyorlaydigan, topshiradigan va kuzatib boradigan DAANA SUSHI xodimlari va ijrochilariga;"
+  ],
+  "— номер телефона и технический идентификатор операции для отправки и проверки одноразового SMS-кода;": [
+    "— бир жолку SMS кодду жөнөтүү жана текшерүү үчүн телефон номери жана операциянын техникалык идентификатору;",
+    "— phone number and a technical operation identifier for sending and verifying one-time SMS codes;",
+    "— бір реттік SMS кодын жіберу және тексеру үшін телефон нөмірі мен операцияның техникалық идентификаторы;",
+    "— bir martalik SMS-kodni yuborish va tekshirish uchun telefon raqami va amaliyotning texnik identifikatori;"
+  ],
+  "Яндексу": [
+    "Яндекске",
+    "Yandex",
+    "Яндекске",
+    "Yandex’ga"
+  ],
+  "— технические данные и координаты при загрузке карты или использовании геолокации;": [
+    "— картаны жүктөөдө же геолокацияны колдонууда техникалык маалыматтар жана координаттар;",
+    "— technical data and coordinates when loading maps or using geolocation;",
+    "— картаны жүктеу не геолокацияны пайдалану кезіндегі техникалық деректер мен координаттар;",
+    "— xaritani yuklash yoki geolokatsiyadan foydalanishda texnik ma’lumotlar va koordinatalar;"
+  ],
+  "провайдерам хостинга, базы данных и сетевой защиты — для работы и безопасности Сервиса;": [
+    "хостинг, маалымат базасы жана тармактык коргоо провайдерлерине — Кызматтын иштөөсү жана коопсуздугу үчүн;",
+    "hosting, database and network security providers — for Service operation and security;",
+    "хостинг, дерекқор және желілік қорғау провайдерлеріне — Қызмет жұмысы мен қауіпсіздігі үшін;",
+    "xosting, ma’lumotlar bazasi va tarmoq xavfsizligi provayderlariga — Xizmat ishlashi va xavfsizligi uchun;"
+  ],
+  "провайдеру вывода наград и соответствующей блокчейн-сети — адрес кошелька, сеть, сведения об активе и операции, необходимые для исполнения заявки;": [
+    "сыйлыктарды чыгаруу провайдерине жана тиешелүү блокчейн тармагына — өтүнмөнү аткарууга зарыл капчыктын дареги, тармак, актив жана операция жөнүндө маалыматтар;",
+    "the reward withdrawal provider and relevant blockchain network — wallet address, network, asset and transaction information needed to fulfil the request;",
+    "сыйақыны шығару провайдеріне және тиісті блокчейн желісіне — өтінімді орындауға қажет әмиян мекенжайы, желі, актив пен операция туралы мәліметтер;",
+    "mukofot chiqarish provayderi va tegishli blokcheyn tarmog‘iga — arizani bajarish uchun zarur hamyon manzili, tarmoq, aktiv va amaliyot ma’lumotlari;"
+  ],
+  "государственным органам — когда передача обязательна по применимому законодательству.": [
+    "мамлекеттик органдарга — колдонулуучу мыйзам боюнча берүү милдеттүү болгондо.",
+    "public authorities — where disclosure is required by applicable law.",
+    "мемлекеттік органдарға — қолданылатын заңнамаға сәйкес беру міндетті болғанда.",
+    "davlat organlariga — amaldagi qonunchilikka ko‘ra taqdim etish majburiy bo‘lganda."
+  ],
+  "Некоторые поставщики инфраструктуры и блокчейн-сети могут находиться за пределами Кыргызской Республики. Поэтому обработка может включать трансграничную передачу в объёме, необходимом для выбранной пользователем функции.": [
+    "Айрым инфраструктура жеткирүүчүлөрү жана блокчейн тармактары Кыргыз Республикасынын чегинен тышкары жайгашышы мүмкүн. Ошондуктан иштетүү колдонуучу тандаган функция үчүн зарыл көлөмдө чек ара аралык берүүнү камтышы мүмкүн.",
+    "Some infrastructure providers and blockchain networks may be located outside the Kyrgyz Republic. Processing may therefore include cross-border transfers as necessary for the feature you choose.",
+    "Кейбір инфрақұрылым жеткізушілері мен блокчейн желілері Қырғыз Республикасынан тыс орналасуы мүмкін. Сондықтан өңдеу пайдаланушы таңдаған функцияға қажетті көлемде трансшекаралық беруді қамтуы мүмкін.",
+    "Ayrim infratuzilma ta’minotchilari va blokcheyn tarmoqlari Qirg‘iz Respublikasidan tashqarida joylashgan bo‘lishi mumkin. Shu sababli qayta ishlash foydalanuvchi tanlagan funksiya uchun zarur hajmda transchegaraviy uzatishni o‘z ichiga olishi mumkin."
+  ],
+  "5. Публичность блокчейна": [
+    "5. Блокчейндин ачыктыгы",
+    "5. Public blockchain records",
+    "5. Блокчейннің ашықтығы",
+    "5. Blokcheynning ochiqligi"
+  ],
+  "После отправки NAKTA Coin или NFT сведения о кошельке, активе, сумме и хеше транзакции могут стать общедоступными в соответствующем блокчейне. Блокчейн-запись нельзя изменить или удалить силами ДААНА СУШИ. Имя, номер телефона и содержание заказа специально в блокчейн не публикуются.": [
+    "NAKTA Coin же NFT жөнөтүлгөндөн кийин капчык, актив, сумма жана транзакциянын хеши жөнүндө маалыматтар тиешелүү блокчейнде жалпыга ачык болушу мүмкүн. Блокчейн жазуусун ДААНА СУШИ өзгөртө же өчүрө албайт. Аты, телефон номери жана буйрутманын мазмуну атайын блокчейнге жарыяланбайт.",
+    "After NAKTA Coin or NFTs are sent, wallet, asset, amount and transaction hash information may become public on the relevant blockchain. DAANA SUSHI cannot change or delete blockchain records. Names, phone numbers and order contents are not intentionally published on the blockchain.",
+    "NAKTA Coin немесе NFT жіберілгеннен кейін әмиян, актив, сома және транзакция хеші туралы мәліметтер тиісті блокчейнде жалпыға ашық болуы мүмкін. ДААНА СУШИ блокчейн жазбасын өзгерте немесе жоя алмайды. Аты, телефон нөмірі және тапсырыс мазмұны блокчейнге арнайы жарияланбайды.",
+    "NAKTA Coin yoki NFT yuborilgach, hamyon, aktiv, summa va tranzaksiya xeshi haqidagi ma’lumotlar tegishli blokcheynda ochiq bo‘lishi mumkin. DAANA SUSHI blokcheyn yozuvini o‘zgartira yoki o‘chira olmaydi. Ism, telefon raqami va buyurtma tarkibi blokcheynga ataylab e’lon qilinmaydi."
+  ],
+  "6. Локальное хранение и сессия": [
+    "6. Жергиликтүү сактоо жана сессия",
+    "6. Local storage and sessions",
+    "6. Жергілікті сақтау және сессия",
+    "6. Mahalliy saqlash va seans"
+  ],
+  "Сайт сохраняет в локальном хранилище браузера корзину, выбранную точку и данные, необходимые для поддержания авторизованной сессии. Это позволяет не вводить одни и те же сведения повторно. Пользователь может выйти из аккаунта или очистить данные сайта в настройках браузера; очистка локальных данных не удаляет записи заказа и аккаунта на сервере.": [
+    "Сайт браузердин жергиликтүү сактагычында себетти, тандалган пунктту жана авторизацияланган сессияны сактоо үчүн зарыл маалыматтарды сактайт. Бул бир эле маалыматтарды кайра киргизбөөгө мүмкүндүк берет. Колдонуучу аккаунттан чыга алат же браузердин жөндөөлөрүнөн сайттын маалыматтарын тазалай алат; жергиликтүү маалыматтарды тазалоо сервердеги буйрутма жана аккаунт жазууларын өчүрбөйт.",
+    "The site stores your cart, selected store and data needed to maintain an authenticated session in browser local storage, so you do not have to enter the same information repeatedly. You can sign out or clear site data in browser settings; clearing local data does not delete order or account records on the server.",
+    "Сайт браузердің жергілікті жадында себетті, таңдалған пунктті және авторизацияланған сессияны сақтау үшін қажетті деректерді сақтайды. Бұл бір мәліметті қайта енгізбеуге мүмкіндік береді. Пайдаланушы аккаунттан шыға алады немесе браузер баптауларында сайт деректерін тазарта алады; жергілікті деректерді тазарту сервердегі тапсырыс пен аккаунт жазбаларын жоймайды.",
+    "Sayt brauzerning mahalliy xotirasida savat, tanlangan punkt va avtorizatsiyalangan seansni saqlash uchun zarur ma’lumotlarni saqlaydi. Bu bir xil ma’lumotlarni qayta kiritmaslik imkonini beradi. Foydalanuvchi akkauntdan chiqishi yoki brauzer sozlamalarida sayt ma’lumotlarini tozalashi mumkin; mahalliy ma’lumotlarni tozalash serverdagi buyurtma va akkaunt yozuvlarini o‘chirmaydi."
+  ],
+  "7. Срок хранения и удаление": [
+    "7. Сактоо мөөнөтү жана өчүрүү",
+    "7. Retention and deletion",
+    "7. Сақтау мерзімі және жою",
+    "7. Saqlash muddati va o‘chirish"
+  ],
+  "Данные хранятся не дольше, чем это необходимо для работы аккаунта, выполнения заказа и вывода наград, поддержки, безопасности, разрешения споров и исполнения обязательных требований. Срок может различаться для разных категорий данных. Недействительные сессии и временные коды удаляются или прекращают действовать в соответствии с техническими настройками Сервиса.": [
+    "Маалыматтар аккаунттун иштөөсүнө, буйрутманы аткарууга, сыйлыктарды чыгарууга, колдоого, коопсуздукка, талаштарды чечүүгө жана милдеттүү талаптарды аткарууга зарыл мөөнөттөн ашык сакталбайт. Мөөнөт маалыматтардын категориясына жараша айырмаланышы мүмкүн. Жараксыз сессиялар жана убактылуу коддор Кызматтын техникалык жөндөөлөрүнө ылайык өчүрүлөт же күчүн жоготот.",
+    "Data is retained no longer than necessary for account operation, order fulfilment, reward withdrawals, support, security, dispute resolution and mandatory requirements. Retention periods may differ by data category. Invalid sessions and temporary codes are deleted or expire according to the Service's technical settings.",
+    "Деректер аккаунт жұмысы, тапсырысты орындау, сыйақыны шығару, қолдау, қауіпсіздік, дауларды шешу және міндетті талаптарды орындау үшін қажет мерзімнен ұзақ сақталмайды. Мерзім деректер санатына қарай өзгеше болуы мүмкін. Жарамсыз сессиялар мен уақытша кодтар Қызметтің техникалық баптауларына сәйкес жойылады немесе күшін жояды.",
+    "Ma’lumotlar akkaunt ishlashi, buyurtmani bajarish, mukofot chiqarish, yordam, xavfsizlik, nizolarni hal etish va majburiy talablarni bajarish uchun zarur muddatdan ortiq saqlanmaydi. Muddat ma’lumotlar turiga qarab farq qilishi mumkin. Yaroqsiz seanslar va vaqtinchalik kodlar Xizmat texnik sozlamalariga muvofiq o‘chiriladi yoki amal qilishdan to‘xtaydi."
+  ],
+  "Запросить удаление аккаунта можно по инструкции на странице": [
+    "Аккаунтту өчүрүүнү төмөнкү барактагы көрсөтмө боюнча сурасаңыз болот:",
+    "To request account deletion, follow the instructions on",
+    "Аккаунтты жоюды мына беттегі нұсқаулық бойынша сұрауға болады:",
+    "Akkauntni o‘chirishni quyidagi sahifadagi ko‘rsatmaga muvofiq so‘rashingiz mumkin:"
+  ],
+  "«Удаление аккаунта и данных»": [
+    "«Аккаунтту жана маалыматтарды өчүрүү»",
+    "“Account and data deletion”",
+    "«Аккаунт пен деректерді жою»",
+    "«Akkaunt va ma’lumotlarni o‘chirish»"
+  ],
+  ". Заказы, бухгалтерские записи, журналы безопасности и сведения, которые требуется хранить по закону или для разрешения спора, могут сохраняться в необходимом объёме. Публичные блокчейн-транзакции удалить невозможно.": [
+    ". Буйрутмалар, эсепке алуу жазуулары, коопсуздук журналдары жана мыйзам боюнча же талашты чечүү үчүн сакталууга тийиш маалыматтар зарыл көлөмдө сакталышы мүмкүн. Жалпыга ачык блокчейн транзакцияларын өчүрүү мүмкүн эмес.",
+    ". Orders, accounting records, security logs and information required by law or for dispute resolution may be retained as necessary. Public blockchain transactions cannot be deleted.",
+    ". Тапсырыстар, бухгалтерлік жазбалар, қауіпсіздік журналдары және заң бойынша не дауды шешу үшін сақталуға тиіс мәліметтер қажетті көлемде сақталуы мүмкін. Жалпыға ашық блокчейн транзакцияларын жою мүмкін емес.",
+    ". Buyurtmalar, buxgalteriya yozuvlari, xavfsizlik jurnallari va qonun yoki nizoni hal etish uchun saqlanishi kerak bo‘lgan ma’lumotlar zarur hajmda saqlanishi mumkin. Ochiq blokcheyn tranzaksiyalarini o‘chirib bo‘lmaydi."
+  ],
+  "8. Права пользователя": [
+    "8. Колдонуучунун укуктары",
+    "8. Your rights",
+    "8. Пайдаланушының құқықтары",
+    "8. Foydalanuvchi huquqlari"
+  ],
+  "Пользователь может запросить сведения о своих данных, их исправление, ограничение обработки или удаление, а также отозвать разрешение на геолокацию в настройках устройства. Возможность удовлетворения запроса зависит от применимого законодательства и обязательных сроков хранения. Для защиты аккаунта поддержка вправе проверить владение указанным номером телефона.": [
+    "Колдонуучу өз маалыматтары жөнүндө маалымат алууну, аларды оңдоону, иштетүүнү чектөөнү же өчүрүүнү сурай алат, ошондой эле түзмөктүн жөндөөлөрүнөн геолокация уруксатын кайтарып ала алат. Суроо-талапты аткаруу мүмкүнчүлүгү колдонулуучу мыйзамга жана милдеттүү сактоо мөөнөттөрүнө жараша болот. Аккаунтту коргоо үчүн колдоо кызматы көрсөтүлгөн телефон номери сиздики экенин текшерүүгө укуктуу.",
+    "You may request information about your data, its correction, restricted processing or deletion, and revoke location permission in device settings. Whether a request can be granted depends on applicable law and mandatory retention periods. To protect the account, support may verify ownership of the specified phone number.",
+    "Пайдаланушы өз деректері туралы ақпарат алуды, оларды түзетуді, өңдеуді шектеуді немесе жоюды сұрай алады және құрылғы баптауларында геолокация рұқсатын кері қайтара алады. Сұрауды қанағаттандыру мүмкіндігі қолданылатын заңнама мен міндетті сақтау мерзімдеріне байланысты. Аккаунтты қорғау үшін қолдау қызметі көрсетілген телефон нөміріне иелікті тексеруге құқылы.",
+    "Foydalanuvchi o‘z ma’lumotlari haqida axborot olish, ularni tuzatish, qayta ishlashni cheklash yoki o‘chirishni so‘rashi va qurilma sozlamalarida geolokatsiya ruxsatini bekor qilishi mumkin. So‘rovni bajarish imkoniyati amaldagi qonunchilik va majburiy saqlash muddatlariga bog‘liq. Akkauntni himoyalash uchun yordam xizmati ko‘rsatilgan telefon raqamiga egalikni tekshirishga haqli."
+  ],
+  "9. Безопасность": [
+    "9. Коопсуздук",
+    "9. Security",
+    "9. Қауіпсіздік",
+    "9. Xavfsizlik"
+  ],
+  "Для передачи данных применяется защищённое соединение, доступ к служебным данным ограничивается, а данные сессии на сервере хранятся в защищённом виде. Пользователь не должен сообщать кому-либо SMS-коды, пароль администратора, приватный ключ или seed-фразу криптокошелька: ДААНА СУШИ не запрашивает такие сведения для вывода наград.": [
+    "Маалыматтарды берүүдө корголгон байланыш колдонулат, кызматтык маалыматтарга жетүү чектелет жана сервердеги сессия маалыматтары корголгон түрдө сакталат. Колдонуучу SMS коддорду, администратордун сырсөзүн, криптокапчыктын жеке ачкычын же seed фразасын эч кимге бербеши керек: ДААНА СУШИ сыйлыктарды чыгаруу үчүн мындай маалыматтарды сурабайт.",
+    "Data is transmitted over a secure connection, access to service data is restricted and session data is stored securely on the server. Do not share SMS codes, the admin password, private keys or wallet seed phrases: DAANA SUSHI does not request these for reward withdrawals.",
+    "Деректерді беру үшін қорғалған байланыс қолданылады, қызметтік деректерге қолжетімділік шектеледі және сервердегі сессия деректері қорғалған түрде сақталады. Пайдаланушы SMS кодтарын, әкімші құпиясөзін, криптоәмиянның жеке кілтін не seed-фразасын ешкімге бермеуі тиіс: ДААНА СУШИ сыйақыны шығару үшін мұндай мәліметтерді сұрамайды.",
+    "Ma’lumot uzatishda himoyalangan aloqa qo‘llanadi, xizmat ma’lumotlariga kirish cheklanadi va serverdagi seans ma’lumotlari himoyalangan holda saqlanadi. Foydalanuvchi SMS-kodlar, administrator paroli, kriptohamyon maxfiy kaliti yoki seed-iborasini hech kimga bermasligi kerak: DAANA SUSHI mukofot chiqarish uchun bularni so‘ramaydi."
+  ],
+  "10. Изменения и контакты": [
+    "10. Өзгөртүүлөр жана байланыштар",
+    "10. Changes and contact",
+    "10. Өзгерістер және байланыс",
+    "10. O‘zgarishlar va aloqa"
+  ],
+  "Политика может обновляться при изменении функций Сервиса или требований законодательства. Новая редакция публикуется на этой странице с новой датой вступления в силу. Вопросы о данных и запросы можно направить через": [
+    "Кызматтын функциялары же мыйзам талаптары өзгөргөндө саясат жаңыртылышы мүмкүн. Жаңы редакция ушул баракта жаңы күчүнө кирүү күнү менен жарыяланат. Маалыматтар боюнча суроолорду жана суроо-талаптарды бул жерден жөнөтө аласыз:",
+    "This policy may be updated when Service features or legal requirements change. The new version will be published on this page with a new effective date. Send data questions and requests through",
+    "Қызмет функциялары немесе заң талаптары өзгергенде саясат жаңартылуы мүмкін. Жаңа редакция осы бетте жаңа күшіне ену күнімен жарияланады. Деректер туралы сұрақтар мен сұрауларды мына жерден жіберуге болады:",
+    "Xizmat funksiyalari yoki qonun talablari o‘zgarganda siyosat yangilanishi mumkin. Yangi tahrir ushbu sahifada yangi kuchga kirish sanasi bilan e’lon qilinadi. Ma’lumotlar bo‘yicha savol va so‘rovlarni quyidagidan yuborishingiz mumkin:"
+  ],
+  "Условия использования и заказа": [
+    "Колдонуу жана буйрутма берүү шарттары",
+    "Terms of use and ordering",
+    "Пайдалану және тапсырыс беру шарттары",
+    "Foydalanish va buyurtma berish shartlari"
+  ],
+  "Эти условия регулируют использование сайта": [
+    "Бул шарттар төмөнкү сайтты колдонууну жөнгө салат:",
+    "These terms govern use of",
+    "Бұл шарттар мына сайтты пайдалануды реттейді:",
+    "Ushbu shartlar quyidagi saytdan foydalanishni tartibga soladi:"
+  ],
+  ", оформление заказов и участие в программе наград ДААНА СУШИ. Оформляя заказ, создавая аккаунт или отправляя заявку на вывод награды, пользователь подтверждает, что ознакомился с настоящими условиями и": [
+    ", буйрутма берүүнү жана ДААНА СУШИ сыйлык программасына катышууну. Буйрутма берүү, аккаунт түзүү же сыйлыкты чыгарууга өтүнмө жөнөтүү менен колдонуучу ушул шарттар жана төмөнкү документ менен таанышканын ырастайт:",
+    ", placing orders and participating in the DAANA SUSHI rewards programme. By ordering, creating an account or submitting a withdrawal request, you confirm that you have read these terms and the",
+    ", тапсырыс беруді және ДААНА СУШИ сыйақы бағдарламасына қатысуды. Тапсырыс беру, аккаунт жасау немесе сыйақыны шығаруға өтінім жіберу арқылы пайдаланушы осы шарттармен және мына құжатпен танысқанын растайды:",
+    ", buyurtma berish va DAANA SUSHI mukofot dasturida ishtirok etishni. Buyurtma berish, akkaunt yaratish yoki mukofotni chiqarishga ariza yuborish orqali foydalanuvchi ushbu shartlar va quyidagi hujjat bilan tanishganini tasdiqlaydi:"
+  ],
+  "политикой конфиденциальности": [
+    "купуялык саясаты",
+    "privacy policy",
+    "құпиялық саясаты",
+    "maxfiylik siyosati"
+  ],
+  "1. Оператор и назначение Сервиса": [
+    "1. Оператор жана Кызматтын максаты",
+    "1. Operator and purpose of the Service",
+    "1. Оператор және Қызмет мақсаты",
+    "1. Operator va Xizmat maqsadi"
+  ],
+  "Оператором Сервиса является": [
+    "Кызматтын оператору —",
+    "The Service operator is",
+    "Қызмет операторы —",
+    "Xizmat operatori —"
+  ],
+  ". Сервис позволяет посмотреть меню, выбрать точку получения, оформить заказ, подтвердить номер телефона, просматривать сведения аккаунта, получать NAKTA Coin и NFT и направлять заявки на их вывод. Наличие товаров, точек, способов оплаты и отдельных функций может меняться.": [
+    ". Кызмат менюну көрүүгө, алып кетүү пунктун тандоого, буйрутма берүүгө, телефон номерин ырастоого, аккаунттун маалыматтарын көрүүгө, NAKTA Coin жана NFT алууга жана аларды чыгарууга өтүнмө берүүгө мүмкүндүк берет. Товарлардын, пункттардын, төлөм ыкмаларынын жана айрым функциялардын жеткиликтүүлүгү өзгөрүшү мүмкүн.",
+    ". The Service lets you browse the menu, select a pickup store, order, verify your phone number, view account information, receive NAKTA Coin and NFTs and request withdrawals. Availability of products, stores, payment methods and features may change.",
+    ". Қызмет мәзірді қарауға, алып кету пунктін таңдауға, тапсырыс беруге, телефон нөмірін растауға, аккаунт мәліметтерін көруге, NAKTA Coin және NFT алуға және оларды шығаруға өтінім беруге мүмкіндік береді. Тауарлар, пункттер, төлем тәсілдері және кейбір функциялардың қолжетімділігі өзгеруі мүмкін.",
+    ". Xizmat menyuni ko‘rish, olib ketish punktini tanlash, buyurtma berish, telefon raqamini tasdiqlash, akkaunt ma’lumotlarini ko‘rish, NAKTA Coin va NFT olish va ularni chiqarishga ariza berish imkonini beradi. Mahsulotlar, punktlar, to‘lov usullari va ayrim funksiyalar mavjudligi o‘zgarishi mumkin."
+  ],
+  "2. Аккаунт и номер телефона": [
+    "2. Аккаунт жана телефон номери",
+    "2. Account and phone number",
+    "2. Аккаунт және телефон нөмірі",
+    "2. Akkaunt va telefon raqami"
+  ],
+  "Для доступа к личным данным, наградам и связанным заказам требуется действующий номер телефона. Пользователь отвечает за правильность номера и сохранность доступа к устройству. Нельзя использовать чужой номер без разрешения владельца, передавать одноразовый код третьим лицам, обходить подтверждение входа или мешать работе Сервиса.": [
+    "Жеке маалыматтарга, сыйлыктарга жана байланыштуу буйрутмаларга жетүү үчүн иштеп жаткан телефон номери керек. Колдонуучу номердин тууралыгына жана түзмөккө жетүүнүн коопсуздугуна жооп берет. Ээсинин уруксатысыз башка бирөөнүн номерин колдонууга, бир жолку кодду үчүнчү жактарга берүүгө, кирүү ырастоосун айланып өтүүгө же Кызматтын ишине тоскоол болууга болбойт.",
+    "A working phone number is required to access personal data, rewards and related orders. You are responsible for the number's accuracy and secure access to your device. Do not use another person's number without permission, share one-time codes, bypass sign-in verification or disrupt the Service.",
+    "Дербес деректерге, сыйақыларға және байланысты тапсырыстарға қол жеткізу үшін қолданыстағы телефон нөмірі қажет. Пайдаланушы нөмірдің дұрыстығы мен құрылғыға қолжетімділіктің қауіпсіздігіне жауапты. Иесінің рұқсатынсыз бөтен нөмірді пайдалануға, бір реттік кодты үшінші тұлғаға беруге, кіруді растауды айналып өтуге немесе Қызмет жұмысына кедергі келтіруге болмайды.",
+    "Shaxsiy ma’lumotlar, mukofotlar va tegishli buyurtmalarga kirish uchun ishlayotgan telefon raqami talab etiladi. Foydalanuvchi raqam to‘g‘riligi va qurilmasiga kirish xavfsizligi uchun javobgar. Egasining ruxsatisiz boshqa raqamdan foydalanish, bir martalik kodni uchinchi shaxslarga berish, kirish tasdig‘ini chetlab o‘tish yoki Xizmat ishiga to‘sqinlik qilish mumkin emas."
+  ],
+  "3. Оформление заказа": [
+    "3. Буйрутма берүү",
+    "3. Placing an order",
+    "3. Тапсырыс беру",
+    "3. Buyurtma berish"
+  ],
+  "Перед отправкой заказа пользователь проверяет состав корзины, количество, выбранную точку, контактные данные, время и итоговую стоимость. Заказ считается принятым в обработку после регистрации Сервисом и может потребовать подтверждения сотрудником. Если товар недоступен, точка закрыта или связаться с пользователем невозможно, заказ может быть уточнён или отменён.": [
+    "Жөнөтүүдөн мурун колдонуучу себеттин курамын, санын, тандалган пунктту, байланыш маалыматтарын, убакытты жана жалпы бааны текшерет. Кызмат каттагандан кийин буйрутма иштетүүгө кабыл алынган болуп эсептелет жана кызматкердин ырастоосун талап кылышы мүмкүн. Товар жеткиликсиз болсо, пункт жабык болсо же колдонуучу менен байланышуу мүмкүн болбосо, буйрутма такталышы же жокко чыгарылышы мүмкүн.",
+    "Before submitting, check the cart contents, quantities, selected store, contact details, time and total price. An order is accepted for processing once registered by the Service and may require staff confirmation. If an item is unavailable, the store is closed or you cannot be reached, the order may be amended or cancelled.",
+    "Жіберер алдында пайдаланушы себет құрамын, санын, таңдалған пунктті, байланыс деректерін, уақыт пен жалпы құнын тексереді. Қызмет тіркегеннен кейін тапсырыс өңдеуге қабылданған болып саналады және қызметкердің растауын талап етуі мүмкін. Тауар қолжетімсіз, пункт жабық немесе пайдаланушымен байланысу мүмкін болмаса, тапсырыс нақтылануы не жойылуы мүмкін.",
+    "Yuborishdan oldin foydalanuvchi savat tarkibi, miqdor, tanlangan punkt, aloqa ma’lumotlari, vaqt va umumiy narxni tekshiradi. Xizmat ro‘yxatga olgandan keyin buyurtma ko‘rib chiqishga qabul qilingan hisoblanadi va xodim tasdig‘ini talab qilishi mumkin. Mahsulot yo‘q, punkt yopiq yoki foydalanuvchi bilan bog‘lanib bo‘lmasa, buyurtma aniqlashtirilishi yoki bekor qilinishi mumkin."
+  ],
+  "4. Цена и оплата": [
+    "4. Баа жана төлөм",
+    "4. Prices and payment",
+    "4. Баға және төлем",
+    "4. Narx va to‘lov"
+  ],
+  "Актуальная стоимость показывается перед отправкой и проверяется сервером по действующему меню. Сайт только принимает заказ и не проводит онлайн-оплату. Расчёт производится при получении способом, доступным в выбранной точке. ДААНА СУШИ не запрашивает и не сохраняет реквизиты банковской карты. Подробности размещены в разделе": [
+    "Учурдагы баа жөнөтүүдөн мурун көрсөтүлүп, сервер тарабынан учурдагы меню боюнча текшерилет. Сайт буйрутманы гана кабыл алат жана онлайн төлөм жүргүзбөйт. Төлөм алууда тандалган пунктта жеткиликтүү ыкма менен жүргүзүлөт. ДААНА СУШИ банк картасынын реквизиттерин сурабайт жана сактабайт. Толук маалымат бул бөлүмдө берилген:",
+    "The current price is shown before submission and verified by the server against the current menu. The site only accepts orders and does not process online payments. Pay on collection using a method available at the selected store. DAANA SUSHI does not request or store card details. See",
+    "Ағымдағы құны жіберер алдында көрсетіліп, сервер қолданыстағы мәзір бойынша тексереді. Сайт тек тапсырыс қабылдайды және онлайн төлем жүргізбейді. Төлем алғанда таңдалған пунктте қолжетімді тәсілмен жасалады. ДААНА СУШИ банк картасының деректемелерін сұрамайды не сақтамайды. Толығырақ мына бөлімде:",
+    "Joriy narx yuborishdan oldin ko‘rsatiladi va server tomonidan amaldagi menyu bo‘yicha tekshiriladi. Sayt faqat buyurtma qabul qiladi va onlayn to‘lov o‘tkazmaydi. To‘lov olishda, tanlangan punktda mavjud usul bilan qilinadi. DAANA SUSHI bank kartasi rekvizitlarini so‘ramaydi va saqlamaydi. Batafsil ushbu bo‘limda:"
+  ],
+  "«Оплата, отмена и возврат»": [
+    "«Төлөм, жокко чыгаруу жана кайтаруу»",
+    "“Payment, cancellation and refunds”",
+    "«Төлем, бас тарту және қайтару»",
+    "«To‘lov, bekor qilish va qaytarish»"
+  ],
+  "5. Начисление NAKTA Coin и NFT": [
+    "5. NAKTA Coin жана NFT берүү",
+    "5. Earning NAKTA Coin and NFTs",
+    "5. NAKTA Coin және NFT есептеу",
+    "5. NAKTA Coin va NFT hisoblash"
+  ],
+  "NAKTA Coin и NFT являются бонусными цифровыми наградами программы лояльности. Они не являются денежными средствами, банковским счётом или способом оплаты заказа внутри Сервиса и не имеют гарантированной денежной или рыночной стоимости.": [
+    "NAKTA Coin жана NFT — лоялдуулук программасынын бонустук санариптик сыйлыктары. Алар акча, банк эсеби же Кызматтын ичинде буйрутма үчүн төлөм каражаты эмес жана алардын кепилденген акчалай же рыноктук наркы жок.",
+    "NAKTA Coin and NFTs are bonus digital rewards in the loyalty programme. They are not money, a bank account or a payment method within the Service, and have no guaranteed monetary or market value.",
+    "NAKTA Coin және NFT — адалдық бағдарламасының бонустық цифрлық сыйақылары. Олар ақша, банк шоты немесе Қызмет ішінде тапсырыс төлеу құралы емес және кепілдендірілген ақшалай не нарықтық құны жоқ.",
+    "NAKTA Coin va NFT sodiqlik dasturining bonus raqamli mukofotlaridir. Ular pul, bank hisobi yoki Xizmat ichida buyurtma to‘lash vositasi emas va kafolatlangan pul yoki bozor qiymatiga ega emas."
+  ],
+  "Количество NAKTA Coin определяется настройкой товара и его количеством. Начисление за заказ производится после присвоения заказу статуса «Выполнен».": [
+    "NAKTA Coin саны товардын жөндөөсүнө жана анын санына жараша аныкталат. Буйрутмага «Аткарылды» статусу берилгенден кийин сыйлык эсептелет.",
+    "The NAKTA Coin amount depends on each item's reward setting and quantity. Coins are credited after the order is marked completed.",
+    "NAKTA Coin саны тауар баптауы мен санына байланысты анықталады. Тапсырысқа «Орындалды» мәртебесі берілгеннен кейін сыйақы есептеледі.",
+    "NAKTA Coin miqdori mahsulot sozlamasi va uning soniga bog‘liq. Buyurtmaga «Bajarildi» holati berilgandan keyin mukofot hisoblanadi."
+  ],
+  "NFT начисляется при достижении установленного количества выполненных заказов. Порог, название, изображение, описание и блокчейн-сеть награды задаются действующими настройками программы.": [
+    "Белгиленген сандагы аткарылган буйрутмаларга жеткенде NFT берилет. Сыйлыктын босогосу, аты, сүрөтү, сүрөттөмөсү жана блокчейн тармагы программанын учурдагы жөндөөлөрүнө жараша болот.",
+    "An NFT is awarded when the configured number of completed orders is reached. The threshold, name, image, description and blockchain network depend on current programme settings.",
+    "Белгіленген орындалған тапсырыс санына жеткенде NFT беріледі. Сыйақының шегі, атауы, суреті, сипаттамасы және блокчейн желісі бағдарламаның ағымдағы баптауларымен анықталады.",
+    "Belgilangan bajarilgan buyurtmalar soniga yetganda NFT beriladi. Mukofot chegarasi, nomi, rasmi, tavsifi va blokcheyn tarmog‘i dasturning joriy sozlamalariga bog‘liq."
+  ],
+  "Ошибочное начисление, технический дубль, отменённая операция или злоупотребление могут быть исправлены оператором. Ручная корректировка баланса должна отражаться в истории аккаунта.": [
+    "Ката эсептөө, техникалык кайталануу, жокко чыгарылган операция же кыянаттык оператор тарабынан оңдолушу мүмкүн. Балансты кол менен оңдоо аккаунттун тарыхында чагылдырылышы керек.",
+    "The operator may correct mistaken awards, technical duplicates, cancelled transactions or abuse. Manual balance adjustments must appear in account history.",
+    "Қате есептеу, техникалық қайталау, жойылған операция немесе теріс пайдалану оператор тарапынан түзетілуі мүмкін. Балансты қолмен түзету аккаунт тарихында көрсетілуі тиіс.",
+    "Noto‘g‘ri hisoblash, texnik takrorlanish, bekor qilingan amaliyot yoki suiiste’mol operator tomonidan tuzatilishi mumkin. Balansning qo‘lda tuzatilishi akkaunt tarixida aks etishi kerak."
+  ],
+  "Правила и размер будущих начислений могут меняться. Изменения применяются к последующим заказам, если явно не указано иное.": [
+    "Келечектеги сыйлыктардын эрежелери жана өлчөмү өзгөрүшү мүмкүн. Эгер башкача көрсөтүлбөсө, өзгөрүүлөр кийинки буйрутмаларга колдонулат.",
+    "Rules and amounts for future rewards may change. Unless stated otherwise, changes apply to subsequent orders.",
+    "Болашақ сыйақы ережелері мен мөлшері өзгеруі мүмкін. Өзгеше көрсетілмесе, өзгерістер кейінгі тапсырыстарға қолданылады.",
+    "Kelgusi mukofotlar qoidalari va miqdori o‘zgarishi mumkin. Boshqacha ko‘rsatilmagan bo‘lsa, o‘zgarishlar keyingi buyurtmalarga qo‘llanadi."
+  ],
+  "6. Вывод наград": [
+    "6. Сыйлыктарды чыгаруу",
+    "6. Withdrawing rewards",
+    "6. Сыйақыны шығару",
+    "6. Mukofotlarni chiqarish"
+  ],
+  "Награды не расходуются при оплате заказа. Доступные NAKTA Coin или NFT можно запросить к выводу на совместимый криптокошелёк, если функция активна.": [
+    "Сыйлыктар буйрутма үчүн төлөмдө сарпталбайт. Эгер функция активдүү болсо, жеткиликтүү NAKTA Coin же NFTни шайкеш криптокапчыкка чыгарууну сурасаңыз болот.",
+    "Rewards are not spent on orders. If the feature is enabled, you may request withdrawal of available NAKTA Coin or NFTs to a compatible crypto wallet.",
+    "Сыйақылар тапсырыс төлеу кезінде жұмсалмайды. Функция белсенді болса, қолжетімді NAKTA Coin немесе NFT-ді үйлесімді криптоәмиянға шығаруды сұрауға болады.",
+    "Mukofotlar buyurtma uchun to‘lovda sarflanmaydi. Funksiya faol bo‘lsa, mavjud NAKTA Coin yoki NFTni mos kriptohamyonga chiqarishni so‘rash mumkin."
+  ],
+  "Пользователь самостоятельно проверяет адрес кошелька, выбранную сеть и совместимость кошелька с активом. ДААНА СУШИ никогда не запрашивает приватный ключ или seed-фразу.": [
+    "Колдонуучу капчыктын дарегин, тандалган тармакты жана капчыктын активге шайкештигин өзү текшерет. ДААНА СУШИ жеке ачкычты же seed фразасын эч качан сурабайт.",
+    "You are responsible for checking the wallet address, selected network and asset compatibility. DAANA SUSHI never asks for private keys or seed phrases.",
+    "Пайдаланушы әмиян мекенжайын, таңдалған желіні және әмиянның активпен үйлесімділігін өзі тексереді. ДААНА СУШИ жеке кілтті немесе seed-фразаны ешқашан сұрамайды.",
+    "Foydalanuvchi hamyon manzili, tanlangan tarmoq va hamyonning aktivga mosligini o‘zi tekshiradi. DAANA SUSHI maxfiy kalit yoki seed-iborani hech qachon so‘ramaydi."
+  ],
+  "До начала обработки заявка может быть отменена, если интерфейс показывает такую возможность. После передачи операции провайдеру или в блокчейн отмена не гарантируется.": [
+    "Интерфейс мүмкүнчүлүк берсе, иштетүү башталганга чейин өтүнмөнү жокко чыгарууга болот. Операция провайдерге же блокчейнге берилгенден кийин жокко чыгарууга кепилдик берилбейт.",
+    "You may cancel a request before processing starts if the interface offers this option. Cancellation is not guaranteed after submission to the provider or blockchain.",
+    "Интерфейс мүмкіндік берсе, өңдеу басталғанға дейін өтінімнен бас тартуға болады. Операция провайдерге немесе блокчейнге берілгеннен кейін бас тартуға кепілдік берілмейді.",
+    "Interfeys imkon bersa, ko‘rib chiqish boshlanguncha arizani bekor qilish mumkin. Amaliyot provayderga yoki blokcheynga yuborilgandan keyin bekor qilish kafolatlanmaydi."
+  ],
+  "Блокчейн-транзакции необратимы. Ошибка в адресе или сети может привести к безвозвратной утрате награды. Комиссия сети, срок обработки и доступность вывода зависят от сети и провайдера и могут меняться.": [
+    "Блокчейн транзакциялары кайтарылгыс. Дарек же тармактагы ката сыйлыктын биротоло жоголушуна алып келиши мүмкүн. Тармактын комиссиясы, иштетүү мөөнөтү жана чыгаруунун жеткиликтүүлүгү тармакка жана провайдерге жараша болуп, өзгөрүшү мүмкүн.",
+    "Blockchain transactions are irreversible. An incorrect address or network may cause permanent loss of the reward. Network fees, processing times and withdrawal availability depend on the network and provider and may change.",
+    "Блокчейн транзакциялары қайтымсыз. Мекенжай не желідегі қате сыйақының біржола жоғалуына әкелуі мүмкін. Желі комиссиясы, өңдеу мерзімі және шығарудың қолжетімділігі желі мен провайдерге байланысты және өзгеруі мүмкін.",
+    "Blokcheyn tranzaksiyalari qaytarilmaydi. Manzil yoki tarmoqdagi xato mukofotning qaytarib bo‘lmas tarzda yo‘qolishiga olib kelishi mumkin. Tarmoq komissiyasi, ko‘rib chiqish muddati va chiqarish imkoniyati tarmoq va provayderga bog‘liq va o‘zgarishi mumkin."
+  ],
+  "Заявка может быть приостановлена или отклонена при недостаточном балансе, неверных данных, техническом сбое, признаках злоупотребления либо требовании закона. Статус и известная причина отображаются в аккаунте.": [
+    "Баланс жетишсиз болгондо, маалыматтар туура эмес болгондо, техникалык мүчүлүштүктө, кыянаттык белгилеринде же мыйзам талап кылганда өтүнмө токтотулушу же четке кагылышы мүмкүн. Статус жана белгилүү себеби аккаунтта көрсөтүлөт.",
+    "A request may be paused or rejected due to insufficient balance, incorrect data, technical failure, suspected abuse or legal requirements. The status and known reason are shown in your account.",
+    "Баланс жеткіліксіз, деректер қате, техникалық ақау, теріс пайдалану белгілері немесе заң талабы болғанда өтінім тоқтатылуы не қабылданбауы мүмкін. Мәртебесі мен белгілі себебі аккаунтта көрсетіледі.",
+    "Balans yetarli emasligi, noto‘g‘ri ma’lumot, texnik nosozlik, suiiste’mol alomatlari yoki qonun talabi sababli ariza to‘xtatilishi yoki rad etilishi mumkin. Holat va ma’lum sabab akkauntda ko‘rsatiladi."
+  ],
+  "Оператор не гарантирует возможность продажи, обмена, листинга, доходность или сохранение стоимости NAKTA Coin и NFT. Пользователь самостоятельно оценивает налоговые и иные последствия владения или распоряжения наградой.": [
+    "Оператор NAKTA Coin жана NFTни сатуу, алмаштыруу, листингге киргизүү мүмкүнчүлүгүнө, кирешелүүлүгүнө же наркынын сакталышына кепилдик бербейт. Колдонуучу сыйлыкка ээ болуунун же аны пайдалануунун салыктык жана башка кесепеттерин өзү баалайт.",
+    "The operator does not guarantee that NAKTA Coin or NFTs can be sold, exchanged or listed, will generate returns or retain value. You are responsible for assessing tax and other consequences of owning or disposing of a reward.",
+    "Оператор NAKTA Coin және NFT-ді сату, айырбастау, листингке енгізу мүмкіндігіне, кірістілігіне не құнын сақтауға кепілдік бермейді. Пайдаланушы сыйақыға иелік ету не оны пайдалану салдарынан туындайтын салықтық және басқа салдарды өзі бағалайды.",
+    "Operator NAKTA Coin va NFTni sotish, ayirboshlash, listingga kiritish imkoniyati, daromadliligi yoki qiymati saqlanishini kafolatlamaydi. Foydalanuvchi mukofotga egalik qilish yoki uni tasarruf etishning soliq va boshqa oqibatlarini o‘zi baholaydi."
+  ],
+  "7. Отмена заказа, качество и возврат": [
+    "7. Буйрутманы жокко чыгаруу, сапат жана кайтаруу",
+    "7. Order cancellation, quality and refunds",
+    "7. Тапсырыстан бас тарту, сапа және қайтару",
+    "7. Buyurtmani bekor qilish, sifat va qaytarish"
+  ],
+  "Чтобы изменить или отменить заказ, необходимо как можно раньше обратиться в": [
+    "Буйрутманы өзгөртүү же жокко чыгаруу үчүн мүмкүн болушунча эрте бул жерге кайрылуу керек:",
+    "To change or cancel an order, contact as early as possible",
+    "Тапсырысты өзгерту не бас тарту үшін мүмкіндігінше ертерек мына жерге хабарласу керек:",
+    "Buyurtmani o‘zgartirish yoki bekor qilish uchun imkon qadar ertaroq murojaat qiling:"
+  ],
+  ". Возможность отмены зависит от этапа приготовления. При проблеме с составом, комплектностью или качеством сообщите номер заказа, опишите ситуацию и по возможности приложите фотографию. Обращение рассматривается с учётом применимого законодательства и фактических обстоятельств.": [
+    ". Жокко чыгаруу мүмкүнчүлүгү даярдоо этабына жараша болот. Курамы, толуктугу же сапаты боюнча маселе болсо, буйрутманын номерин бериңиз, жагдайды сүрөттөп, мүмкүн болсо сүрөт тиркеңиз. Кайрылуу колдонулуучу мыйзамга жана иш жүзүндөгү жагдайларга ылайык каралат.",
+    ". Cancellation depends on the preparation stage. For issues with contents, completeness or quality, provide your order number, describe the issue and attach a photo if possible. Enquiries are reviewed under applicable law and the actual circumstances.",
+    ". Бас тарту мүмкіндігі дайындау кезеңіне байланысты. Құрам, толықтық не сапа мәселесі болса, тапсырыс нөмірін беріп, жағдайды сипаттаңыз және мүмкін болса фотосурет тіркеңіз. Өтініш қолданылатын заңнама мен нақты жағдайларға сәйкес қаралады.",
+    ". Bekor qilish imkoniyati tayyorlash bosqichiga bog‘liq. Tarkib, to‘liqlik yoki sifat muammosi bo‘lsa, buyurtma raqamini bering, vaziyatni tavsiflang va imkon bo‘lsa surat ilova qiling. Murojaat amaldagi qonunchilik va haqiqiy holatlarga muvofiq ko‘rib chiqiladi."
+  ],
+  "8. Доступность и ответственность": [
+    "8. Жеткиликтүүлүк жана жоопкерчилик",
+    "8. Availability and liability",
+    "8. Қолжетімділік және жауапкершілік",
+    "8. Mavjudlik va javobgarlik"
+  ],
+  "Работа Сервиса зависит от связи, серверов, SMS-провайдера, картографического сервиса, провайдера вывода и блокчейн-сетей. ДААНА СУШИ принимает разумные меры для стабильной работы, но не может гарантировать непрерывность независимых сервисов, неизменность сетевых комиссий или срок подтверждения блокчейн-транзакции. Это условие не ограничивает права пользователя, которые нельзя ограничить законом.": [
+    "Кызматтын иштөөсү байланышка, серверлерге, SMS провайдерине, карта кызматына, чыгаруу провайдерине жана блокчейн тармактарына көз каранды. ДААНА СУШИ туруктуу иштөө үчүн акылга сыярлык чараларды көрөт, бирок көз карандысыз кызматтардын үзгүлтүксүздүгүнө, тармактык комиссиялардын өзгөрбөстүгүнө же блокчейн транзакциясын ырастоо мөөнөтүнө кепилдик бере албайт. Бул шарт колдонуучунун мыйзам боюнча чектелбеген укуктарын чектебейт.",
+    "The Service depends on connectivity, servers, SMS and map services, withdrawal providers and blockchain networks. DAANA SUSHI takes reasonable steps for stable operation but cannot guarantee independent services' continuity, unchanged network fees or blockchain confirmation times. This does not limit any user rights that cannot lawfully be limited.",
+    "Қызмет жұмысы байланысқа, серверлерге, SMS провайдеріне, карта қызметіне, шығару провайдеріне және блокчейн желілеріне тәуелді. ДААНА СУШИ тұрақты жұмыс үшін орынды шаралар қабылдайды, бірақ тәуелсіз сервистердің үздіксіздігіне, желі комиссияларының өзгермеуіне немесе блокчейн транзакциясын растау мерзіміне кепілдік бере алмайды. Бұл шарт пайдаланушының заңмен шектелмейтін құқықтарын шектемейді.",
+    "Xizmat ishlashi aloqa, serverlar, SMS va xarita xizmatlari, chiqarish provayderi va blokcheyn tarmoqlariga bog‘liq. DAANA SUSHI barqaror ish uchun oqilona choralar ko‘radi, ammo mustaqil xizmatlarning uzluksizligi, tarmoq komissiyalari o‘zgarmasligi yoki blokcheyn tranzaksiyasini tasdiqlash muddatini kafolatlamaydi. Ushbu shart foydalanuvchining qonunan cheklab bo‘lmaydigan huquqlarini cheklamaydi."
+  ],
+  "9. Интеллектуальные права": [
+    "9. Интеллектуалдык укуктар",
+    "9. Intellectual property",
+    "9. Зияткерлік құқықтар",
+    "9. Intellektual huquqlar"
+  ],
+  "Название, логотип, дизайн, фотографии, тексты, программный код и другие материалы принадлежат их правообладателям. Их нельзя копировать, продавать или использовать для создания вводящего в заблуждение сервиса без разрешения.": [
+    "Аталыш, логотип, дизайн, сүрөттөр, тексттер, программалык код жана башка материалдар алардын укук ээлерине таандык. Аларды уруксатсыз көчүрүүгө, сатууга же адаштыруучу кызмат түзүү үчүн колдонууга болбойт.",
+    "Names, logos, designs, photos, text, code and other materials belong to their respective rights holders. Do not copy, sell or use them to create a misleading service without permission.",
+    "Атау, логотип, дизайн, фотосуреттер, мәтіндер, бағдарламалық код және басқа материалдар өз құқық иелеріне тиесілі. Оларды рұқсатсыз көшіруге, сатуға немесе жаңылыстыратын сервис жасауға қолдануға болмайды.",
+    "Nom, logotip, dizayn, suratlar, matnlar, dastur kodi va boshqa materiallar tegishli huquq egalariga tegishli. Ularni ruxsatsiz nusxalash, sotish yoki chalg‘ituvchi xizmat yaratish uchun ishlatish mumkin emas."
+  ],
+  "Условия могут обновляться вместе с развитием Сервиса. Новая редакция действует с указанной на странице даты. Вопросы можно направить через": [
+    "Кызматтын өнүгүшү менен шарттар жаңыртылышы мүмкүн. Жаңы редакция баракта көрсөтүлгөн күндөн тартып күчүнө кирет. Суроолорду бул жерден жөнөтсөңүз болот:",
+    "These terms may be updated as the Service develops. The new version takes effect from the date shown on this page. Send questions through",
+    "Қызмет дамуына қарай шарттар жаңартылуы мүмкін. Жаңа редакция бетте көрсетілген күннен бастап күшіне енеді. Сұрақтарды мына жерден жіберуге болады:",
+    "Xizmat rivojlanishi bilan shartlar yangilanishi mumkin. Yangi tahrir sahifada ko‘rsatilgan sanadan kuchga kiradi. Savollarni quyidagidan yuborishingiz mumkin:"
+  ],
+  ". Реквизиты оператора собраны в разделе": [
+    ". Оператордун реквизиттери бул бөлүмдө берилген:",
+    ". Operator details are available under",
+    ". Оператордың деректемелері мына бөлімде берілген:",
+    ". Operator rekvizitlari quyidagi bo‘limda:"
+  ],
+  "«Правовая информация»": [
+    "«Укуктук маалымат»",
+    "“Legal information”",
+    "«Құқықтық ақпарат»",
+    "«Huquqiy ma’lumotlar»"
+  ],
+  "Выбранный язык сохраняется в cookie и локальном хранилище браузера.": [
+    "Тандалган тил браузердин cookie файлында жана жергиликтүү сактагычында сакталат.",
+    "Your language preference is saved in a cookie and browser local storage.",
+    "Таңдалған тіл браузердің cookie файлында және жергілікті жадында сақталады.",
+    "Tanlangan til brauzer cookie fayli va mahalliy xotirasida saqlanadi."
+  ]
+}

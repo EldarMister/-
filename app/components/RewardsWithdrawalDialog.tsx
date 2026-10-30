@@ -1,5 +1,8 @@
 "use client";
 
+import Localized from "../i18n/Localized";
+
+
 import {
   mdiAlertOutline,
   mdiArrowLeft,
@@ -217,7 +220,7 @@ export default function RewardsWithdrawalDialog({ coins, coinNetwork, nfts, onCl
     if (!submitting) onClose();
   };
 
-  return (
+  return <Localized>{(
     <div className="overlay reward-withdrawal-overlay" role="dialog" aria-modal="true" aria-labelledby="reward-withdrawal-title">
       <button className="reward-withdrawal-dismiss" type="button" aria-label="Закрыть форму вывода" disabled={submitting} onClick={close} />
       <section className="reward-withdrawal-dialog">
@@ -272,5 +275,5 @@ export default function RewardsWithdrawalDialog({ coins, coinNetwork, nfts, onCl
         </div>}
       </section>
     </div>
-  );
+  )}</Localized>;
 }

@@ -1,4 +1,5 @@
-const NIKITA_OTP_SEND_URL = "https://smspro.nikita.kg/api/otp/send";
+import { isNikitaSmsToken, NikitaSmsError, sendNikitaSmsCode, verifyNikitaSmsCode } from "./nikita-sms";
+
 const NIKITA_OTP_VERIFY_URL = "https://smspro.nikita.kg/api/otp/verify";
 const REQUEST_TIMEOUT_MS = 8_000;
 
@@ -63,16 +64,41 @@ async function requestNikitaOtp(apiKey: string, url: string, body: Record<string
   return payload;
 }
 
-export async function sendNikitaOtp(apiKey: string, phone: string, transactionId: string) {
-  const payload = await requestNikitaOtp(apiKey, NIKITA_OTP_SEND_URL, {
-    transaction_id: transactionId,
-    phone,
-  }, "send");
-  const token = String(payload.token || "").trim();
-  if (!token) throw new NikitaOtpError(502, null, "SMS-сервис не вернул токен проверки");
-  return token;
+export async function sendNikitaOtp(phone: string, transactionId: string) {
+  try {
+    return await sendNikitaSmsCode({
+      login: process.env.NIKITA_SMS_LOGIN || "",
+      password: process.env.NIKITA_SMS_PASSWORD || "",
+      secret: process.env.JWT_SECRET || "",
+      sender: "DaanaSushKG",
+      brand: "DAANA SUSHI",
+      phone,
+      transactionId,
+      timeoutMs: REQUEST_TIMEOUT_MS,
+    });
+  } catch (error) {
+    if (error instanceof NikitaSmsError) {
+      throw new NikitaOtpError(error.providerStatus === "7" ? 400 : 503,
+        error.providerStatus === null ? null : Number(error.providerStatus), error.message);
+    }
+    throw error;
+  }
 }
 
-export async function verifyNikitaOtp(apiKey: string, token: string, code: string) {
+export async function verifyNikitaOtp(token: string, code: string) {
+  if (isNikitaSmsToken(token)) {
+    let result;
+    try {
+      result = verifyNikitaSmsCode(process.env.JWT_SECRET || "", "DaanaSushKG", token, code);
+    } catch (error) {
+      if (error instanceof NikitaSmsError) throw new NikitaOtpError(503, null, error.message);
+      throw error;
+    }
+    if (!result.valid) throw providerError(Number(result.status), "verify");
+    return;
+  }
+  // Keep old OTP challenges usable during the deployment transition.
+  const apiKey = String(process.env.NIKITA_OTP_API_KEY || "").trim();
+  if (!apiKey) throw new NikitaOtpError(503, null, "Проверка SMS временно недоступна");
   await requestNikitaOtp(apiKey, NIKITA_OTP_VERIFY_URL, { token, code }, "verify");
 }

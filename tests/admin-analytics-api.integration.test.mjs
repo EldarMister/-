@@ -1,0 +1,120 @@
+import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
+import { once } from "node:events";
+import { createServer } from "node:net";
+import { fileURLToPath } from "node:url";
+import test from "node:test";
+import postgres from "postgres";
+
+const controlUrl = process.env.ADMIN_ANALYTICS_TEST_DATABASE_URL;
+test("analytics SQL, categories, timezone, cancellation and CSV agree on isolated fixtures", { skip: !controlUrl, timeout: 180_000 }, async (context) => {
+  const databaseUrl = new URL(controlUrl);
+  assert.ok(["localhost", "127.0.0.1", "[::1]"].includes(databaseUrl.hostname));
+  assert.match(databaseUrl.pathname, /^\/(?:sushi|daana)_admin_test_[a-z0-9_]+$/);
+  const databaseName = `sushi_admin_test_analytics_${Date.now()}_${process.pid}`;
+  const control = postgres(controlUrl, { max: 1, onnotice: () => undefined });
+  await control.unsafe(`CREATE DATABASE "${databaseName}"`);
+  databaseUrl.pathname = `/${databaseName}`;
+  const fixture = postgres(databaseUrl.toString(), { max: 1, onnotice: () => undefined });
+  const listener = createServer().listen(0, "127.0.0.1"); await once(listener, "listening");
+  const port = listener.address().port; await new Promise((resolve) => listener.close(resolve));
+  const base = `http://127.0.0.1:${port}/api`;
+  const password = "AnalyticsFixturePassword123!";
+  const api = spawn(process.execPath, ["--import", "tsx", "server/index.ts"], {
+    cwd: fileURLToPath(new URL("..", import.meta.url)), windowsHide: true,
+    env: { ...process.env, DATABASE_URL: databaseUrl.toString(), ADMIN_PASSWORD: password, JWT_SECRET: "analytics-fixture-jwt-secret-at-least-32", NODE_ENV: "production", API_HOST: "127.0.0.1", PORT: String(port), TRUST_PROXY: "loopback", CORS_ORIGIN: "", NIKITA_OTP_API_KEY: "", NFT_TRANSFER_WEBHOOK_URL: "", NFT_TRANSFER_WEBHOOK_TOKEN: "", VAPID_PRIVATE_KEY: "", VAPID_PUBLIC_KEY: "" },
+  });
+  context.after(async () => {
+    if (api.exitCode === null && api.signalCode === null) { const exited = once(api, "exit"); api.kill("SIGTERM"); await exited; }
+    await fixture.end({ timeout: 5 });
+    await control.unsafe(`DROP DATABASE "${databaseName}" WITH (FORCE)`);
+    await control.end({ timeout: 5 });
+  });
+  let logs = ""; api.stdout.on("data", (chunk) => { logs += chunk; }); api.stderr.on("data", (chunk) => { logs += chunk; });
+  const deadline = Date.now() + 60_000;
+  while (true) {
+    assert.equal(api.exitCode, null, logs);
+    try { if ((await fetch(`${base}/health`)).ok) break; } catch { /* Starting isolated server. */ }
+    assert.ok(Date.now() < deadline, logs); await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  const headers = { origin: "https://daanasushi.com", "x-forwarded-host": "daanasushi.com", "x-forwarded-proto": "https", "content-type": "application/json" };
+  const login = await fetch(`${base}/admin/login`, { method: "POST", headers, body: JSON.stringify({ password }) }); assert.equal(login.status, 200);
+  headers.cookie = login.headers.get("set-cookie").split(";", 1)[0];
+  const [location] = await fixture`INSERT INTO pickup_locations(id,name,address,phone,hours,opens_at,latitude,longitude) VALUES ((SELECT MAX(id)+1 FROM pickup_locations),'Аналитика — изолированный тест','Тестовый адрес','996555000000','00:00 - 23:59','00:00',40.6,72.9) RETURNING id`;
+  const [category] = await fixture`INSERT INTO categories(id,name,slug) VALUES ((SELECT MAX(id)+1 FROM categories),'Категория после изменения','analytics-fixture') RETURNING id`;
+  const [product] = await fixture`INSERT INTO products(id,category_id,name,price,image) VALUES ((SELECT MAX(id)+1 FROM products),${category.id},'Переименованный товар',9999,'') RETURNING id`;
+  const [owner] = await fixture`SELECT id,name FROM admin_users WHERE role='OWNER' ORDER BY id LIMIT 1`;
+  const insertOrder = async (suffix, phone, total, status, timestamp) => {
+    const [customer] = await fixture`INSERT INTO customers(phone,name) VALUES (${phone},'Клиент теста') ON CONFLICT(phone) DO UPDATE SET name=EXCLUDED.name RETURNING id`;
+    const [order] = await fixture`INSERT INTO orders(order_number,customer_id,customer_name,customer_phone,location_id,total,status,created_at) VALUES (${`AN-${suffix}`},${customer.id},'Клиент теста',${phone},${location.id},${total},${status},${new Date(timestamp)}) RETURNING id`;
+    return order;
+  };
+  const previous = await insertOrder("previous", "996555710001", 800, "completed", "2026-10-24T12:00:00+06:00");
+  const completed = await insertOrder("completed", "996555710001", 525, "completed", "2026-10-25T10:15:00+06:00");
+  await insertOrder("new", "996555710002", 100, "new", "2026-10-25T10:30:00+06:00");
+  const cancelled = await insertOrder("cancelled", "996555710002", 300, "cancelled", "2026-10-25T23:59:59+06:00");
+  await insertOrder("outside", "996555710003", 999, "completed", "2026-10-26T00:00:00+06:00");
+  await fixture`INSERT INTO order_items(order_id,product_id,product_name,unit_price,quantity,line_total,category_name_snapshot) VALUES (${previous.id},${product.id},'Ролл до переименования',200,4,800,'Историческая категория'),(${completed.id},${product.id},'Ролл до переименования',200,2,400,'Историческая категория'),(${completed.id},${product.id},'Имбирь',125,1,125,NULL),(${completed.id},${product.id},'Подарок',0,1,0,'Категория не записана')`;
+  await fixture`INSERT INTO order_status_history(order_id,admin_user_id,actor_name,from_status,to_status,created_at) VALUES (${completed.id},${owner.id},${owner.name},'ready','completed','2026-10-25T11:00:00+06:00'),(${cancelled.id},${owner.id},${owner.name},'new','cancelled','2026-10-25T23:59:59+06:00')`;
+  const query = `from=2026-10-25&to=2026-10-25&locationId=${location.id}`;
+  const response = await fetch(`${base}/admin/analytics?${query}`, { headers }); assert.equal(response.status, 200, await response.clone().text());
+  const report = await response.json();
+  assert.deepEqual(Object.fromEntries(Object.keys(report.current).filter((key) => key !== "period").map((key) => [key, report.current[key]])), { orders: 3, completed: 1, cancelled: 1, active: 1, revenue: 525, averageOrder: 525 });
+  assert.equal(report.previous.revenue, 800); assert.equal(report.previous.orders, 1);
+  assert.equal(report.daily.length, 1); assert.equal(report.daily[0].revenue, 525); assert.equal(report.daily[0].orders, 3);
+  assert.equal(report.hourly[10].orders, 2); assert.equal(report.hourly[23].orders, 1);
+  assert.deepEqual(report.customers, { total: 2, new: 1, returning: 1 });
+  assert.equal(report.products.find((item) => item.name === "Ролл до переименования").revenue, 400);
+  assert.equal(report.categories.find((item) => item.name === "Историческая категория").revenue, 400);
+  assert.equal(report.categories.find((item) => item.categoryMissing === true).revenue, 125);
+  assert.equal(report.categories.find((item) => item.categoryMissing === true).name, "Категория не записана");
+  const namedLikeSentinel = report.categories.find((item) => item.name === "Категория не записана" && item.categoryMissing === false);
+  assert.ok(namedLikeSentinel, "a real category named like the missing-data label must remain distinguishable");
+  assert.equal(namedLikeSentinel.revenue, 0);
+  assert.equal(report.categories.find((item) => item.name === "Историческая категория").categoryMissing, false);
+  assert.equal(report.employees[0].statusChanges, 2); assert.equal(report.employees[0].completed, 1); assert.equal(report.employees[0].cancelled, 1);
+  const exported = await fetch(`${base}/admin/analytics/export?${query}`, { headers }); assert.equal(exported.status, 200);
+  const csv = await exported.text(); assert.ok(csv.includes('"Выручка, С";"525";"800"')); assert.ok(csv.includes('"2026-10-25";"3";"525"'));
+  assert.equal(response.headers.get("cache-control"), "no-store");
+  assert.equal((await fetch(`${base}/admin/analytics?from=2026-02-29&to=2026-03-01`, { headers })).status, 400);
+  const historyResponse = await fetch(`${base}/admin/customers/996555710001/orders?limit=1&offset=1`, { headers }); assert.equal(historyResponse.status, 200);
+  const history = await historyResponse.json(); assert.equal(history.items.length, 1); assert.equal(history.total, 2); assert.equal(history.offset, 1);
+  const renamed = await fetch(`${base}/admin/customers/996555710001`, { method: "PATCH", headers, body: JSON.stringify({ name: "Исправленное имя клиента" }) }); assert.equal(renamed.status, 200);
+  const renamedCustomer = await renamed.json(); assert.equal(renamedCustomer.name, "Исправленное имя клиента");
+  assert.equal((await fetch(`${base}/admin/customers/996555710001`, { method: "PATCH", headers, body: JSON.stringify({ name: "Попытка", role: "OWNER" }) })).status, 400);
+  const staffResponse = await fetch(`${base}/admin/staff`, { method: "POST", headers, body: JSON.stringify({ name: "Менеджер аналитики", email: "analytics-manager@test.local", password: "ManagerAnalyticsPassword123!", role: "MANAGER" }) }); assert.equal(staffResponse.status, 201);
+  const manager = await staffResponse.json();
+  const managerLogin = await fetch(`${base}/admin/login`, { method: "POST", headers: { ...headers, cookie: "" }, body: JSON.stringify({ email: "analytics-manager@test.local", password: "ManagerAnalyticsPassword123!" }) }); assert.equal(managerLogin.status, 200);
+  const managerHeaders = { ...headers, cookie: managerLogin.headers.get("set-cookie").split(";", 1)[0] };
+  const pushEndpoint=`https://fcm.googleapis.com/fcm/send/isolated-admin-fixture-${manager.id}`;
+  await fixture`INSERT INTO admin_push_subscriptions(endpoint,admin_user_id,subscription) VALUES (${pushEndpoint},${manager.id},${fixture.json({endpoint:pushEndpoint,keys:{p256dh:"fixture-key",auth:"fixture-auth"}})})`;
+  const statusRequest={method:"POST",headers:managerHeaders,body:JSON.stringify({endpoint:pushEndpoint})};
+  const boundStatus=await fetch(`${base}/admin/push/subscriptions/status`,statusRequest);assert.equal(boundStatus.status,200);assert.deepEqual(await boundStatus.json(),{subscribed:true,configured:false});
+  const otherEmployeeStatus=await fetch(`${base}/admin/push/subscriptions/status`,{...statusRequest,headers});assert.equal(otherEmployeeStatus.status,200);assert.equal((await otherEmployeeStatus.json()).subscribed,false,"another employee cannot claim the browser endpoint binding");
+  assert.equal((await fetch(`${base}/admin/push/subscriptions/status`,{...statusRequest,headers:{"Content-Type":"application/json"}})).status,401);
+  assert.equal((await fetch(`${base}/admin/push/subscriptions/status`,{...statusRequest,body:JSON.stringify({endpoint:"invalid"})})).status,400);
+  assert.equal((await fetch(`${base}/admin/analytics?${query}`, { headers: managerHeaders })).status, 403);
+  assert.equal((await fetch(`${base}/admin/analytics/export?${query}`, { headers: managerHeaders })).status, 403);
+  const customerResponse = await fetch(`${base}/admin/customers/996555710001`, { headers: managerHeaders }); assert.equal(customerResponse.status, 200);
+  const customer = await customerResponse.json();
+  for (const key of ["naktaCoins", "nftCount", "availableNftCount", "pendingNftCount", "adjustments", "nfts"]) assert.equal(key in customer, false, `${key} must not reach an employee without loyalty.view`);
+  const contactOnly = await fetch(`${base}/admin/staff/${manager.id}/access`, { method: "PUT", headers, body: JSON.stringify({ role: "MANAGER", permissions: { "orders.view": false } }) }); assert.equal(contactOnly.status, 200);
+  assert.equal((await fetch(`${base}/admin/push/subscriptions/status`,statusRequest)).status,403,"revoked order access must block subscription status lookup");
+  const contactResponse = await fetch(`${base}/admin/customers/996555710001`, { headers: managerHeaders }); assert.equal(contactResponse.status, 200);
+  const contact = await contactResponse.json();
+  for (const key of ["ordersCount", "completedOrders", "revenue", "lastOrderAt", "orders"]) assert.equal(key in contact, false, `${key} must not reach an employee without orders.view`);
+  const contactListResponse = await fetch(`${base}/admin/customers?limit=10`, { headers: managerHeaders }); assert.equal(contactListResponse.status, 200);
+  const contactList = await contactListResponse.json(); assert.ok(contactList.items.length);
+  for (const row of contactList.items) for (const key of ["ordersCount", "completedOrders", "revenue", "lastOrderAt"]) assert.equal(key in row, false);
+  assert.equal((await fetch(`${base}/admin/customers/996555710001/orders`, { headers: managerHeaders })).status, 403);
+  const customerRewards = await fetch(`${base}/admin/staff/${manager.id}/access`, { method: "PUT", headers, body: JSON.stringify({ role: "MANAGER", permissions: { "orders.view": false, "loyalty.view": true, "loyalty.adjust": true } }) }); assert.equal(customerRewards.status, 200);
+  const rewardUpdateResponse = await fetch(`${base}/admin/customers/996555710001/rewards/adjust`, { method: "POST", headers: managerHeaders, body: JSON.stringify({ asset: "coin", delta: 1, reason: "Проверка разграничения данных" }) }); assert.equal(rewardUpdateResponse.status, 200);
+  const rewardUpdate = await rewardUpdateResponse.json();
+  for (const key of ["ordersCount", "completedOrders", "revenue", "lastOrderAt", "orders"]) assert.equal(key in rewardUpdate, false, "reward adjustment response must also prune restricted orders");
+  const rewardsWithoutContacts = await fetch(`${base}/admin/staff/${manager.id}/access`, { method: "PUT", headers, body: JSON.stringify({ role: "MANAGER", permissions: { "users.view": false, "loyalty.view": true, "loyalty.adjust": true } }) }); assert.equal(rewardsWithoutContacts.status, 200);
+  const restrictedSession = await fetch(`${base}/admin/session`, { headers: managerHeaders }); const restricted = await restrictedSession.json(); assert.equal(restricted.user.permissions.includes("loyalty.adjust"), false);
+  assert.equal((await fetch(`${base}/admin/customers/996555710001/rewards/adjust`, { method: "POST", headers: managerHeaders, body: JSON.stringify({ asset: "coin", delta: 1, reason: "Проверка недоступной операции" }) })).status, 403);
+  const revoked = await fetch(`${base}/admin/staff/${manager.id}/access`, { method: "PUT", headers, body: JSON.stringify({ role: "MANAGER", permissions: { "users.view": false } }) }); assert.equal(revoked.status, 200);
+  const restoredStatus=await fetch(`${base}/admin/push/subscriptions/status`,statusRequest);assert.equal(restoredStatus.status,200);assert.equal((await restoredStatus.json()).subscribed,false,"restored order permissions do not restore the old deleted binding");
+  assert.equal((await fetch(`${base}/admin/customers/996555710001`, { headers: managerHeaders })).status, 403, "next request must apply revoked permissions without logging in again");
+});

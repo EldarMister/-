@@ -47,11 +47,33 @@ test("gateway replaces spoofable forwarding headers with socket facts", () => {
   assert.equal(headers.authorization, "Bearer safe-token");
   assert.equal(headers["content-type"], "application/json");
   assert.equal(headers.forwarded, undefined);
-  assert.equal(headers["x-forwarded-host"], undefined);
+  assert.equal(headers["x-forwarded-host"], "attacker.example");
   assert.equal(headers["x-forwarded-port"], undefined);
   assert.equal(headers.connection, undefined);
   assert.equal(headers["keep-alive"], undefined);
   assert.equal(headers["x-remove-me"], undefined);
+});
+
+test("gateway preserves the public host while replacing spoofed forwarded hosts", () => {
+  const headers = buildProxyHeaders({
+    host: "daanasushi.com",
+    origin: "https://daanasushi.com",
+    "x-forwarded-host": "attacker.example",
+    "x-forwarded-proto": "http",
+  }, "10.0.0.4", 4010, "https");
+  assert.equal(headers.host, "127.0.0.1:4010");
+  assert.equal(headers["x-forwarded-host"], "daanasushi.com");
+  assert.equal(headers["x-forwarded-proto"], "https");
+  assert.equal(headers.origin, "https://daanasushi.com");
+});
+
+test("gateway does not forward malformed public authorities", () => {
+  for (const host of ["daanasushi.com,attacker.example", "daanasushi.com@attacker.example", "daanasushi.com/path", "daanasushi.com:invalid", "daanasushi.com\\attacker.example"]) {
+    const headers = buildProxyHeaders({ host, "x-forwarded-host": "attacker.example" }, "127.0.0.1", 4010, "https");
+    assert.equal(headers["x-forwarded-host"], undefined);
+  }
+  const local = buildProxyHeaders({ host: "[::1]:3100" }, "127.0.0.1", 4010, "http");
+  assert.equal(local["x-forwarded-host"], "[::1]:3100");
 });
 
 test("gateway selects the rightmost untrusted address for configured TLS proxy hops", () => {

@@ -1,9 +1,16 @@
 "use client";
 
+import Localized from "./i18n/Localized";
+import LanguageSelector from "./i18n/LanguageSelector";
+import PromotionArtwork from "./i18n/PromotionArtwork";
+import LocalizedPageTitle from "./i18n/LocalizedPageTitle";
+
+
 import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { categories as seedCategories, locations as seedLocations, products as seedProducts, promotions as seedPromotions } from "./data";
 import { PaymentRules, PrivacyPolicy } from "./LegalContent";
 import CustomerAccountModal from "./components/CustomerAccountModal";
+import ProductDetailsModal from "./components/ProductDetailsModal";
 import { LEGAL_DETAILS } from "./legalDetails";
 import { distanceInKilometers, pickupStatus, type MapPosition } from "./locationUtils";
 import PickupMap from "./PickupMap";
@@ -76,9 +83,10 @@ function Header({
   onPromo: () => void;
   customerLoggedIn: boolean;
 }) {
-  return (
+  return <Localized>{(
     <header className="site-header">
       <div className="header-inner">
+        <LanguageSelector className="header-language" compact />
         <button className="logo-button" onClick={onCatalog} aria-label="На главную">
           <img src="/assets/icons/logo.svg" alt="ДААНА СУШИ" />
         </button>
@@ -104,7 +112,7 @@ function Header({
         </div>
       </div>
     </header>
-  );
+  )}</Localized>;
 }
 
 function CategoryTabs({ items, selectedId, onSelect }: { items: Category[]; selectedId: number; onSelect: (id: number) => void }) {
@@ -135,7 +143,7 @@ function CategoryTabs({ items, selectedId, onSelect }: { items: Category[]; sele
     };
   }, [items, selectedId, syncArrows]);
   const move = (direction: number) => scroller.current?.scrollBy({ left: direction * 180, behavior: "smooth" });
-  return (
+  return <Localized>{(
     <nav className="category-nav" aria-label="Категории меню">
       <button className="category-arrow category-arrow-left" type="button" aria-label="Предыдущие категории" disabled={!canMoveLeft} onClick={() => move(-1)}><MaterialIcon>chevron_left</MaterialIcon></button>
       <div className="category-scroller" ref={scroller} onScroll={syncArrows} role="tablist">
@@ -155,18 +163,18 @@ function CategoryTabs({ items, selectedId, onSelect }: { items: Category[]; sele
       </div>
       <button className="category-arrow category-arrow-right" type="button" aria-label="Следующие категории" disabled={!canMoveRight} onClick={() => move(1)}><MaterialIcon>chevron_right</MaterialIcon></button>
     </nav>
-  );
+  )}</Localized>;
 }
 
 function QuantityControl({ quantity, onDecrease, onIncrease }: { quantity: number; onDecrease: () => void; onIncrease: () => void }) {
   if (quantity === 0) {
-    return (
+    return <Localized>{(
       <button className="round-icon-button add-only" onClick={onIncrease} aria-label="Добавить в корзину">
         <MaterialIcon>add_circle_outline</MaterialIcon>
       </button>
-    );
+    )}</Localized>;
   }
-  return (
+  return <Localized>{(
     <div className="quantity-control">
       <button className="round-icon-button" onClick={onDecrease} aria-label="Уменьшить количество">
         <MaterialIcon>remove_circle_outline</MaterialIcon>
@@ -176,29 +184,29 @@ function QuantityControl({ quantity, onDecrease, onIncrease }: { quantity: numbe
         <MaterialIcon>add_circle_outline</MaterialIcon>
       </button>
     </div>
-  );
+  )}</Localized>;
 }
 
-function ProductCard({ product, quantity, onDecrease, onIncrease }: { product: Product; quantity: number; onDecrease: () => void; onIncrease: () => void }) {
-  return (
+function ProductCard({ product, quantity, onDecrease, onIncrease, onOpen }: { product: Product; quantity: number; onDecrease: () => void; onIncrease: () => void; onOpen: () => void }) {
+  return <Localized>{(
     <article className="product-card">
       <div className="product-card-inner">
-        <img src={product.image} alt={product.name} loading="lazy" />
+        <button type="button" className="product-image-button" onClick={onOpen} aria-label={`Состав и описание: ${product.name}`}><img src={product.image} alt={product.name} loading="lazy" /></button>
         {(product.naktaCoins || 0) > 0 && <span className="product-reward-badge"><b>+{product.naktaCoins}</b> NAKTA Coin</span>}
-        <h2><span>{product.name}</span></h2>
+        <h2><button type="button" className="product-name-button" onClick={onOpen}><span>{product.name}</span></button></h2>
         <div className="product-card-buy">
           <div className="price-pill">{product.price * Math.max(quantity, 1)} С</div>
           <QuantityControl quantity={quantity} onDecrease={onDecrease} onIncrease={onIncrease} />
         </div>
       </div>
     </article>
-  );
+  )}</Localized>;
 }
 
 function HeroCarousel({ promotions, onOpen }: { promotions: Promotion[]; onOpen: () => void }) {
   const slides = useMemo(() => {
     const activePromotions = promotions.filter((promotion) => promotion.active).sort((left, right) => left.sortOrder - right.sortOrder);
-    return (activePromotions.length ? activePromotions : seedPromotions).map((promotion) => ({ image: promotion.image, alt: promotion.title }));
+    return (activePromotions.length ? activePromotions : seedPromotions).map((promotion) => ({ image: promotion.image, alt: promotion.title, title: promotion.title, description: promotion.description }));
   }, [promotions]);
   const [active, setActive] = useState(1);
   const [paused, setPaused] = useState(false);
@@ -234,7 +242,7 @@ function HeroCarousel({ promotions, onOpen }: { promotions: Promotion[]; onOpen:
     }
     onOpen();
   };
-  return (
+  return <Localized>{(
     <div
       className={`hero-promo ${transition ? `is-transitioning slide-${transition.direction}` : ""}`}
       role="group"
@@ -254,26 +262,26 @@ function HeroCarousel({ promotions, onOpen }: { promotions: Promotion[]; onOpen:
       {transition ? (
         <>
           <button className="hero-slide hero-slide-outgoing" key={`hero-from-${transition.token}`} onClick={openPromotion} aria-hidden="true" tabIndex={-1}>
-            <img src={slides[transition.from].image} alt="" />
+            <PromotionArtwork {...slides[transition.from]} />
           </button>
           <button className="hero-slide hero-slide-incoming" key={`hero-to-${transition.token}`} onClick={openPromotion} aria-label={slides[transition.to].alt}>
-            <img src={slides[transition.to].image} alt={slides[transition.to].alt} />
+            <PromotionArtwork {...slides[transition.to]} />
           </button>
         </>
       ) : (
         <button className="hero-slide" onClick={openPromotion} aria-label={slides[current].alt}>
-          <img src={slides[current].image} alt={slides[current].alt} />
+          <PromotionArtwork {...slides[current]} />
         </button>
       )}
       <button className="hero-arrow hero-arrow-left" onClick={() => move(-1)} aria-label="Предыдущая акция"><MaterialIcon>chevron_left</MaterialIcon></button>
       <button className="hero-arrow hero-arrow-right" onClick={() => move(1)} aria-label="Следующая акция"><MaterialIcon>chevron_right</MaterialIcon></button>
     </div>
-  );
+  )}</Localized>;
 }
 
 function PromotionFlipCard({ promotion }: { promotion: Promotion }) {
   const [flipped, setFlipped] = useState(false);
-  return (
+  return <Localized>{(
     <article className="promotion-card">
       <button
         className={`promotion-flip-card ${flipped ? "flipped" : ""}`}
@@ -283,7 +291,7 @@ function PromotionFlipCard({ promotion }: { promotion: Promotion }) {
         onClick={() => setFlipped((value) => !value)}
       >
         <span className="promotion-face promotion-front" aria-hidden={flipped || undefined}>
-          <img src={promotion.image} alt={promotion.title} />
+          <PromotionArtwork image={promotion.image} title={promotion.title} description={promotion.description} />
         </span>
         <span className="promotion-face promotion-back" aria-hidden={!flipped || undefined}>
           <span className="promotion-copy">
@@ -293,10 +301,10 @@ function PromotionFlipCard({ promotion }: { promotion: Promotion }) {
         </span>
       </button>
     </article>
-  );
+  )}</Localized>;
 }
 
-function CatalogPanel({ categories, categoryId, className = "", products, promotions, cart, onChangeQuantity, onOpenPromo, hidden = false }: {
+function CatalogPanel({ categories, categoryId, className = "", products, promotions, cart, onChangeQuantity, onOpenPromo, onOpenProduct, hidden = false }: {
   categories: Category[];
   categoryId: number;
   className?: string;
@@ -305,21 +313,22 @@ function CatalogPanel({ categories, categoryId, className = "", products, promot
   cart: Record<number, number>;
   onChangeQuantity: (id: number, delta: number) => void;
   onOpenPromo: () => void;
+  onOpenProduct: (id: number) => void;
   hidden?: boolean;
 }) {
   const visibleProducts = products.filter((product) => product.categoryId === categoryId && product.active);
   const categoryName = categories.find((category) => category.id === categoryId)?.name || "Меню";
-  return (
+  return <Localized>{(
     <section className={`product-grid category-panel category-${categoryId} ${className}`} id={`category-panel-${categoryId}`} role="tabpanel" aria-hidden={hidden || undefined}>
       <h1 className="visually-hidden">{categoryName} — меню ДААНА СУШИ</h1>
       <div className="product-slot hero-slot"><HeroCarousel promotions={promotions} onOpen={onOpenPromo} /></div>
       {visibleProducts.map((product) => (
         <div className="product-slot card-slot" key={product.id}>
-          <ProductCard product={product} quantity={cart[product.id] || 0} onDecrease={() => onChangeQuantity(product.id, -1)} onIncrease={() => onChangeQuantity(product.id, 1)} />
+          <ProductCard product={product} quantity={cart[product.id] || 0} onDecrease={() => onChangeQuantity(product.id, -1)} onIncrease={() => onChangeQuantity(product.id, 1)} onOpen={() => onOpenProduct(product.id)} />
         </div>
       ))}
     </section>
-  );
+  )}</Localized>;
 }
 
 function CartPanel({ lines, onCheckout, onDecrease, onEnter, onIncrease, onLeave, onRemove }: {
@@ -332,7 +341,7 @@ function CartPanel({ lines, onCheckout, onDecrease, onEnter, onIncrease, onLeave
   onRemove: (id: number) => void;
 }) {
   const total = lines.reduce((sum, line) => sum + line.price * line.quantity, 0);
-  return (
+  return <Localized>{(
     <aside className="cart-panel" aria-label="Корзина" onMouseEnter={onEnter} onMouseLeave={onLeave}>
       {lines.length === 0 ? (
         <div className="empty-cart"><MaterialIcon>shopping_cart</MaterialIcon><span>Корзина пока пуста</span></div>
@@ -353,7 +362,7 @@ function CartPanel({ lines, onCheckout, onDecrease, onEnter, onIncrease, onLeave
         </>
       )}
     </aside>
-  );
+  )}</Localized>;
 }
 
 function LocationPicker({ compact = false, items, selected, onChange }: { compact?: boolean; items: PickupLocation[]; selected: PickupLocation | null; onChange: (location: PickupLocation) => void }) {
@@ -361,7 +370,7 @@ function LocationPicker({ compact = false, items, selected, onChange }: { compac
   const activeItems = items.filter((item) => item.active);
   const label = selected ? `Выбрано: ${selected.address}` : "Выберите точку, где вы заберете заказ";
   const listboxId = compact ? "pickup-location-options" : "dialog-location-options";
-  return (
+  return <Localized>{(
     <div className={`location-picker ${compact ? "compact" : ""}`}>
       <button className="location-select-display" type="button" role="combobox" aria-controls={listboxId} aria-expanded={open} aria-haspopup="listbox" aria-label={label} onClick={() => setOpen((value) => !value)}>
         <span>{selected ? <><strong>Выбрано:</strong>&nbsp; {selected.address}</> : label}</span>
@@ -375,17 +384,17 @@ function LocationPicker({ compact = false, items, selected, onChange }: { compac
         </div>
       )}
     </div>
-  );
+  )}</Localized>;
 }
 
 function LocationOption({ item, selected, onSelect }: { item: PickupLocation; selected: boolean; onSelect: () => void }) {
   const status = pickupStatus(item);
-  return (
+  return <Localized>{(
     <button type="button" role="option" aria-selected={selected} className={selected ? "selected" : ""} onClick={onSelect}>
       <span className="location-option-copy"><strong>{item.name}</strong><small>{item.address}</small></span>
       <span className="location-option-status">{status.label}<br />{status.time}</span>
     </button>
-  );
+  )}</Localized>;
 }
 
 function LocationModal({ closing, current, items, onSelect }: { closing: boolean; current: PickupLocation | null; items: PickupLocation[]; onSelect: (location: PickupLocation) => void }) {
@@ -397,7 +406,7 @@ function LocationModal({ closing, current, items, onSelect }: { closing: boolean
     return [...items].sort((left, right) => distanceInKilometers(userPosition, left) - distanceInKilometers(userPosition, right));
   }, [items, userPosition]);
   const selected = orderedItems.find((location) => location.id === selectedId) || null;
-  return (
+  return <Localized>{(
     <div className={`modal-backdrop ${closing ? "is-closing" : ""}`} role="presentation">
       <section className="modal-card location-modal" role="dialog" aria-modal="true" aria-labelledby="location-title">
         <h2 id="location-title" className="visually-hidden">Выберите точку, где вы заберете заказ</h2>
@@ -421,7 +430,7 @@ function LocationModal({ closing, current, items, onSelect }: { closing: boolean
         </div>
       </section>
     </div>
-  );
+  )}</Localized>;
 }
 
 function OrderView({ lines, products, location, locations, onChangeQuantity, onClear, onLocationChange, onNeedLocation, onSuccess }: {
@@ -504,10 +513,10 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
       setError(submitError instanceof Error ? submitError.message : "Не удалось создать заказ");
     } finally { setPending(false); }
   };
-  return (
+  return <Localized>{(
     <section className="order-page">
       <div className="order-heading-row">
-        <div className="order-heading-visual"><img src="/assets/order/HeadingSection.webp" alt="Ваш заказ" /><button type="button" onClick={onClear}>Очистить корзину</button></div>
+        <div className="order-heading-visual"><h1 className="translated-order-title">Ваш заказ</h1><img src="/assets/order/HeadingSection.webp" alt="Ваш заказ" /><button type="button" onClick={onClear}>Очистить корзину</button></div>
         <div className="order-summary">
           <div className="order-summary-total"><strong>Корзина:</strong><b>{total} С</b></div>
           <div className="order-promo"><input value={promo} onChange={(event) => setPromo(event.target.value)} placeholder="Промокод" aria-label="Промокод" /><button type="button" onClick={() => setPromoMessage(promo.trim() ? "Промокод не найден" : "Введите промокод")}>применить</button></div>
@@ -554,22 +563,23 @@ function OrderView({ lines, products, location, locations, onChangeQuantity, onC
         <p className="order-consent">Нажимая кнопку, я принимаю <a href="/legal">правовую информацию</a>, <a href="/privacy">политику конфиденциальности</a> и <a href="/terms">условия использования</a>.</p>
       </form>
     </section>
-  );
+  )}</Localized>;
 }
 
 function ContactChannels({ className }: { className: string }) {
-  return (
+  return <Localized>{(
     <span className={className}>
       <a className="contact-channel whatsapp" href={`https://wa.me/${CONTACT_PHONE_DIGITS}`} aria-label={`WhatsApp ${CONTACT_PHONE_DISPLAY}`} title={`WhatsApp: ${CONTACT_PHONE_DISPLAY}`}><MaterialIcon>phone_in_talk</MaterialIcon></a>
       <a className="contact-channel phone" href={`tel:+${CONTACT_PHONE_DIGITS}`} aria-label={`Позвонить ${CONTACT_PHONE_DISPLAY}`} title={`Позвонить: ${CONTACT_PHONE_DISPLAY}`}><MaterialIcon>phone</MaterialIcon></a>
     </span>
-  );
+  )}</Localized>;
 }
 
 function Footer({ settings }: { settings: SiteSettings }) {
-  return (
+  return <Localized>{(
     <footer className="site-footer">
       <div className="footer-container">
+        <div className="footer-language"><LanguageSelector /></div>
         <div className="footer-top">
           <div className="footer-brand"><img src="/assets/icons/logo.svg" alt="ДААНА СУШИ" /><span>ДААНА СУШИ © 2026 {settings.legalName}</span></div>
           <a className="footer-payment" href="/payment-rule">*правила оплаты на сайте*</a>
@@ -583,7 +593,7 @@ function Footer({ settings }: { settings: SiteSettings }) {
         <address className="visually-hidden">Оператор: {LEGAL_DETAILS.operator}. ИНН: {LEGAL_DETAILS.inn}. Регистрационный номер: {LEGAL_DETAILS.registrationNumber}. Адрес: {LEGAL_DETAILS.address}.</address>
       </div>
     </footer>
-  );
+  )}</Localized>;
 }
 
 export default function SushiApp({ initialCategoryId = 1, initialView = "catalog" }: SushiAppProps) {
@@ -598,9 +608,9 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   const [customerLoggedIn, setCustomerLoggedIn] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [orderNumber, setOrderNumber] = useState("");
-  const [headerHidden, setHeaderHidden] = useState(false);
   const [categoryList, setCategoryList] = useState<Category[]>(seedCategories);
   const [productList, setProductList] = useState<Product[]>(seedProducts);
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null);
   const [locationList, setLocationList] = useState<PickupLocation[]>(seedLocations);
   const [promotionList, setPromotionList] = useState<Promotion[]>(seedPromotions);
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({ legalName: LEGAL_DETAILS.operator, telegram: "https://t.me/BIG_REST_TEAM" });
@@ -701,23 +711,6 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   useEffect(() => { localStorage.setItem("sushi-cart", JSON.stringify(cart)); }, [cart]);
 
   useEffect(() => {
-    let previousY = window.scrollY;
-    let direction: "up" | "down" = "down";
-    let directionAnchor = previousY;
-    const onScroll = () => {
-      const currentY = window.scrollY;
-      const nextDirection = currentY >= previousY ? "down" : "up";
-      if (nextDirection !== direction) directionAnchor = previousY;
-      if (currentY <= 250 || nextDirection === "up") setHeaderHidden(false);
-      else if (currentY - directionAnchor > 100) setHeaderHidden(true);
-      direction = nextDirection;
-      previousY = currentY;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
     if (!mobileMenuOpen && !locationOpen) return;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -743,6 +736,7 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
   }, []);
 
   const lines = useMemo(() => productList.filter((product) => cart[product.id] > 0).map((product) => ({ ...product, quantity: cart[product.id] })), [cart, productList]);
+  const selectedProduct = productList.find((product) => product.id === selectedProductId);
   const cartCount = lines.reduce((sum, line) => sum + line.quantity, 0);
   const changeQuantity = (id: number, delta: number) => setCart((current) => ({ ...current, [id]: Math.max(0, (current[id] || 0) + delta) }));
   const navigateCategory = (id: number) => {
@@ -757,11 +751,11 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
     } else {
       setCategoryTransition(null);
     }
-    setCategoryId(id); setView("catalog"); setHeaderHidden(false); setCartOpen(false); window.history.pushState({}, "", `/catalog/${id}`); window.scrollTo({ top: 0, behavior: "smooth" });
+    setCategoryId(id); setView("catalog"); setCartOpen(false); window.history.pushState({}, "", `/catalog/${id}`); window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  const navigatePromo = () => { setView("promo"); setHeaderHidden(false); setCartOpen(false); window.history.pushState({}, "", "/promo"); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const navigateOrder = () => { setView("order"); setHeaderHidden(false); setCartOpen(false); window.history.pushState({}, "", "/order"); window.scrollTo({ top: 0, behavior: "smooth" }); };
-  const navigatePayment = () => { setView("payment"); setHeaderHidden(false); setCartOpen(false); setMobileMenuOpen(false); window.history.pushState({}, "", "/payment-rule"); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const navigatePromo = () => { setView("promo"); setCartOpen(false); window.history.pushState({}, "", "/promo"); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const navigateOrder = () => { setView("order"); setCartOpen(false); window.history.pushState({}, "", "/order"); window.scrollTo({ top: 0, behavior: "smooth" }); };
+  const navigatePayment = () => { setView("payment"); setCartOpen(false); setMobileMenuOpen(false); window.history.pushState({}, "", "/payment-rule"); window.scrollTo({ top: 0, behavior: "smooth" }); };
   const saveLocation = (chosen: PickupLocation) => {
     setLocation(chosen);
     localStorage.setItem("sushi-location", String(chosen.id));
@@ -788,12 +782,14 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
     if (cartCloseTimer.current) window.clearTimeout(cartCloseTimer.current);
     cartCloseTimer.current = window.setTimeout(() => setCartOpen(false), 200);
   };
-  return (
-    <div className={`site-shell ${headerHidden ? "header-hidden" : ""} ${view}-view`}>
+  return <Localized>{(
+    <div className={`site-shell ${view}-view`}>
+      <LocalizedPageTitle title={view === "order" ? "Оформление заказа" : view === "promo" ? "Акции" : view === "payment" ? "Оплата, отмена и возврат" : view === "privacy" ? "Политика конфиденциальности" : categoryList.find((category) => category.id === categoryId)?.name || "Меню"} />
       <Header cartCount={cartCount} cartOpen={cartOpen} customerLoggedIn={customerLoggedIn} location={location} menuOpen={mobileMenuOpen} onCart={navigateOrder} onCartPreviewEnter={keepCartPreview} onCartPreviewLeave={closeCartPreview} onCatalog={() => navigateCategory(1)} onLocation={openLocation} onLogin={() => setLoginOpen(true)} onMenu={() => setMobileMenuOpen((open) => !open)} onPromo={navigatePromo} />
       <CategoryTabs items={categoryList} selectedId={view === "catalog" ? categoryId : 0} onSelect={navigateCategory} />
       <button className={`mobile-menu-scrim ${mobileMenuOpen ? "is-open" : ""}`} onClick={() => setMobileMenuOpen(false)} aria-label="Закрыть меню" aria-hidden={!mobileMenuOpen} tabIndex={mobileMenuOpen ? 0 : -1} />
       <aside className={`mobile-menu-panel ${mobileMenuOpen ? "is-open" : ""}`} aria-label="Главное меню" aria-hidden={!mobileMenuOpen} inert={!mobileMenuOpen ? true : undefined}>
+        <div className="mobile-menu-language"><LanguageSelector /></div>
         <nav>
           <button onClick={() => { setMobileMenuOpen(false); navigateCategory(1); }}><MaterialIcon>restaurant_menu</MaterialIcon><span>Блюда</span></button>
           <button onClick={() => { setMobileMenuOpen(false); navigatePromo(); }}><MaterialIcon>card_giftcard</MaterialIcon><span>Акции</span></button>
@@ -823,19 +819,20 @@ export default function SushiApp({ initialCategoryId = 1, initialView = "catalog
           <div className={`category-transition-shell ${categoryTransition ? `is-transitioning slide-${categoryTransition.direction}` : ""}`}>
             {categoryTransition ? (
               <>
-                <CatalogPanel key={`from-${categoryTransition.token}`} categories={categoryList} categoryId={categoryTransition.from} className="category-panel-outgoing" products={productList} promotions={promotionList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} hidden />
-                <CatalogPanel key={`to-${categoryTransition.token}`} categories={categoryList} categoryId={categoryTransition.to} className="category-panel-incoming" products={productList} promotions={promotionList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} />
+                <CatalogPanel key={`from-${categoryTransition.token}`} categories={categoryList} categoryId={categoryTransition.from} className="category-panel-outgoing" products={productList} promotions={promotionList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} onOpenProduct={(id) => { setCartOpen(false); setSelectedProductId(id); }} hidden />
+                <CatalogPanel key={`to-${categoryTransition.token}`} categories={categoryList} categoryId={categoryTransition.to} className="category-panel-incoming" products={productList} promotions={promotionList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} onOpenProduct={(id) => { setCartOpen(false); setSelectedProductId(id); }} />
               </>
             ) : (
-              <CatalogPanel categories={categoryList} categoryId={categoryId} products={productList} promotions={promotionList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} />
+              <CatalogPanel categories={categoryList} categoryId={categoryId} products={productList} promotions={promotionList} cart={cart} onChangeQuantity={changeQuantity} onOpenPromo={navigatePromo} onOpenProduct={(id) => { setCartOpen(false); setSelectedProductId(id); }} />
             )}
           </div>
         )}
       </main>
       <Footer settings={siteSettings} />
+      {selectedProduct && <ProductDetailsModal product={selectedProduct} quantity={cart[selectedProduct.id] || 0} onIncrease={() => changeQuantity(selectedProduct.id, 1)} onDecrease={() => changeQuantity(selectedProduct.id, -1)} onClose={() => setSelectedProductId(null)} />}
       {locationOpen && <LocationModal closing={locationClosing} current={location} items={locationList} onSelect={saveLocation} />}
       {loginOpen && <CustomerAccountModal apiUrl={API_URL} coinNetwork={coinNetwork} onClose={() => setLoginOpen(false)} onSessionChange={handleCustomerSessionChange} />}
       {orderNumber && <div className="modal-backdrop"><section className="modal-card success-modal"><MaterialIcon>check_circle</MaterialIcon><h2>Заказ принят</h2><p>Номер вашего заказа: <strong>{orderNumber}</strong></p><button className="primary-button" onClick={() => setOrderNumber("")}>Хорошо</button></section></div>}
     </div>
-  );
+  )}</Localized>;
 }

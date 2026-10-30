@@ -13,6 +13,26 @@ CREATE TABLE IF NOT EXISTS admin_sessions (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Admin v2: additive migration, existing accounts and sessions are preserved.
+ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'ADMIN';
+ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS active BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE admin_users ADD COLUMN IF NOT EXISTS permission_overrides JSONB NOT NULL DEFAULT '{}';
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname='admin_users_role_check') THEN
+    ALTER TABLE admin_users ADD CONSTRAINT admin_users_role_check CHECK (role IN ('OWNER','ADMIN','MANAGER'));
+  END IF;
+END $$;
+CREATE TABLE IF NOT EXISTS admin_audit_log (
+  id BIGSERIAL PRIMARY KEY, admin_user_id BIGINT REFERENCES admin_users(id),
+  actor_name TEXT NOT NULL, action TEXT NOT NULL, target TEXT NOT NULL DEFAULT '',
+  details JSONB NOT NULL DEFAULT '{}', created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_admin_audit_created ON admin_audit_log(created_at DESC);
+CREATE TABLE IF NOT EXISTS admin_push_subscriptions (
+  endpoint TEXT PRIMARY KEY, admin_user_id BIGINT NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
+  subscription JSONB NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(), updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 CREATE INDEX IF NOT EXISTS idx_admin_sessions_expiry ON admin_sessions(expires_at);
 
 CREATE TABLE IF NOT EXISTS categories (
@@ -40,6 +60,16 @@ CREATE TABLE IF NOT EXISTS products (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+ALTER TABLE products ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMPTZ;
+ALTER TABLE products ADD COLUMN IF NOT EXISTS ingredients TEXT NOT NULL DEFAULT '';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS serving TEXT NOT NULL DEFAULT '';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS weight_unit TEXT NOT NULL DEFAULT 'г';
+ALTER TABLE products ADD COLUMN IF NOT EXISTS weight NUMERIC(10,2) CHECK (weight BETWEEN 0 AND 1000000);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS calories NUMERIC(10,2) CHECK (calories BETWEEN 0 AND 1000000);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS protein NUMERIC(10,2) CHECK (protein BETWEEN 0 AND 1000000);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS fat NUMERIC(10,2) CHECK (fat BETWEEN 0 AND 1000000);
+ALTER TABLE products ADD COLUMN IF NOT EXISTS carbohydrates NUMERIC(10,2) CHECK (carbohydrates BETWEEN 0 AND 1000000);
 
 CREATE TABLE IF NOT EXISTS pickup_locations (
   id INTEGER PRIMARY KEY,
@@ -357,3 +387,73 @@ BEGIN
     END IF;
   END LOOP;
 END $$;
+
+-- Promote the original account once. Never silently recreate a revoked owner.
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM app_migrations WHERE key='2026-10-25-admin-v2-access') THEN
+    UPDATE admin_users SET role='OWNER' WHERE id=(SELECT id FROM admin_users ORDER BY id LIMIT 1);
+    INSERT INTO app_migrations(key) VALUES ('2026-10-25-admin-v2-access');
+  END IF;
+END $$;
+ALTER TABLE order_items ADD COLUMN IF NOT EXISTS category_name_snapshot TEXT;
+ALTER TABLE order_items ADD COLUMN IF NOT EXISTS category_id_snapshot INTEGER;
+CREATE TABLE IF NOT EXISTS order_status_history (
+  id BIGSERIAL PRIMARY KEY, order_id BIGINT NOT NULL REFERENCES orders(id),
+  admin_user_id BIGINT REFERENCES admin_users(id), actor_name TEXT,
+  from_status TEXT, to_status TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_order_status_history_order ON order_status_history(order_id,created_at);
+CREATE OR REPLACE FUNCTION notify_admin_order_created() RETURNS TRIGGER AS $$
+BEGIN
+  PERFORM pg_notify('admin_order_created', json_build_object('eventId','order:'||NEW.id,'orderId',NEW.id,'orderNumber',NEW.order_number)::text);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname='admin_order_created' AND tgrelid='orders'::regclass) THEN
+    CREATE TRIGGER admin_order_created AFTER INSERT ON orders FOR EACH ROW EXECUTE FUNCTION notify_admin_order_created();
+  END IF;
+END $$;
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname='admin_change' AND tgrelid='admin_users'::regclass) THEN
+    CREATE TRIGGER admin_change AFTER INSERT OR UPDATE OR DELETE ON admin_users FOR EACH STATEMENT EXECUTE FUNCTION notify_admin_change();
+  END IF;
+END $$;
+CREATE TABLE IF NOT EXISTS admin_push_deliveries (order_id BIGINT PRIMARY KEY REFERENCES orders(id), created_at TIMESTAMPTZ NOT NULL DEFAULT NOW());
+ALTER TABLE admin_push_subscriptions ADD COLUMN IF NOT EXISTS session_token_hash TEXT;
+ALTER TABLE admin_push_subscriptions ADD COLUMN IF NOT EXISTS locale TEXT NOT NULL DEFAULT 'ru';
+CREATE INDEX IF NOT EXISTS idx_orders_customer_history ON orders(customer_phone,created_at);
+CREATE INDEX IF NOT EXISTS idx_orders_location_created ON orders(location_id,created_at);
+CREATE INDEX IF NOT EXISTS idx_order_status_history_created ON order_status_history(created_at);
+
+-- Durable, forward-only notification history. Existing orders are not backfilled.
+CREATE TABLE IF NOT EXISTS admin_order_events (
+  event_id TEXT PRIMARY KEY,
+  order_id BIGINT NOT NULL UNIQUE REFERENCES orders(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT clock_timestamp(),
+  transaction_id BIGINT NOT NULL DEFAULT txid_current()
+);
+ALTER TABLE admin_order_events ADD COLUMN IF NOT EXISTS transaction_id BIGINT NOT NULL DEFAULT txid_current();
+CREATE INDEX IF NOT EXISTS idx_admin_order_events_created ON admin_order_events(created_at DESC,order_id DESC);
+CREATE TABLE IF NOT EXISTS admin_order_event_reads (
+  admin_user_id BIGINT NOT NULL REFERENCES admin_users(id) ON DELETE CASCADE,
+  event_id TEXT NOT NULL REFERENCES admin_order_events(event_id) ON DELETE CASCADE,
+  read_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  PRIMARY KEY(admin_user_id,event_id)
+);
+INSERT INTO app_migrations(key) VALUES ('2026-10-28-order-notification-history') ON CONFLICT DO NOTHING;
+DO $$ DECLARE table_name TEXT; BEGIN
+  FOREACH table_name IN ARRAY ARRAY['admin_audit_log','order_status_history'] LOOP
+    IF NOT EXISTS(SELECT 1 FROM pg_trigger WHERE tgname='admin_change' AND tgrelid=table_name::regclass) THEN
+      EXECUTE format('CREATE TRIGGER admin_change AFTER INSERT OR UPDATE OR DELETE ON %I FOR EACH STATEMENT EXECUTE FUNCTION notify_admin_change()',table_name);
+    END IF;
+  END LOOP;
+END $$;
+CREATE OR REPLACE FUNCTION notify_admin_order_created() RETURNS TRIGGER AS $$
+DECLARE occurred_at TIMESTAMPTZ := clock_timestamp();
+BEGIN
+  INSERT INTO admin_order_events(event_id,order_id,created_at) VALUES ('order:'||NEW.id,NEW.id,occurred_at) ON CONFLICT DO NOTHING;
+  PERFORM pg_notify('admin_order_created',json_build_object('eventId','order:'||NEW.id,'orderId',NEW.id,'orderNumber',NEW.order_number,'createdAt',occurred_at)::text);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;

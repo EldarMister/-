@@ -1,3 +1,6 @@
+"use client";
+
+import Localized from "../i18n/Localized";
 import { LEGAL_DETAILS } from "../legalDetails";
 import styles from "./LegalOperatorDetails.module.css";
 
@@ -9,14 +12,14 @@ const rows = [
 ] as const;
 
 export function LegalOperatorDetails({ className = "" }: { className?: string }) {
-  return (
+  return <Localized>{(
     <dl className={`${styles.details} ${className}`.trim()}>
       {rows.map(([label, value]) => (
         <div key={label}>
           <dt>{label}:</dt>
-          <dd>{value}</dd>
+          <dd translate="no">{value}</dd>
         </div>
       ))}
     </dl>
-  );
+  )}</Localized>;
 }

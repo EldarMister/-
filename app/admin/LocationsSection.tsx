@@ -1,9 +1,15 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useAdminLanguage } from "./i18n";
+
+import { type FormEvent, useCallback, useId, useMemo, useRef, useState } from "react";
 import { hasValidCoordinates, type LocationGeocodeResult, type MapPosition } from "../locationUtils";
 import PickupMap from "../PickupMap";
 import type { PickupLocation } from "../types";
+import AdminDialog from "./AdminDialog";
+import { useAdminAccess } from "./AdminAccess";
+import { Badge, Button, PageHeading } from "./ui";
+import { usePagedAdminList, Pagination, type AdminListRequest } from "./usePagedAdminList";
 
 type LocationDraft = Omit<PickupLocation, "id" | "latitude" | "longitude"> & {
   id?: number;
@@ -13,8 +19,9 @@ type LocationDraft = Omit<PickupLocation, "id" | "latitude" | "longitude"> & {
 
 type LocationsSectionProps = {
   locations: PickupLocation[];
-  request: (path: string, options?: RequestInit) => Promise<unknown>;
+  request: AdminListRequest;
   onRefresh: () => Promise<void>;
+  refreshKey?: number;
 };
 
 function newLocation(): LocationDraft {
@@ -47,7 +54,10 @@ function asMapLinkResult(value: unknown): LocationGeocodeResult {
   return { ...position, address: typeof result.address === "string" ? result.address.trim() : "" };
 }
 
-export default function LocationsSection({ locations, request, onRefresh }: LocationsSectionProps) {
+export default function LocationsSection({ locations: refreshSignal, request, onRefresh, refreshKey = 0 }: LocationsSectionProps) {
+  const { t } = useAdminLanguage();
+
+  const { can } = useAdminAccess();
   const [editing, setEditing] = useState<LocationDraft | null>(null);
   const [saving, setSaving] = useState(false);
   const [addressBusy, setAddressBusy] = useState(false);
@@ -60,10 +70,16 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
   const [deleting, setDeleting] = useState<PickupLocation | null>(null);
   const [removing, setRemoving] = useState(false);
   const [deleteError, setDeleteError] = useState("");
-  const deleteDialogRef = useRef<HTMLDialogElement>(null);
-  useEffect(() => {
-    if (deleting) deleteDialogRef.current?.showModal();
-  }, [deleting]);
+  const [listError, setListError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("all");
+  const list = usePagedAdminList<PickupLocation>(request, "locations", new URLSearchParams({ search, ...(status === "all" ? {} : { active: String(status === "active") }) }).toString(), refreshSignal, 24, refreshKey);
+  const locations = list.items;
+  const editorSessionRef = useRef(0);
+  const actionPending = useRef(false);
+  const linkPending = useRef(false);
+  const editorId = useId();
   const editingLatitude = editing?.latitude;
   const editingLongitude = editing?.longitude;
   const editingId = editing?.id;
@@ -78,6 +94,12 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
     () => locations.filter((location) => location.id !== editingId),
     [locations, editingId],
   );
+  const visibleLocations = locations;
+
+  const refreshList = async () => {
+    try { await Promise.all([onRefresh(), list.reload()]); }
+    catch (reason) { setListError(reason instanceof Error ? reason.message : "Изменение сохранено, но список не удалось обновить. Нажмите «Обновить»."); }
+  };
 
   const searchAddress = useCallback(async (address: string) => {
     const result = await request(`geocode?query=${encodeURIComponent(address)}`);
@@ -91,10 +113,13 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
   }, [request]);
 
   const applyMapLink = async () => {
+    if (linkPending.current || actionPending.current) return;
     if (!editing || !mapLink.trim()) {
       setError("Вставьте ссылку из Яндекс Карт.");
       return;
     }
+    const session = editorSessionRef.current;
+    linkPending.current = true;
     setMapLinkBusy(true);
     setMapLinkStatus("");
     setError("");
@@ -104,21 +129,26 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: mapLink.trim() }),
       }));
+      if (session !== editorSessionRef.current) return;
       const address = result.address || editing.address.trim();
       setEditing((current) => current ? { ...current, ...result, address: result.address || current.address } : current);
       setAddressConfirmed(Boolean(address));
       setMapLinkStatus(`Координаты определены: ${result.latitude.toFixed(6)}, ${result.longitude.toFixed(6)}`);
       if (!address) setError("Координаты определены. Теперь укажите адрес точки.");
     } catch (linkError) {
-      setError(linkError instanceof Error ? linkError.message : "Не удалось обработать ссылку Яндекс Карт");
+      if (session === editorSessionRef.current) setError(linkError instanceof Error ? linkError.message : "Не удалось обработать ссылку Яндекс Карт");
     } finally {
-      setMapLinkBusy(false);
+      if (session === editorSessionRef.current) { linkPending.current = false; setMapLinkBusy(false); }
     }
   };
 
   const save = async (event: FormEvent) => {
     event.preventDefault();
-    if (!editing) return;
+    if (!editing || actionPending.current || !can(editing.id ? "locations.edit" : "locations.create")) return;
+    if (![editing.name, editing.address, editing.phone, editing.hours, editing.opensAt].every((value) => value.trim())) {
+      setError("Заполните название, телефон, адрес и часы работы точки.");
+      return;
+    }
     if (locationBusy) {
       setError("Дождитесь завершения поиска адреса.");
       return;
@@ -127,44 +157,57 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
       setError("Подтвердите адрес кнопкой «Найти» или выберите точку на карте.");
       return;
     }
+    if (editing.id && !locations.some((location) => location.id === editing.id)) {
+      setError("Эта точка уже удалена. Закройте окно и обновите список.");
+      return;
+    }
 
+    actionPending.current = true;
     setSaving(true);
     setError("");
+    setListError("");
     try {
       await request(editing.id ? `locations/${editing.id}` : "locations", {
         method: editing.id ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...editing, address: editing.address.trim() }),
+        body: JSON.stringify({ ...editing, name: editing.name.trim(), address: editing.address.trim(), phone: editing.phone.trim(), hours: editing.hours.trim() }),
       });
+      editorSessionRef.current += 1;
       setEditing(null);
       setAddressConfirmed(false);
-      await onRefresh();
+      setNotice(editing.id ? "Изменения точки сохранены." : "Точка добавлена.");
+      await refreshList();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Не удалось сохранить точку");
     } finally {
+      actionPending.current = false;
       setSaving(false);
     }
   };
 
   const remove = async (event: FormEvent) => {
     event.preventDefault();
-    if (!deleting || removing) return;
+    if (!deleting || actionPending.current || !can("locations.delete")) return;
+    actionPending.current = true;
     setRemoving(true);
     setDeleteError("");
-    setError("");
+    setListError("");
     try {
       await request(`locations/${deleting.id}`, { method: "DELETE" });
-      if (editing?.id === deleting.id) setEditing(null);
+      if (editing?.id === deleting.id) { editorSessionRef.current += 1; setEditing(null); }
       setDeleting(null);
-      await onRefresh();
+      setNotice(`Точка «${deleting.name}» архивирована.`);
+      await refreshList();
     } catch (removeError) {
       setDeleteError(removeError instanceof Error ? removeError.message : "Не удалось удалить точку");
     } finally {
+      actionPending.current = false;
       setRemoving(false);
     }
   };
 
   const updatePosition = useCallback((next: MapPosition) => {
+    if (actionPending.current) return;
     setEditing((current) => current ? { ...current, ...next } : current);
     setAddressConfirmed(false);
     setError("");
@@ -172,12 +215,14 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
   }, []);
 
   const updateAddress = useCallback((address: string) => {
+    if (actionPending.current) return;
     setEditing((current) => current ? { ...current, address } : current);
     setAddressConfirmed(false);
     setError("");
   }, []);
 
   const applyResolvedLocation = useCallback((result: LocationGeocodeResult) => {
+    if (actionPending.current) return;
     setEditing((current) => current ? {
       ...current,
       address: result.address,
@@ -189,6 +234,9 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
   }, []);
 
   const startNewLocation = () => {
+    if (actionPending.current || !can("locations.create")) return;
+    editorSessionRef.current += 1;
+    linkPending.current = false;
     setEditorSession((current) => current + 1);
     setEditing(newLocation());
     setAddressConfirmed(false);
@@ -197,20 +245,30 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
     setMapLinkBusy(false);
     setMapLinkStatus("");
     setError("");
+    setListError("");
+    setNotice("");
   };
 
   const startEditingLocation = (location: PickupLocation) => {
+    if (actionPending.current || !can("locations.edit")) return;
+    editorSessionRef.current += 1;
+    linkPending.current = false;
     setEditorSession((current) => current + 1);
     setEditing({ ...location });
-    setAddressConfirmed(true);
+    setAddressConfirmed(Boolean(location.address.trim()) && hasValidCoordinates(location));
     setAddressBusy(false);
     setMapLink("");
     setMapLinkBusy(false);
     setMapLinkStatus("");
     setError("");
+    setListError("");
+    setNotice("");
   };
 
   const cancelEditing = () => {
+    if (actionPending.current) return;
+    editorSessionRef.current += 1;
+    linkPending.current = false;
     setEditing(null);
     setAddressConfirmed(false);
     setAddressBusy(false);
@@ -222,42 +280,46 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
 
   return (
     <section className="admin-section locations-admin-section">
-      <div className="section-title">
-        <div>
-          <h2>Точки самовывоза</h2>
-          <p>Адрес и метка на Яндекс Картах редактируются здесь.</p>
-        </div>
-        <button className="admin-primary" type="button" onClick={startNewLocation}>+ Добавить</button>
+      <PageHeading title={t("Точки самовывоза")} description={t("Адреса, контакты и доступность точек на сайте.")}>{can("locations.create") && <Button variant="default" type="button" disabled={saving || removing} onClick={startNewLocation}>{t("+ Добавить точку")}</Button>}</PageHeading>
+
+      {listError ? <div className="admin-error banner" role="alert">{listError}</div> : null}
+      {notice ? <div className="admin-success banner" role="status">{t(notice)}</div> : null}
+      {t(list.error) && <div className="admin-error banner" role="alert">{t(list.error)}<button type="button" onClick={() => void list.reload()}>{t("Повторить")}</button></div>}
+      <div className="admin-crud-toolbar">
+        <label className="admin-search-field"><span className="sr-only">{t("Поиск точек по названию, адресу или телефону")}</span><input type="search" placeholder={t("Название, адрес или телефон")} value={search} onChange={(event) => { setSearch(event.target.value); list.setPage(0); }} /></label>
+        <label className="admin-filter-field"><span className="sr-only">{t("Видимость точки на сайте")}</span><select value={status} onChange={(event) => { setStatus(event.target.value); list.setPage(0); }}><option value="all">{t("Все точки")}</option><option value="active">{t("На сайте")}</option><option value="hidden">{t("Скрытые")}</option></select></label>
+        <span className="admin-list-count" role="status">{list.loading ? t("Обновляем…") : t("Всего: {v0}", { v0: list.total })}</span>
       </div>
 
-      {error ? <div className="admin-error banner">{error}</div> : null}
-
       {editing ? (
-        <form className="editor-form location-editor-form" onSubmit={save}>
-          <h3>{editing.id ? "Редактирование точки" : "Новая точка"}</h3>
+        <AdminDialog title={editing.id ? t("Изменить «{v0}»", { v0: editing.name }) : t("Новая точка самовывоза")} description={t("Укажите контакты и часы работы. Подтвердите адрес на карте или вставьте ссылку из Яндекс Карт.")} onClose={cancelEditing} busy={saving} className="admin-editor-dialog location-editor-dialog">
+        <form className="editor-form location-editor-form" onSubmit={save} aria-busy={saving}>
+          {error ? <div className="admin-error" role="alert">{t(error)}</div> : null}
+          <fieldset disabled={saving} className="admin-editor-fieldset">
           <div className="location-editor-layout">
             <div className="editor-grid location-fields">
-              <label>Название<input value={editing.name} onChange={(event) => setEditing({ ...editing, name: event.target.value })} required /></label>
-              <label>Телефон<input value={editing.phone} onChange={(event) => setEditing({ ...editing, phone: event.target.value })} required /></label>
-              <label className="wide-field">Адрес<input value={editing.address} onChange={(event) => updateAddress(event.target.value)} placeholder="Город, улица, дом" disabled={locationBusy} required /></label>
-              <div className="wide-field location-link-field">
-                <label htmlFor="yandex-map-link">Ссылка из Яндекс Карт</label>
+              <label>{t("Название")}<input value={editing.name} onChange={(event) => setEditing({ ...editing, name: event.target.value })} required /></label>
+              <label>{t("Телефон")}<input type="tel" autoComplete="tel" value={editing.phone} onChange={(event) => setEditing({ ...editing, phone: event.target.value })} required /></label>
+              <label className="wide-field">{t("Адрес")}<input value={editing.address} onChange={(event) => updateAddress(event.target.value)} placeholder={t("Город, улица, дом")} disabled={locationBusy} required /></label>
+              <details className="wide-field location-link-details">
+                <summary>{t("Указать точку ссылкой из Яндекс Карт")}</summary>
+                <div className="location-link-field">
+                <label htmlFor={`${editorId}-yandex-map-link`}>{t("Ссылка из Яндекс Карт")}</label>
                 <div className="location-link-control">
-                  <input id="yandex-map-link" type="url" value={mapLink} onChange={(event) => { setMapLink(event.target.value); setMapLinkStatus(""); }} placeholder="https://yandex.ru/maps/…" disabled={locationBusy} />
-                  <button type="button" onClick={() => void applyMapLink()} disabled={locationBusy || !mapLink.trim()}>{mapLinkBusy ? "Определяем…" : "Определить точку"}</button>
+                  <input id={`${editorId}-yandex-map-link`} type="url" value={mapLink} onChange={(event) => { setMapLink(event.target.value); setMapLinkStatus(""); }} placeholder="https://yandex.ru/maps/…" disabled={locationBusy} />
+                  <button type="button" onClick={() => void applyMapLink()} disabled={locationBusy || !mapLink.trim()}>{mapLinkBusy ? t("Определяем…") : t("Определить точку")}</button>
                 </div>
-                <small>{mapLinkStatus || "Откройте точку в Яндекс Картах, нажмите «Поделиться» и вставьте ссылку."}</small>
-              </div>
-              <label>Часы работы<input value={editing.hours} onChange={(event) => setEditing({ ...editing, hours: event.target.value })} required /></label>
-              <label>Открытие<input type="time" value={editing.opensAt} onChange={(event) => setEditing({ ...editing, opensAt: event.target.value })} required /></label>
-              <label>Широта<input type="number" value={editing.latitude} placeholder="Определится автоматически" readOnly /></label>
-              <label>Долгота<input type="number" value={editing.longitude} placeholder="Определится автоматически" readOnly /></label>
-              <label className="check-field"><input type="checkbox" checked={editing.active} onChange={(event) => setEditing({ ...editing, active: event.target.checked })} />Показывать на сайте</label>
+                <small>{mapLinkStatus ? t(mapLinkStatus) : t("Откройте точку в Яндекс Картах, нажмите «Поделиться» и вставьте ссылку.")}</small>
+                </div>
+              </details>
+              <label>{t("Часы работы")}<input value={editing.hours} onChange={(event) => setEditing({ ...editing, hours: event.target.value })} required /></label>
+              <label>{t("Открытие")}<input type="time" value={editing.opensAt} onChange={(event) => setEditing({ ...editing, opensAt: event.target.value })} required /></label>
+              <label className="check-field"><input type="checkbox" checked={editing.active} onChange={(event) => setEditing({ ...editing, active: event.target.checked })} />{t("Показывать на сайте")}</label>
               <p className={`location-address-confirmation ${addressConfirmed ? "is-confirmed" : ""}`} role="status">
-                {locationBusy ? "Определяем точку…" : addressConfirmed ? "Адрес и точка на карте подтверждены" : "Вставьте ссылку, найдите адрес или выберите точку на карте"}
+                {locationBusy ? t("Определяем точку…") : addressConfirmed ? t("Адрес и точка на карте подтверждены") : t("Вставьте ссылку, найдите адрес или выберите точку на карте")}
               </p>
             </div>
-            <div className="location-map-editor">
+            <div className="location-map-editor" inert={saving || mapLinkBusy}>
               <PickupMap
                 key={`${editing.id ? `location-${editing.id}` : "new-location"}-${editorSession}`}
                 locations={otherLocations}
@@ -269,50 +331,42 @@ export default function LocationsSection({ locations, request, onRefresh }: Loca
                 onAddressSearch={searchAddress}
                 onAddressResolve={resolveAddress}
                 onAddressBusyChange={setAddressBusy}
-                ariaLabel="Редактор точки на Яндекс Картах"
+                ariaLabel={t("Редактор точки на Яндекс Картах")}
               />
             </div>
           </div>
+          </fieldset>
           <div className="editor-actions">
-            <button type="button" onClick={cancelEditing}>Отмена</button>
-            <button className="admin-primary" disabled={saving || locationBusy || !addressConfirmed}>
-              {saving ? "Сохранение…" : locationBusy ? "Проверка точки…" : "Сохранить"}
+            <button type="button" data-dialog-dismiss disabled={saving} onClick={cancelEditing}>{t("Отмена")}</button>
+            <button type="submit" className="admin-primary" disabled={saving || locationBusy}>
+              {saving ? t("Сохранение…") : locationBusy ? t("Проверка точки…") : t("Сохранить")}
             </button>
           </div>
         </form>
+        </AdminDialog>
       ) : null}
 
-      <div className="admin-table-wrap">
-        <table>
-          <thead><tr><th>Точка</th><th>Адрес</th><th>Координаты</th><th>Статус</th><th /></tr></thead>
-          <tbody>
-            {locations.map((location) => (
-              <tr key={location.id}>
-                <td><strong>{location.name}</strong><br /><small>{location.phone}</small></td>
-                <td>{location.address}</td>
-                <td className="coordinate-cell">{location.latitude.toFixed(6)}<br />{location.longitude.toFixed(6)}</td>
-                <td>{location.active ? "На сайте" : "Скрыта"}</td>
-                <td className="row-actions">
-                  <button type="button" onClick={() => startEditingLocation(location)}>Изменить</button>
-                  <button type="button" className="danger" disabled={removing} onClick={() => { setDeleting(location); setDeleteError(""); }}>Удалить</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      {visibleLocations.length ? <div className="admin-record-list location-admin-list">{visibleLocations.map((location) => <article className="admin-record-card location-card" key={location.id}>
+        <header className="admin-record-summary"><h3>{location.name}</h3><Badge variant={location.active ? "success" : "secondary"}>{location.active ? t("На сайте") : t("Скрыта")}</Badge></header>
+        <dl className="admin-record-fields">
+          <div className="wide-field"><dt>{t("Адрес")}</dt><dd>{location.address}</dd></div>
+          <div><dt>{t("Телефон")}</dt><dd><a href={`tel:${location.phone}`}>{location.phone}</a></dd></div>
+          <div><dt>{t("Часы работы")}</dt><dd>{location.hours}</dd></div>
+        </dl>
+        {hasValidCoordinates(location) ? <a className="location-card-map-link" href={`https://yandex.ru/maps/?pt=${location.longitude},${location.latitude}&z=16&l=map`} target="_blank" rel="noreferrer">{t("Открыть на карте ↗")}</a> : <p className="admin-error">{t("Проверьте координаты точки в редакторе.")}</p>}
+        <footer className="admin-record-actions">{can("locations.edit") && <Button type="button" disabled={saving || removing} onClick={() => startEditingLocation(location)} aria-label={t("Редактировать точку «{v0}»", { v0: location.name })}>{t("Редактировать")}</Button>}{can("locations.delete") && <Button variant="ghost" type="button" className="danger" disabled={saving || removing} onClick={() => { setDeleting(location); setDeleteError(""); setNotice(""); }} aria-label={t("Архивировать точку «{v0}»", { v0: location.name })}>{t("Архивировать")}</Button>}</footer>
+      </article>)}</div> : !list.loading && !t(list.error) ? <div className="admin-empty-state"><h3>{search || status !== "all" ? t("Точки не найдены") : t("Точек пока нет")}</h3><p>{search || status !== "all" ? t("Измените поиск или фильтр видимости.") : t("Добавьте точку, чтобы покупатели могли выбрать место самовывоза.")}</p></div> : null}
+      <Pagination page={list.page} total={list.total} limit={list.limit} loading={list.loading} onPage={list.setPage} />
       {deleting ? (
-        <dialog ref={deleteDialogRef} className="admin-action-dialog location-delete-dialog" aria-labelledby="location-delete-title" aria-describedby="location-delete-description" onCancel={(event) => { if (removing) event.preventDefault(); else setDeleting(null); }}>
-          <header><h2 id="location-delete-title">Удалить точку «{deleting.name}»?</h2></header>
-          <form onSubmit={remove}>
-            <p id="location-delete-description">Точка исчезнет с сайта и из списка управления. Ранее оформленные заказы сохранятся.</p>
-            {deleteError ? <div className="admin-error" role="alert">{deleteError}</div> : null}
-            <div>
-              <button type="button" disabled={removing} onClick={() => setDeleting(null)}>Отмена</button>
-              <button type="submit" className="danger-solid" disabled={removing}>{removing ? "Удаление…" : "Удалить"}</button>
+        <AdminDialog title={t("Архивировать точку «{v0}»?", { v0: deleting.name })} description={t("Точка исчезнет с сайта и из списка управления. Ранее оформленные заказы сохранятся.")} onClose={() => { if (!removing) setDeleting(null); }} busy={removing} className="admin-confirm-dialog">
+          <form onSubmit={remove} aria-busy={removing}>
+            {deleteError ? <div className="admin-error" role="alert">{t(deleteError)}</div> : null}
+            <div className="editor-actions">
+              <button type="button" disabled={removing} onClick={() => setDeleting(null)}>{t("Отмена")}</button>
+              <button type="submit" className="danger-solid" disabled={removing}>{removing ? t("Архивируем…") : t("Архивировать")}</button>
             </div>
           </form>
-        </dialog>
+        </AdminDialog>
       ) : null}
     </section>
   );

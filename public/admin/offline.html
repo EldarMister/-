@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#171717" />
+    <title>ДААНА · Нет соединения</title>
+    <style>
+      body {
+        margin: 0;
+        background: #fafafa;
+        color: #171717;
+        font: 16px/1.6 system-ui;
+        display: grid;
+        place-items: center;
+        min-height: 100dvh;
+      }
+      main {
+        max-width: 430px;
+        padding: 32px;
+      }
+      p {
+        color: #737373;
+      }
+      a {
+        display: inline-block;
+        padding: 10px 20px;
+        background: #171717;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+      }
+      small {
+        font-size: 12px;
+      }
+      select {
+        margin-top: 24px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        background: #fff;
+        color: #171717;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <small id="brand">ДААНА СУШИ · ПАНЕЛЬ УПРАВЛЕНИЯ</small>
+      <h1 id="title">Нет соединения</h1>
+      <p id="explanation">
+        Для просмотра заказов и сохранения изменений подключитесь к интернету.
+      </p>
+      <p id="queue">
+        Операции не отправляются автоматически после восстановления связи.
+      </p>
+      <a id="retry" href="/admin/app">Повторить подключение</a><br /><select
+        id="language"
+        aria-label="Язык"
+      >
+        <option value="ru">Русский</option>
+        <option value="ky">Кыргызча</option>
+        <option value="en">English</option>
+        <option value="kk">Қазақша</option>
+        <option value="uz">O‘zbekcha</option>
+      </select>
+    </main>
+    <script>
+      // This shell reads only the public language preference. It never stores orders,
+      // account details, sessions or pending business operations.
+      const copy = {
+        ru: [
+          "ДААНА СУШИ · ПАНЕЛЬ УПРАВЛЕНИЯ",
+          "Нет соединения",
+          "Для просмотра заказов и сохранения изменений подключитесь к интернету.",
+          "Операции не отправляются автоматически после восстановления связи.",
+          "Повторить подключение",
+          "Язык",
+        ],
+        ky: [
+          "ДААНА СУШИ · БАШКАРУУ ПАНЕЛИ",
+          "Байланыш жок",
+          "Буйрутмаларды көрүү жана өзгөртүүлөрдү сактоо үчүн интернетке туташыңыз.",
+          "Байланыш калыбына келгенде аракеттер автоматтык түрдө жөнөтүлбөйт.",
+          "Кайра туташуу",
+          "Тил",
+        ],
+        en: [
+          "DAANA SUSHI · DASHBOARD",
+          "No connection",
+          "Connect to the internet to view orders and save changes.",
+          "Actions are not sent automatically when the connection is restored.",
+          "Try again",
+          "Language",
+        ],
+        kk: [
+          "ДААНА СУШИ · БАСҚАРУ ПАНЕЛІ",
+          "Байланыс жоқ",
+          "Тапсырыстарды көру және өзгерістерді сақтау үшін интернетке қосылыңыз.",
+          "Байланыс қалпына келгенде әрекеттер автоматты түрде жіберілмейді.",
+          "Қайта қосылу",
+          "Тіл",
+        ],
+        uz: [
+          "DAANA SUSHI · BOSHQARUV PANELI",
+          "Aloqa yo‘q",
+          "Buyurtmalarni ko‘rish va o‘zgarishlarni saqlash uchun internetga ulaning.",
+          "Aloqa tiklanganda amallar avtomatik yuborilmaydi.",
+          "Qayta ulanish",
+          "Til",
+        ],
+      };
+      const select = document.getElementById("language");
+      function render(language) {
+        const key = Object.hasOwn(copy, language) ? language : "ru";
+        const text = copy[key];
+        document.documentElement.lang = key;
+        document.title = "ДААНА · " + text[1];
+        ["brand", "title", "explanation", "queue", "retry"].forEach(
+          (id, index) => {
+            document.getElementById(id).textContent = text[index];
+          },
+        );
+        select.value = key;
+        select.setAttribute("aria-label", text[5]);
+      }
+      let language = "ru";
+      try {
+        language = localStorage.getItem("daana-language") || "ru";
+      } catch {}
+      render(language);
+      select.addEventListener("change", () => {
+        render(select.value);
+        try {
+          localStorage.setItem("daana-language", select.value);
+        } catch {}
+      });
+    </script>
+  </body>
+</html>

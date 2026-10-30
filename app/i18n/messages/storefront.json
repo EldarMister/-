@@ -1,0 +1,1466 @@
+{
+  "Язык сайта": [
+    "Сайттын тили",
+    "Website language",
+    "Сайт тілі",
+    "Sayt tili"
+  ],
+  "На главную": [
+    "Башкы бетке",
+    "Home",
+    "Басты бетке",
+    "Bosh sahifa"
+  ],
+  "ВЫБЕРИТЕ ТОЧКУ": [
+    "ПУНКТТУ ТАНДАҢЫЗ",
+    "CHOOSE A STORE",
+    "ПУНКТТІ ТАҢДАҢЫЗ",
+    "PUNKTNI TANLANG"
+  ],
+  "Акции": [
+    "Акциялар",
+    "Offers",
+    "Акциялар",
+    "Aksiyalar"
+  ],
+  "Кабинет": [
+    "Кабинет",
+    "Account",
+    "Кабинет",
+    "Kabinet"
+  ],
+  "Войти": [
+    "Кирүү",
+    "Sign in",
+    "Кіру",
+    "Kirish"
+  ],
+  "Корзина": [
+    "Себет",
+    "Cart",
+    "Себет",
+    "Savat"
+  ],
+  "Закрыть меню": [
+    "Менюну жабуу",
+    "Close menu",
+    "Мәзірді жабу",
+    "Menyuni yopish"
+  ],
+  "Меню": [
+    "Меню",
+    "Menu",
+    "Мәзір",
+    "Menyu"
+  ],
+  "Категории меню": [
+    "Менюнун бөлүмдөрү",
+    "Menu categories",
+    "Мәзір санаттары",
+    "Menyu bo‘limlari"
+  ],
+  "Предыдущие категории": [
+    "Мурунку бөлүмдөр",
+    "Previous categories",
+    "Алдыңғы санаттар",
+    "Oldingi bo‘limlar"
+  ],
+  "Следующие категории": [
+    "Кийинки бөлүмдөр",
+    "Next categories",
+    "Келесі санаттар",
+    "Keyingi bo‘limlar"
+  ],
+  "Добавить в корзину": [
+    "Себетке кошуу",
+    "Add to cart",
+    "Себетке қосу",
+    "Savatga qo‘shish"
+  ],
+  "Уменьшить количество": [
+    "Санын азайтуу",
+    "Decrease quantity",
+    "Санын азайту",
+    "Sonini kamaytirish"
+  ],
+  "Увеличить количество": [
+    "Санын көбөйтүү",
+    "Increase quantity",
+    "Санын көбейту",
+    "Sonini oshirish"
+  ],
+  "С": [
+    "сом",
+    "KGS",
+    "сом",
+    "KGS"
+  ],
+  "Скидка последний час": [
+    "Акыркы сааттагы арзандатуу",
+    "Last-hour discount",
+    "Соңғы сағаттағы жеңілдік",
+    "Oxirgi soatdagi chegirma"
+  ],
+  "Предыдущая акция": [
+    "Мурунку акция",
+    "Previous offer",
+    "Алдыңғы акция",
+    "Oldingi aksiya"
+  ],
+  "Следующая акция": [
+    "Кийинки акция",
+    "Next offer",
+    "Келесі акция",
+    "Keyingi aksiya"
+  ],
+  "Показать изображение акции": [
+    "Акциянын сүрөтүн көрсөтүү",
+    "Show offer image",
+    "Акция суретін көрсету",
+    "Aksiya rasmini ko‘rsatish"
+  ],
+  "Показать условия акции": [
+    "Акциянын шарттарын көрсөтүү",
+    "Show offer terms",
+    "Акция шарттарын көрсету",
+    "Aksiya shartlarini ko‘rsatish"
+  ],
+  "— меню ДААНА СУШИ": [
+    "— ДААНА СУШИ менюсу",
+    "— DAANA SUSHI menu",
+    "— ДААНА СУШИ мәзірі",
+    "— DAANA SUSHI menyusi"
+  ],
+  "Корзина пока пуста": [
+    "Себет азырынча бош",
+    "Your cart is empty",
+    "Себет әзірге бос",
+    "Savat hozircha bo‘sh"
+  ],
+  "Удалить {0}": [
+    "{0} — алып салуу",
+    "Remove {0}",
+    "{0} — алып тастау",
+    "{0} — olib tashlash"
+  ],
+  "Сумма заказа:": [
+    "Буйрутманын суммасы:",
+    "Order total:",
+    "Тапсырыс сомасы:",
+    "Buyurtma summasi:"
+  ],
+  "Выбрано: {0}": [
+    "Тандалды: {0}",
+    "Selected: {0}",
+    "Таңдалды: {0}",
+    "Tanlandi: {0}"
+  ],
+  "Выберите точку, где вы заберете заказ": [
+    "Буйрутманы алып кетүүчү пунктту тандаңыз",
+    "Choose your pickup store",
+    "Тапсырысты алып кететін пунктті таңдаңыз",
+    "Buyurtmani olib ketish punktini tanlang"
+  ],
+  "Выбрано:": [
+    "Тандалды:",
+    "Selected:",
+    "Таңдалды:",
+    "Tanlandi:"
+  ],
+  "Точки самовывоза": [
+    "Алып кетүү пункттары",
+    "Pickup stores",
+    "Алып кету пункттері",
+    "Olib ketish punktlari"
+  ],
+  "Ок": [
+    "Макул",
+    "OK",
+    "Жарайды",
+    "OK"
+  ],
+  "Добавьте товары в корзину": [
+    "Себетке товар кошуңуз",
+    "Add items to your cart",
+    "Себетке тауар қосыңыз",
+    "Savatga mahsulot qo‘shing"
+  ],
+  "Введите 9 цифр номера после +996": [
+    "+996дан кийинки 9 санды киргизиңиз",
+    "Enter the 9 digits after +996",
+    "+996-дан кейінгі 9 цифрды енгізіңіз",
+    "+996 dan keyingi 9 ta raqamni kiriting"
+  ],
+  "Приготовить к: {0}": [
+    "Даяр болчу убакыт: {0}",
+    "Ready by: {0}",
+    "Дайын болатын уақыт: {0}",
+    "Tayyor bo‘lish vaqti: {0}"
+  ],
+  "Промокод: {0}": [
+    "Промокод: {0}",
+    "Promo code: {0}",
+    "Промокод: {0}",
+    "Promokod: {0}"
+  ],
+  "Не удалось создать заказ": [
+    "Буйрутма түзүлгөн жок",
+    "Unable to place the order",
+    "Тапсырыс жасау мүмкін болмады",
+    "Buyurtma berilmadi"
+  ],
+  "Ваш заказ": [
+    "Буйрутмаңыз",
+    "Your order",
+    "Тапсырысыңыз",
+    "Buyurtmangiz"
+  ],
+  "Очистить корзину": [
+    "Себетти тазалоо",
+    "Clear cart",
+    "Себетті тазалау",
+    "Savatni tozalash"
+  ],
+  "Корзина:": [
+    "Себет:",
+    "Cart:",
+    "Себет:",
+    "Savat:"
+  ],
+  "Промокод": [
+    "Промокод",
+    "Promo code",
+    "Промокод",
+    "Promokod"
+  ],
+  "Промокод не найден": [
+    "Промокод табылган жок",
+    "Promo code not found",
+    "Промокод табылмады",
+    "Promokod topilmadi"
+  ],
+  "Введите промокод": [
+    "Промокодду киргизиңиз",
+    "Enter a promo code",
+    "Промокодты енгізіңіз",
+    "Promokodni kiriting"
+  ],
+  "применить": [
+    "колдонуу",
+    "apply",
+    "қолдану",
+    "qo‘llash"
+  ],
+  "Не забудьте к вашему заказу": [
+    "Буйрутмаңызга кошууну унутпаңыз",
+    "Complete your order",
+    "Тапсырысыңызға қосуды ұмытпаңыз",
+    "Buyurtmangizga qo‘shishni unutmang"
+  ],
+  "Дополнительно к заказу": [
+    "Буйрутмага кошумча",
+    "Order extras",
+    "Тапсырысқа қосымша",
+    "Buyurtmaga qo‘shimcha"
+  ],
+  "Оформление заказа": [
+    "Буйрутманы берүү",
+    "Checkout",
+    "Тапсырысты рәсімдеу",
+    "Buyurtmani rasmiylashtirish"
+  ],
+  "Имя": [
+    "Аты",
+    "Name",
+    "Аты",
+    "Ism"
+  ],
+  "Телефон после +996": [
+    "+996дан кийинки номер",
+    "Phone number after +996",
+    "+996-дан кейінгі нөмір",
+    "+996 dan keyingi raqam"
+  ],
+  "Комментарий к заказу": [
+    "Буйрутмага комментарий",
+    "Order notes",
+    "Тапсырысқа түсініктеме",
+    "Buyurtmaga izoh"
+  ],
+  "Приготовить к:": [
+    "Даяр болчу убакыт:",
+    "Ready by:",
+    "Дайын болатын уақыт:",
+    "Tayyor bo‘lish vaqti:"
+  ],
+  "Выбрать": [
+    "Тандоо",
+    "Select",
+    "Таңдау",
+    "Tanlash"
+  ],
+  "Закрыть выбор времени": [
+    "Убакыт тандоону жабуу",
+    "Close time picker",
+    "Уақыт таңдауды жабу",
+    "Vaqt tanlashni yopish"
+  ],
+  "Время самовывоза": [
+    "Алып кетүү убактысы",
+    "Pickup time",
+    "Алып кету уақыты",
+    "Olib ketish vaqti"
+  ],
+  "СОЗДАЕМ ЗАКАЗ…": [
+    "БУЙРУТМА ТҮЗҮЛҮҮДӨ…",
+    "PLACING ORDER…",
+    "ТАПСЫРЫС ЖАСАЛУДА…",
+    "BUYURTMA YUBORILMOQDA…"
+  ],
+  "ОФОРМИТЬ ЗАКАЗ · {0} С": [
+    "БУЙРУТМА БЕРҮҮ · {0} сом",
+    "PLACE ORDER · {0} KGS",
+    "ТАПСЫРЫС БЕРУ · {0} сом",
+    "BUYURTMA BERISH · {0} KGS"
+  ],
+  "Нажимая кнопку, я принимаю": [
+    "Баскычты басуу менен мен кабыл алам:",
+    "By clicking, I accept the",
+    "Батырманы басу арқылы қабылдаймын:",
+    "Tugmani bosish orqali quyidagilarni qabul qilaman:"
+  ],
+  "правовую информацию": [
+    "укуктук маалыматты",
+    "legal information",
+    "құқықтық ақпаратты",
+    "huquqiy ma’lumotlarni"
+  ],
+  "политику конфиденциальности": [
+    "купуялык саясатын",
+    "privacy policy",
+    "құпиялық саясатын",
+    "maxfiylik siyosatini"
+  ],
+  "и": [
+    "жана",
+    "and",
+    "және",
+    "va"
+  ],
+  "условия использования": [
+    "колдонуу шарттарын",
+    "terms of use",
+    "пайдалану шарттарын",
+    "foydalanish shartlarini"
+  ],
+  "Позвонить {0}": [
+    "{0} номерине чалуу",
+    "Call {0}",
+    "{0} нөміріне қоңырау шалу",
+    "{0} raqamiga qo‘ng‘iroq qilish"
+  ],
+  "Позвонить: {0}": [
+    "Чалуу: {0}",
+    "Call: {0}",
+    "Қоңырау шалу: {0}",
+    "Qo‘ng‘iroq: {0}"
+  ],
+  "*правила оплаты на сайте*": [
+    "*сайттагы төлөм эрежелери*",
+    "*payment rules*",
+    "*сайттағы төлем ережелері*",
+    "*saytdagi to‘lov qoidalari*"
+  ],
+  "Связаться с нами": [
+    "Биз менен байланышуу",
+    "Contact us",
+    "Бізбен байланысу",
+    "Biz bilan bog‘lanish"
+  ],
+  "Политика обработки персональных данных": [
+    "Жеке маалыматтарды иштетүү саясаты",
+    "Personal data policy",
+    "Дербес деректерді өңдеу саясаты",
+    "Shaxsiy ma’lumotlarni qayta ishlash siyosati"
+  ],
+  "Правовая информация": [
+    "Укуктук маалымат",
+    "Legal information",
+    "Құқықтық ақпарат",
+    "Huquqiy ma’lumotlar"
+  ],
+  "Условия использования": [
+    "Колдонуу шарттары",
+    "Terms of use",
+    "Пайдалану шарттары",
+    "Foydalanish shartlari"
+  ],
+  "Удаление аккаунта": [
+    "Аккаунтту өчүрүү",
+    "Delete account",
+    "Аккаунтты жою",
+    "Akkauntni o‘chirish"
+  ],
+  "Оператор:": [
+    "Оператор:",
+    "Operator:",
+    "Оператор:",
+    "Operator:"
+  ],
+  ". ИНН:": [
+    ". ИНН:",
+    ". Tax ID:",
+    ". Салық нөмірі:",
+    ". STIR:"
+  ],
+  ". Регистрационный номер:": [
+    ". Каттоо номери:",
+    ". Registration number:",
+    ". Тіркеу нөмірі:",
+    ". Ro‘yxat raqami:"
+  ],
+  ". Адрес:": [
+    ". Дарек:",
+    ". Address:",
+    ". Мекенжай:",
+    ". Manzil:"
+  ],
+  "Главное меню": [
+    "Башкы меню",
+    "Main menu",
+    "Негізгі мәзір",
+    "Asosiy menyu"
+  ],
+  "Блюда": [
+    "Тамактар",
+    "Food",
+    "Тағамдар",
+    "Taomlar"
+  ],
+  "Оплата": [
+    "Төлөм",
+    "Payment",
+    "Төлем",
+    "To‘lov"
+  ],
+  "ДААНА СУШИ — ЭТО КОГДА": [
+    "ДААНА СУШИ —",
+    "DAANA SUSHI —",
+    "ДААНА СУШИ —",
+    "DAANA SUSHI —"
+  ],
+  "УДОБНО И ВКУСНО": [
+    "ЫҢГАЙЛУУ ЖАНА ДААМДУУ",
+    "EASY AND DELICIOUS",
+    "ЫҢҒАЙЛЫ ӘРІ ДӘМДІ",
+    "QULAY VA MAZALI"
+  ],
+  "Акции и скидки ДААНА СУШИ": [
+    "ДААНА СУШИ акциялары жана арзандатуулары",
+    "DAANA SUSHI offers and discounts",
+    "ДААНА СУШИ акциялары мен жеңілдіктері",
+    "DAANA SUSHI aksiyalari va chegirmalari"
+  ],
+  "Заказ принят": [
+    "Буйрутма кабыл алынды",
+    "Order received",
+    "Тапсырыс қабылданды",
+    "Buyurtma qabul qilindi"
+  ],
+  "Номер вашего заказа:": [
+    "Буйрутмаңыздын номери:",
+    "Your order number:",
+    "Тапсырыс нөміріңіз:",
+    "Buyurtmangiz raqami:"
+  ],
+  "Хорошо": [
+    "Макул",
+    "OK",
+    "Жарайды",
+    "Yaxshi"
+  ],
+  "Редактируемая точка": [
+    "Өзгөртүлүп жаткан пункт",
+    "Store being edited",
+    "Өңделіп жатқан пункт",
+    "Tahrirlanayotgan punkt"
+  ],
+  "Ваше местоположение": [
+    "Сиздин жайгашкан жериңиз",
+    "Your location",
+    "Сіздің орналасқан жеріңіз",
+    "Joylashuvingiz"
+  ],
+  "Карта точек самовывоза": [
+    "Алып кетүү пункттарынын картасы",
+    "Pickup store map",
+    "Алып кету пункттерінің картасы",
+    "Olib ketish punktlari xaritasi"
+  ],
+  "Определяем адрес по точке…": [
+    "Картадагы чекиттин дареги аныкталууда…",
+    "Looking up this location…",
+    "Картадағы нүктенің мекенжайы анықталуда…",
+    "Xaritadagi nuqta manzili aniqlanmoqda…"
+  ],
+  "Адрес и координаты подтверждены.": [
+    "Дарек жана координаттар ырасталды.",
+    "Address and coordinates confirmed.",
+    "Мекенжай мен координаттар расталды.",
+    "Manzil va koordinatalar tasdiqlandi."
+  ],
+  "Не удалось определить адрес. Попробуйте ещё раз.": [
+    "Дарек аныкталган жок. Кайра аракет кылыңыз.",
+    "Unable to find the address. Try again.",
+    "Мекенжай анықталмады. Қайталап көріңіз.",
+    "Manzil aniqlanmadi. Qayta urinib ko‘ring."
+  ],
+  "Введите город, улицу и номер дома.": [
+    "Шаарды, көчөнү жана үйдүн номерин киргизиңиз.",
+    "Enter the city, street and building number.",
+    "Қаланы, көшені және үй нөмірін енгізіңіз.",
+    "Shahar, ko‘cha va uy raqamini kiriting."
+  ],
+  "Поиск адреса пока не настроен.": [
+    "Дарек издөө азырынча жөндөлгөн эмес.",
+    "Address search is not configured yet.",
+    "Мекенжай іздеу әлі бапталмаған.",
+    "Manzil qidiruvi hali sozlanmagan."
+  ],
+  "Ищем адрес в Яндекс Картах…": [
+    "Дарек Яндекс Карталардан изделүүдө…",
+    "Searching Yandex Maps…",
+    "Мекенжай Яндекс Карталардан ізделуде…",
+    "Manzil Yandex Xaritalardan qidirilmoqda…"
+  ],
+  "Адрес найден — метка установлена.": [
+    "Дарек табылып, белги коюлду.",
+    "Address found and pin placed.",
+    "Мекенжай табылып, белгі қойылды.",
+    "Manzil topildi va belgi qo‘yildi."
+  ],
+  "Адрес не найден. Уточните город, улицу и номер дома.": [
+    "Дарек табылган жок. Шаарды, көчөнү жана үйдүн номерин тактаңыз.",
+    "Address not found. Check the city, street and building number.",
+    "Мекенжай табылмады. Қаланы, көшені және үй нөмірін нақтылаңыз.",
+    "Manzil topilmadi. Shahar, ko‘cha va uy raqamini aniqlashtiring."
+  ],
+  "Яндекс Карты не загрузились.": [
+    "Яндекс Карталар жүктөлгөн жок.",
+    "Yandex Maps did not load.",
+    "Яндекс Карталар жүктелмеді.",
+    "Yandex Xaritalar yuklanmadi."
+  ],
+  "Не удалось подготовить Яндекс Карты.": [
+    "Яндекс Карталарды даярдоо мүмкүн болгон жок.",
+    "Unable to initialize Yandex Maps.",
+    "Яндекс Карталарды дайындау мүмкін болмады.",
+    "Yandex Xaritalarni tayyorlab bo‘lmadi."
+  ],
+  "Не удалось запустить определение местоположения.": [
+    "Жайгашкан жерди аныктоо башталган жок.",
+    "Unable to start location detection.",
+    "Орналасқан жерді анықтау басталмады.",
+    "Joylashuvni aniqlash boshlanmadi."
+  ],
+  "Определяем ваше местоположение…": [
+    "Жайгашкан жериңиз аныкталууда…",
+    "Finding your location…",
+    "Орналасқан жеріңіз анықталуда…",
+    "Joylashuvingiz aniqlanmoqda…"
+  ],
+  "Ближайшая точка: {0}": [
+    "Эң жакын пункт: {0}",
+    "Nearest store: {0}",
+    "Ең жақын пункт: {0}",
+    "Eng yaqin punkt: {0}"
+  ],
+  "Местоположение найдено.": [
+    "Жайгашкан жер табылды.",
+    "Location found.",
+    "Орналасқан жер табылды.",
+    "Joylashuv topildi."
+  ],
+  "Не удалось определить местоположение. Проверьте разрешение браузера.": [
+    "Жайгашкан жер аныкталган жок. Браузердин уруксатын текшериңиз.",
+    "Unable to find your location. Check browser permissions.",
+    "Орналасқан жер анықталмады. Браузер рұқсатын тексеріңіз.",
+    "Joylashuv aniqlanmadi. Brauzer ruxsatlarini tekshiring."
+  ],
+  "Добавьте ключ JavaScript API Яндекс Карт, чтобы карта заработала.": [
+    "Картаны иштетүү үчүн Яндекс Карталардын JavaScript API ачкычын кошуңуз.",
+    "Add the Yandex Maps JavaScript API key to enable the map.",
+    "Картаны қосу үшін Яндекс Карталардың JavaScript API кілтін қосыңыз.",
+    "Xaritani yoqish uchun Yandex Xaritalar JavaScript API kalitini qo‘shing."
+  ],
+  "Не удалось загрузить Яндекс Карты. Проверьте API-ключ и ограничение домена.": [
+    "Яндекс Карталар жүктөлгөн жок. API ачкычын жана домен чектөөсүн текшериңиз.",
+    "Unable to load Yandex Maps. Check the API key and domain restrictions.",
+    "Яндекс Карталар жүктелмеді. API кілті мен домен шектеуін тексеріңіз.",
+    "Yandex Xaritalar yuklanmadi. API kaliti va domen cheklovlarini tekshiring."
+  ],
+  "Загрузка Яндекс Карт…": [
+    "Яндекс Карталар жүктөлүүдө…",
+    "Loading Yandex Maps…",
+    "Яндекс Карталар жүктелуде…",
+    "Yandex Xaritalar yuklanmoqda…"
+  ],
+  "Кыргызстан, город или село, улица, дом": [
+    "Кыргызстан, шаар же айыл, көчө, үй",
+    "Kyrgyzstan, city or village, street, building",
+    "Қырғызстан, қала не ауыл, көше, үй",
+    "Qirg‘iziston, shahar yoki qishloq, ko‘cha, uy"
+  ],
+  "Адрес точки для поиска на карте": [
+    "Картадан издөө үчүн пункттун дареги",
+    "Store address to search on the map",
+    "Картадан іздеу үшін пункт мекенжайы",
+    "Xaritadan qidirish uchun punkt manzili"
+  ],
+  "Ищем…": [
+    "Изделүүдө…",
+    "Searching…",
+    "Ізделуде…",
+    "Qidirilmoqda…"
+  ],
+  "Найти": [
+    "Табуу",
+    "Search",
+    "Іздеу",
+    "Qidirish"
+  ],
+  "Масштаб карты": [
+    "Картанын масштабы",
+    "Map zoom",
+    "Карта масштабы",
+    "Xarita masshtabi"
+  ],
+  "Приблизить": [
+    "Жакындатуу",
+    "Zoom in",
+    "Жақындату",
+    "Yaqinlashtirish"
+  ],
+  "Отдалить": [
+    "Алыстатуу",
+    "Zoom out",
+    "Алыстату",
+    "Uzoqlashtirish"
+  ],
+  "Показать моё местоположение": [
+    "Жайгашкан жеримди көрсөтүү",
+    "Show my location",
+    "Орналасқан жерімді көрсету",
+    "Joylashuvimni ko‘rsatish"
+  ],
+  "Открыть в Яндекс Картах": [
+    "Яндекс Карталардан ачуу",
+    "Open in Yandex Maps",
+    "Яндекс Карталардан ашу",
+    "Yandex Xaritalarda ochish"
+  ],
+  "Введите адрес, нажмите на карту или перетащите красную метку": [
+    "Даректи киргизиңиз, картаны басыңыз же кызыл белгини жылдырыңыз",
+    "Enter an address, click the map or drag the red pin",
+    "Мекенжайды енгізіңіз, картаны басыңыз не қызыл белгіні жылжытыңыз",
+    "Manzil kiriting, xaritani bosing yoki qizil belgini suring"
+  ],
+  "Доступен": [
+    "Жеткиликтүү",
+    "Available",
+    "Қолжетімді",
+    "Mavjud"
+  ],
+  "Ожидает обработки": [
+    "Иштетүүнү күтүүдө",
+    "Awaiting processing",
+    "Өңдеуді күтуде",
+    "Ko‘rib chiqilmoqda"
+  ],
+  "Отправлен в сеть": [
+    "Тармакка жөнөтүлдү",
+    "Submitted to network",
+    "Желіге жіберілді",
+    "Tarmoqqa yuborildi"
+  ],
+  "Выведен": [
+    "Чыгарылды",
+    "Withdrawn",
+    "Шығарылды",
+    "Chiqarildi"
+  ],
+  "Ошибка": [
+    "Ката",
+    "Error",
+    "Қате",
+    "Xato"
+  ],
+  "Отменён": [
+    "Жокко чыгарылды",
+    "Cancelled",
+    "Бас тартылды",
+    "Bekor qilindi"
+  ],
+  "Новый": [
+    "Жаңы",
+    "New",
+    "Жаңа",
+    "Yangi"
+  ],
+  "Подтверждён": [
+    "Ырасталды",
+    "Confirmed",
+    "Расталды",
+    "Tasdiqlandi"
+  ],
+  "Готовится": [
+    "Даярдалууда",
+    "Preparing",
+    "Дайындалуда",
+    "Tayyorlanmoqda"
+  ],
+  "Готов": [
+    "Даяр",
+    "Ready",
+    "Дайын",
+    "Tayyor"
+  ],
+  "Выдан": [
+    "Берилди",
+    "Collected",
+    "Берілді",
+    "Topshirildi"
+  ],
+  "Дата не указана": [
+    "Дата көрсөтүлгөн эмес",
+    "Date unavailable",
+    "Күні көрсетілмеген",
+    "Sana ko‘rsatilmagan"
+  ],
+  "Заказ №": [
+    "Буйрутма №",
+    "Order #",
+    "Тапсырыс №",
+    "Buyurtma №"
+  ],
+  "· самовывоз": [
+    "· алып кетүү",
+    "· pickup",
+    "· алып кету",
+    "· olib ketish"
+  ],
+  "Самовывоз": [
+    "Алып кетүү",
+    "Pickup",
+    "Алып кету",
+    "Olib ketish"
+  ],
+  "Адрес уточняется": [
+    "Дарек такталууда",
+    "Address to be confirmed",
+    "Мекенжай нақтылануда",
+    "Manzil aniqlashtirilmoqda"
+  ],
+  "Сессия истекла. Войдите ещё раз.": [
+    "Сессиянын мөөнөтү бүттү. Кайра кириңиз.",
+    "Your session expired. Sign in again.",
+    "Сессия мерзімі аяқталды. Қайта кіріңіз.",
+    "Seans tugadi. Qayta kiring."
+  ],
+  "Не удалось загрузить профиль": [
+    "Профиль жүктөлгөн жок",
+    "Unable to load your profile",
+    "Профиль жүктелмеді",
+    "Profil yuklanmadi"
+  ],
+  "Сервер не вернул данные пользователя": [
+    "Сервер колдонуучунун маалыматтарын кайтарган жок",
+    "The server returned no account data",
+    "Сервер пайдаланушы деректерін қайтармады",
+    "Server foydalanuvchi ma’lumotlarini qaytarmadi"
+  ],
+  "Не удалось отправить код": [
+    "Код жөнөтүлгөн жок",
+    "Unable to send the code",
+    "Код жіберілмеді",
+    "Kod yuborilmadi"
+  ],
+  "Сервер не вернул срок сессии": [
+    "Сервер сессиянын мөөнөтүн кайтарган жок",
+    "The server returned no session expiry",
+    "Сервер сессия мерзімін қайтармады",
+    "Server seans muddatini qaytarmadi"
+  ],
+  "Код отправлен. Код для локального запуска: {0}.": [
+    "Код жөнөтүлдү. Жергиликтүү иштетүү коду: {0}.",
+    "Code sent. Local development code: {0}.",
+    "Код жіберілді. Жергілікті іске қосу коды: {0}.",
+    "Kod yuborildi. Mahalliy ishga tushirish kodi: {0}."
+  ],
+  "Код отправлен.": [
+    "Код жөнөтүлдү.",
+    "Code sent.",
+    "Код жіберілді.",
+    "Kod yuborildi."
+  ],
+  "Не удалось войти": [
+    "Кирүү мүмкүн болгон жок",
+    "Unable to sign in",
+    "Кіру мүмкін болмады",
+    "Kirish amalga oshmadi"
+  ],
+  "Не удалось выполнить запрос": [
+    "Суроо-талап аткарылган жок",
+    "Unable to complete the request",
+    "Сұрау орындалмады",
+    "So‘rov bajarilmadi"
+  ],
+  "Не удалось отменить вывод": [
+    "Чыгарууну жокко чыгаруу мүмкүн болгон жок",
+    "Unable to cancel the withdrawal",
+    "Шығарудан бас тарту мүмкін болмады",
+    "Chiqarishni bekor qilib bo‘lmadi"
+  ],
+  "Не удалось завершить сессию": [
+    "Сессияны бүтүрүү мүмкүн болгон жок",
+    "Unable to end the session",
+    "Сессияны аяқтау мүмкін болмады",
+    "Seansni yakunlab bo‘lmadi"
+  ],
+  "Не удалось выйти из профиля": [
+    "Профилден чыгуу мүмкүн болгон жок",
+    "Unable to sign out",
+    "Профильден шығу мүмкін болмады",
+    "Profildan chiqib bo‘lmadi"
+  ],
+  "Баланс": [
+    "Баланс",
+    "Balance",
+    "Баланс",
+    "Balans"
+  ],
+  "Настройки": [
+    "Жөндөөлөр",
+    "Settings",
+    "Баптаулар",
+    "Sozlamalar"
+  ],
+  "Личный кабинет": [
+    "Жеке кабинет",
+    "My account",
+    "Жеке кабинет",
+    "Shaxsiy kabinet"
+  ],
+  "Закрыть личный кабинет": [
+    "Жеке кабинетти жабуу",
+    "Close account",
+    "Жеке кабинетті жабу",
+    "Shaxsiy kabinetni yopish"
+  ],
+  "Закрыть": [
+    "Жабуу",
+    "Close",
+    "Жабу",
+    "Yopish"
+  ],
+  "Проверяем сессию…": [
+    "Сессия текшерилүүдө…",
+    "Checking your session…",
+    "Сессия тексерілуде…",
+    "Seans tekshirilmoqda…"
+  ],
+  "Мы отправили SMS с кодом на номер": [
+    "Код жазылган SMS төмөнкү номерге жөнөтүлдү:",
+    "We sent a code by SMS to",
+    "Коды бар SMS мына нөмірге жіберілді:",
+    "Kodli SMS ushbu raqamga yuborildi:"
+  ],
+  "Изменить номер": [
+    "Номерди өзгөртүү",
+    "Change number",
+    "Нөмірді өзгерту",
+    "Raqamni o‘zgartirish"
+  ],
+  "Введите номер телефона. В течение минуты мы отправим вам": [
+    "Телефон номериңизди киргизиңиз. Бир мүнөттүн ичинде жөнөтөбүз:",
+    "Enter your phone number. Within a minute we will send you",
+    "Телефон нөмірін енгізіңіз. Бір минут ішінде жібереміз:",
+    "Telefon raqamingizni kiriting. Bir daqiqa ichida yuboramiz:"
+  ],
+  "SMS с одноразовым кодом": [
+    "бир жолку код жазылган SMS",
+    "an SMS with a one-time code",
+    "бір реттік коды бар SMS",
+    "bir martalik kodli SMS"
+  ],
+  "Код из SMS": [
+    "SMS коду",
+    "SMS code",
+    "SMS коды",
+    "SMS kodi"
+  ],
+  "Номер телефона": [
+    "Телефон номери",
+    "Phone number",
+    "Телефон нөмірі",
+    "Telefon raqami"
+  ],
+  "Подождите…": [
+    "Күтө туруңуз…",
+    "Please wait…",
+    "Күте тұрыңыз…",
+    "Kuting…"
+  ],
+  "Получить код": [
+    "Код алуу",
+    "Get code",
+    "Код алу",
+    "Kod olish"
+  ],
+  "Продолжая, вы принимаете": [
+    "Улантуу менен кабыл аласыз:",
+    "By continuing, you accept the",
+    "Жалғастыру арқылы қабылдайсыз:",
+    "Davom etish orqali qabul qilasiz:"
+  ],
+  "Вернуться в меню": [
+    "Менюга кайтуу",
+    "Back to menu",
+    "Мәзірге оралу",
+    "Menyuga qaytish"
+  ],
+  "Повторить": [
+    "Кайра аракет кылуу",
+    "Retry",
+    "Қайталау",
+    "Qayta urinish"
+  ],
+  "Загружаем профиль…": [
+    "Профиль жүктөлүүдө…",
+    "Loading your profile…",
+    "Профиль жүктелуде…",
+    "Profil yuklanmoqda…"
+  ],
+  "Привет!": [
+    "Салам!",
+    "Hello!",
+    "Сәлем!",
+    "Salom!"
+  ],
+  "Выходим…": [
+    "Чыгууда…",
+    "Signing out…",
+    "Шығуда…",
+    "Chiqilmoqda…"
+  ],
+  "Выйти": [
+    "Чыгуу",
+    "Sign out",
+    "Шығу",
+    "Chiqish"
+  ],
+  "Разделы личного кабинета": [
+    "Жеке кабинеттин бөлүмдөрү",
+    "Account sections",
+    "Жеке кабинет бөлімдері",
+    "Shaxsiy kabinet bo‘limlari"
+  ],
+  "Мои заказы": [
+    "Буйрутмаларым",
+    "My orders",
+    "Тапсырыстарым",
+    "Buyurtmalarim"
+  ],
+  "NAKTA Coin и NFT": [
+    "NAKTA Coin жана NFT",
+    "NAKTA Coin and NFT",
+    "NAKTA Coin және NFT",
+    "NAKTA Coin va NFT"
+  ],
+  "Поддержка": [
+    "Колдоо кызматы",
+    "Support",
+    "Қолдау қызметі",
+    "Yordam xizmati"
+  ],
+  "О нас": [
+    "Биз жөнүндө",
+    "About us",
+    "Біз туралы",
+    "Biz haqimizda"
+  ],
+  "Версия 0.1.0": [
+    "0.1.0 версиясы",
+    "Version 0.1.0",
+    "0.1.0 нұсқасы",
+    "0.1.0 versiyasi"
+  ],
+  "Ваш баланс": [
+    "Балансыңыз",
+    "Your balance",
+    "Балансыңыз",
+    "Balansingiz"
+  ],
+  "Ваши NFT": [
+    "NFTлериңиз",
+    "Your NFTs",
+    "NFT-леріңіз",
+    "NFTlaringiz"
+  ],
+  "цифровых наград": [
+    "санариптик сыйлык",
+    "digital rewards",
+    "цифрлық сыйақы",
+    "raqamli mukofot"
+  ],
+  "Вывести": [
+    "Чыгаруу",
+    "Withdraw",
+    "Шығару",
+    "Chiqarish"
+  ],
+  "Как работают NAKTA Coin и NFT": [
+    "NAKTA Coin жана NFT кантип иштейт",
+    "How NAKTA Coin and NFTs work",
+    "NAKTA Coin және NFT қалай жұмыс істейді",
+    "NAKTA Coin va NFT qanday ishlaydi"
+  ],
+  "Награды не тратятся внутри сайта. Накопленные коины и NFT можно вывести на свой криптокошелёк.": [
+    "Сыйлыктар сайтта сарпталбайт. Топтолгон коиндерди жана NFTлерди өз криптокапчыгыңызга чыгара аласыз.",
+    "Rewards cannot be spent on the site. You can withdraw your coins and NFTs to your crypto wallet.",
+    "Сыйақылар сайт ішінде жұмсалмайды. Жиналған коиндер мен NFT-лерді криптоәмияныңызға шығара аласыз.",
+    "Mukofotlar sayt ichida sarflanmaydi. To‘plangan koin va NFTlarni kriptohamyoningizga chiqarishingiz mumkin."
+  ],
+  "История операций": [
+    "Операциялардын тарыхы",
+    "Transaction history",
+    "Операциялар тарихы",
+    "Amaliyotlar tarixi"
+  ],
+  "Причина:": [
+    "Себеби:",
+    "Reason:",
+    "Себебі:",
+    "Sabab:"
+  ],
+  "Отменить вывод": [
+    "Чыгарууну жокко чыгаруу",
+    "Cancel withdrawal",
+    "Шығарудан бас тарту",
+    "Chiqarishni bekor qilish"
+  ],
+  "Вывод NFT «": [
+    "NFT чыгаруу: «",
+    "NFT withdrawal: “",
+    "NFT шығару: «",
+    "NFT chiqarish: «"
+  ],
+  "Кошелёк:": [
+    "Капчык:",
+    "Wallet:",
+    "Әмиян:",
+    "Hamyon:"
+  ],
+  "Операций пока нет.": [
+    "Азырынча операциялар жок.",
+    "No transactions yet.",
+    "Әзірге операциялар жоқ.",
+    "Hozircha amaliyotlar yo‘q."
+  ],
+  "Заказы": [
+    "Буйрутмалар",
+    "Orders",
+    "Тапсырыстар",
+    "Buyurtmalar"
+  ],
+  "Активные": [
+    "Учурдагы",
+    "Active",
+    "Белсенді",
+    "Faol"
+  ],
+  "История": [
+    "Тарых",
+    "History",
+    "Тарих",
+    "Tarix"
+  ],
+  "Пока здесь пусто,": [
+    "Азырынча бул жер бош,",
+    "Nothing here yet,",
+    "Әзірге мұнда бос,",
+    "Hozircha bu yer bo‘sh,"
+  ],
+  "пора сделать первый заказ!": [
+    "биринчи буйрутманы берүүгө убакыт келди!",
+    "time to place your first order!",
+    "алғашқы тапсырыс беретін уақыт келді!",
+    "birinchi buyurtmani berish vaqti keldi!"
+  ],
+  "История заказов пока пуста.": [
+    "Буйрутмалардын тарыхы азырынча бош.",
+    "No past orders yet.",
+    "Тапсырыстар тарихы әзірге бос.",
+    "Buyurtmalar tarixi hozircha bo‘sh."
+  ],
+  "Телефон аккаунта": [
+    "Аккаунттун телефону",
+    "Account phone number",
+    "Аккаунт телефоны",
+    "Akkaunt telefoni"
+  ],
+  "Баланс NAKTA Coin": [
+    "NAKTA Coin балансы",
+    "NAKTA Coin balance",
+    "NAKTA Coin балансы",
+    "NAKTA Coin balansi"
+  ],
+  "Получено NFT": [
+    "Алынган NFT",
+    "NFTs received",
+    "Алынған NFT",
+    "Olingan NFT"
+  ],
+  "Выйти из профиля": [
+    "Профилден чыгуу",
+    "Sign out",
+    "Профильден шығу",
+    "Profildan chiqish"
+  ],
+  "Закрыть подтверждение": [
+    "Ырастоону жабуу",
+    "Close confirmation",
+    "Растауды жабу",
+    "Tasdiqlashni yopish"
+  ],
+  "Отменить вывод?": [
+    "Чыгаруу жокко чыгарылсынбы?",
+    "Cancel this withdrawal?",
+    "Шығарудан бас тартасыз ба?",
+    "Chiqarish bekor qilinsinmi?"
+  ],
+  "{0} вернутся на баланс.": [
+    "{0} балансыңызга кайтарылат.",
+    "{0} will be returned to your balance.",
+    "{0} балансыңызға қайтарылады.",
+    "{0} balansingizga qaytariladi."
+  ],
+  "{0} снова станет доступен для вывода.": [
+    "{0} кайра чыгарууга жеткиликтүү болот.",
+    "{0} will be available to withdraw again.",
+    "{0} қайтадан шығаруға қолжетімді болады.",
+    "{0} yana chiqarish uchun mavjud bo‘ladi."
+  ],
+  "Отмена возможна только до начала обработки.": [
+    "Иштетүү башталганга чейин гана жокко чыгарууга болот.",
+    "You can cancel only before processing starts.",
+    "Өңдеу басталғанға дейін ғана бас тартуға болады.",
+    "Faqat ko‘rib chiqish boshlanguncha bekor qilish mumkin."
+  ],
+  "Не отменять": [
+    "Жокко чыгарбоо",
+    "Keep withdrawal",
+    "Бас тартпау",
+    "Bekor qilmaslik"
+  ],
+  "Отменяем…": [
+    "Жокко чыгарылууда…",
+    "Cancelling…",
+    "Бас тартылуда…",
+    "Bekor qilinmoqda…"
+  ],
+  "Сканирование QR не поддерживается этим браузером. Вставьте адрес вручную.": [
+    "Бул браузер QR сканерлөөнү колдобойт. Даректи кол менен киргизиңиз.",
+    "This browser does not support QR scanning. Enter the address manually.",
+    "Бұл браузер QR сканерлеуді қолдамайды. Мекенжайды қолмен енгізіңіз.",
+    "Bu brauzer QR skanerlashni qo‘llamaydi. Manzilni qo‘lda kiriting."
+  ],
+  "В QR-коде не найден корректный адрес криптокошелька.": [
+    "QR коддон жарактуу криптокапчык дареги табылган жок.",
+    "No valid crypto wallet address found in the QR code.",
+    "QR кодтан жарамды криптоәмиян мекенжайы табылмады.",
+    "QR-kodda to‘g‘ri kriptohamyon manzili topilmadi."
+  ],
+  "Не удалось открыть камеру. Разрешите доступ или вставьте адрес вручную.": [
+    "Камера ачылган жок. Уруксат бериңиз же даректи кол менен киргизиңиз.",
+    "Unable to open the camera. Allow access or enter the address manually.",
+    "Камера ашылмады. Рұқсат беріңіз немесе мекенжайды қолмен енгізіңіз.",
+    "Kamera ochilmadi. Ruxsat bering yoki manzilni qo‘lda kiriting."
+  ],
+  "Не удалось прочитать буфер обмена. Вставьте адрес в поле вручную.": [
+    "Алмашуу буферин окуу мүмкүн болгон жок. Даректи талаага кол менен киргизиңиз.",
+    "Unable to read the clipboard. Paste the address into the field manually.",
+    "Алмасу буферін оқу мүмкін болмады. Мекенжайды өріске қолмен қойыңыз.",
+    "Almashuv buferini o‘qib bo‘lmadi. Manzilni maydonga qo‘lda kiriting."
+  ],
+  "Не удалось оставить заявку": [
+    "Өтүнмө жөнөтүлгөн жок",
+    "Unable to submit the request",
+    "Өтінім жіберілмеді",
+    "Ariza yuborilmadi"
+  ],
+  "Закрыть форму вывода": [
+    "Чыгаруу формасын жабуу",
+    "Close withdrawal form",
+    "Шығару нысанын жабу",
+    "Chiqarish shaklini yopish"
+  ],
+  "Вернуться к форме": [
+    "Формага кайтуу",
+    "Back to form",
+    "Нысанға оралу",
+    "Shaklga qaytish"
+  ],
+  "Сканирование QR": [
+    "QR сканерлөө",
+    "Scan QR code",
+    "QR сканерлеу",
+    "QR skanerlash"
+  ],
+  "Наведите камеру на QR-код с адресом криптокошелька.": [
+    "Камераны криптокапчык дареги бар QR кодго багыттаңыз.",
+    "Point your camera at the QR code containing the wallet address.",
+    "Камераны криптоәмиян мекенжайы бар QR кодқа бағыттаңыз.",
+    "Kamerani kriptohamyon manzili yozilgan QR-kodga qarating."
+  ],
+  "Заявка принята": [
+    "Өтүнмө кабыл алынды",
+    "Request received",
+    "Өтінім қабылданды",
+    "Ariza qabul qilindi"
+  ],
+  "Мы проверим заявку и отправим награду на указанный криптокошелёк. Статус появится в истории операций.": [
+    "Өтүнмөнү текшерип, сыйлыкты көрсөтүлгөн криптокапчыкка жөнөтөбүз. Статус операциялардын тарыхында көрүнөт.",
+    "We will review your request and send the reward to the specified wallet. Check its status in your transaction history.",
+    "Өтінімді тексеріп, сыйақыны көрсетілген криптоәмиянға жібереміз. Мәртебесі операциялар тарихында көрсетіледі.",
+    "Arizani tekshirib, mukofotni ko‘rsatilgan kriptohamyonga yuboramiz. Holati amaliyotlar tarixida ko‘rinadi."
+  ],
+  "Готово": [
+    "Даяр",
+    "Done",
+    "Дайын",
+    "Tayyor"
+  ],
+  "Изменить данные": [
+    "Маалыматтарды өзгөртүү",
+    "Edit details",
+    "Деректерді өзгерту",
+    "Ma’lumotlarni o‘zgartirish"
+  ],
+  "Подтверждение вывода": [
+    "Чыгарууну ырастоо",
+    "Confirm withdrawal",
+    "Шығаруды растау",
+    "Chiqarishni tasdiqlash"
+  ],
+  "Проверьте данные перед отправкой заявки": [
+    "Өтүнмөнү жөнөтүүдөн мурун маалыматтарды текшериңиз",
+    "Check your details before submitting",
+    "Өтінімді жіберер алдында деректерді тексеріңіз",
+    "Ariza yuborishdan oldin ma’lumotlarni tekshiring"
+  ],
+  "Актив": [
+    "Актив",
+    "Asset",
+    "Актив",
+    "Aktiv"
+  ],
+  "Сумма": [
+    "Сумма",
+    "Amount",
+    "Сома",
+    "Summa"
+  ],
+  "Адрес кошелька": [
+    "Капчыктын дареги",
+    "Wallet address",
+    "Әмиян мекенжайы",
+    "Hamyon manzili"
+  ],
+  "Сеть": [
+    "Тармак",
+    "Network",
+    "Желі",
+    "Tarmoq"
+  ],
+  "Проверьте адрес кошелька внимательно. После отправки заявки изменить его нельзя.": [
+    "Капчыктын дарегин кылдат текшериңиз. Өтүнмө жөнөтүлгөндөн кийин аны өзгөртүү мүмкүн эмес.",
+    "Check the wallet address carefully. You cannot change it after submitting.",
+    "Әмиян мекенжайын мұқият тексеріңіз. Өтінім жіберілгеннен кейін оны өзгерту мүмкін емес.",
+    "Hamyon manzilini diqqat bilan tekshiring. Ariza yuborilgandan keyin uni o‘zgartirib bo‘lmaydi."
+  ],
+  "Отправляем заявку…": [
+    "Өтүнмө жөнөтүлүүдө…",
+    "Submitting request…",
+    "Өтінім жіберілуде…",
+    "Ariza yuborilmoqda…"
+  ],
+  "Подтвердить вывод": [
+    "Чыгарууну ырастоо",
+    "Confirm withdrawal",
+    "Шығаруды растау",
+    "Chiqarishni tasdiqlash"
+  ],
+  "Вывод награды": [
+    "Сыйлыкты чыгаруу",
+    "Withdraw reward",
+    "Сыйақыны шығару",
+    "Mukofotni chiqarish"
+  ],
+  "Что хотите вывести?": [
+    "Эмнени чыгаргыңыз келет?",
+    "What would you like to withdraw?",
+    "Нені шығарғыңыз келеді?",
+    "Nimani chiqarmoqchisiz?"
+  ],
+  "Выберите NFT": [
+    "NFT тандаңыз",
+    "Choose an NFT",
+    "NFT таңдаңыз",
+    "NFT tanlang"
+  ],
+  "{0}, сеть {1}": [
+    "{0}, тармак {1}",
+    "{0}, network {1}",
+    "{0}, желі {1}",
+    "{0}, tarmoq {1}"
+  ],
+  "Количество NAKTA Coin": [
+    "NAKTA Coin саны",
+    "NAKTA Coin amount",
+    "NAKTA Coin саны",
+    "NAKTA Coin miqdori"
+  ],
+  "От 1 до {0}": [
+    "1ден {0} чейин",
+    "From 1 to {0}",
+    "1-ден {0} дейін",
+    "1 dan {0} gacha"
+  ],
+  "Введите количество от 1 до": [
+    "Санын киргизиңиз: 1ден",
+    "Enter an amount from 1 to",
+    "Санын енгізіңіз: 1-ден",
+    "Miqdorni kiriting: 1 dan"
+  ],
+  "К выводу:": [
+    "Чыгарылат:",
+    "To withdraw:",
+    "Шығарылады:",
+    "Chiqariladi:"
+  ],
+  "Адрес криптокошелька": [
+    "Криптокапчыктын дареги",
+    "Crypto wallet address",
+    "Криптоәмиян мекенжайы",
+    "Kriptohamyon manzili"
+  ],
+  "Введите адрес кошелька": [
+    "Капчыктын дарегин киргизиңиз",
+    "Enter your wallet address",
+    "Әмиян мекенжайын енгізіңіз",
+    "Hamyon manzilini kiriting"
+  ],
+  "Вставить адрес": [
+    "Даректи коюу",
+    "Paste address",
+    "Мекенжайды қою",
+    "Manzilni joylash"
+  ],
+  "Вставить адрес из буфера": [
+    "Даректи буферден коюу",
+    "Paste address from clipboard",
+    "Мекенжайды буферден қою",
+    "Manzilni buferdan joylash"
+  ],
+  "Сканировать QR": [
+    "QR сканерлөө",
+    "Scan QR",
+    "QR сканерлеу",
+    "QR skanerlash"
+  ],
+  "Сканировать QR-код кошелька": [
+    "Капчыктын QR кодун сканерлөө",
+    "Scan wallet QR code",
+    "Әмиянның QR кодын сканерлеу",
+    "Hamyon QR-kodini skanerlash"
+  ],
+  "Проверьте адрес для сети": [
+    "Бул тармактын дарегин текшериңиз:",
+    "Check the address for network",
+    "Мына желінің мекенжайын тексеріңіз:",
+    "Ushbu tarmoq manzilini tekshiring:"
+  ],
+  "Введите адрес вручную или отсканируйте QR-код. После отправки заявки адрес изменить нельзя.": [
+    "Даректи кол менен киргизиңиз же QR кодду сканерлеңиз. Өтүнмө жөнөтүлгөндөн кийин даректи өзгөртүү мүмкүн эмес.",
+    "Enter the address manually or scan a QR code. You cannot change it after submitting.",
+    "Мекенжайды қолмен енгізіңіз немесе QR кодты сканерлеңіз. Өтінім жіберілгеннен кейін мекенжай өзгертілмейді.",
+    "Manzilni qo‘lda kiriting yoki QR-kodni skanerlang. Ariza yuborilgach manzilni o‘zgartirib bo‘lmaydi."
+  ],
+  "Продолжить": [
+    "Улантуу",
+    "Continue",
+    "Жалғастыру",
+    "Davom etish"
+  ],
+  "Вернуться назад": [
+    "Артка кайтуу",
+    "Go back",
+    "Артқа оралу",
+    "Orqaga qaytish"
+  ],
+  "Оператор сервиса": [
+    "Кызматтын оператору",
+    "Service operator",
+    "Қызмет операторы",
+    "Xizmat operatori"
+  ],
+  "ИНН": [
+    "ИНН",
+    "Tax ID",
+    "Салық нөмірі",
+    "STIR"
+  ],
+  "Регистрационный номер": [
+    "Каттоо номери",
+    "Registration number",
+    "Тіркеу нөмірі",
+    "Ro‘yxat raqami"
+  ],
+  "Адрес": [
+    "Дарек",
+    "Address",
+    "Мекенжай",
+    "Manzil"
+  ],
+  "часы работы": [
+    "иштөө убактысы",
+    "opening hours",
+    "жұмыс уақыты",
+    "ish vaqti"
+  ],
+  "открыто до": [
+    "Жабылат:",
+    "open until",
+    "Жабылады:",
+    "yopiladi:"
+  ],
+  "закрыто до": [
+    "Ачылат:",
+    "closed until",
+    "Ашылады:",
+    "ochiladi:"
+  ],
+  "{0}. {1}": [
+    "{0}. {1}",
+    "{0}. {1}",
+    "{0}. {1}",
+    "{0}. {1}"
+  ],
+  "Failed to fetch": [
+    "Серверге туташуу мүмкүн болгон жок. Кайра аракет кылыңыз.",
+    "Unable to connect to the server. Try again.",
+    "Серверге қосылу мүмкін болмады. Қайталап көріңіз.",
+    "Serverga ulanib bo‘lmadi. Qayta urinib ko‘ring."
+  ]
+}

@@ -1,3 +1,6 @@
+"use client";
+
+import Localized from "./i18n/Localized";
 import { LegalOperatorDetails } from "./components/LegalOperatorDetails";
 import { LEGAL_DETAILS } from "./legalDetails";
 
@@ -8,11 +11,11 @@ type LegalDocumentProps = {
 const EFFECTIVE_DATE = "5 сентября 2026 года";
 
 function UpdatedAt() {
-  return <p className="legal-updated">Дата вступления в силу: {EFFECTIVE_DATE}</p>;
+  return <Localized>{<p className="legal-updated">Дата вступления в силу: {EFFECTIVE_DATE}</p>}</Localized>;
 }
 
 export function PaymentRules({ showTitle = true }: LegalDocumentProps) {
-  return (
+  return <Localized>{(
     <section className="legal-page payment-rules">
       {showTitle ? <h1>Оплата, отмена и возврат</h1> : null}
       <UpdatedAt />
@@ -36,11 +39,11 @@ export function PaymentRules({ showTitle = true }: LegalDocumentProps) {
       <h2>Реквизиты оператора</h2>
       <LegalOperatorDetails />
     </section>
-  );
+  )}</Localized>;
 }
 
 export function PrivacyPolicy({ showTitle = true }: LegalDocumentProps) {
-  return (
+  return <Localized>{(
     <section className="legal-page privacy-policy">
       {showTitle ? <h1>Политика конфиденциальности</h1> : null}
       <UpdatedAt />
@@ -89,6 +92,7 @@ export function PrivacyPolicy({ showTitle = true }: LegalDocumentProps) {
       <h2>6. Локальное хранение и сессия</h2>
       <p>Сайт сохраняет в локальном хранилище браузера корзину, выбранную точку и данные, необходимые для поддержания авторизованной сессии. Это позволяет не вводить одни и те же сведения повторно. Пользователь может выйти из аккаунта или очистить данные сайта в настройках браузера; очистка локальных данных не удаляет записи заказа и аккаунта на сервере.</p>
 
+      <p>Выбранный язык сохраняется в cookie и локальном хранилище браузера.</p>
       <h2>7. Срок хранения и удаление</h2>
       <p>Данные хранятся не дольше, чем это необходимо для работы аккаунта, выполнения заказа и вывода наград, поддержки, безопасности, разрешения споров и исполнения обязательных требований. Срок может различаться для разных категорий данных. Недействительные сессии и временные коды удаляются или прекращают действовать в соответствии с техническими настройками Сервиса.</p>
       <p>Запросить удаление аккаунта можно по инструкции на странице <a href="/delete-account">«Удаление аккаунта и данных»</a>. Заказы, бухгалтерские записи, журналы безопасности и сведения, которые требуется хранить по закону или для разрешения спора, могут сохраняться в необходимом объёме. Публичные блокчейн-транзакции удалить невозможно.</p>
@@ -102,11 +106,11 @@ export function PrivacyPolicy({ showTitle = true }: LegalDocumentProps) {
       <h2>10. Изменения и контакты</h2>
       <p>Политика может обновляться при изменении функций Сервиса или требований законодательства. Новая редакция публикуется на этой странице с новой датой вступления в силу. Вопросы о данных и запросы можно направить через <a href="/support">поддержку</a>.</p>
     </section>
-  );
+  )}</Localized>;
 }
 
 export function TermsOfUse({ showTitle = true }: LegalDocumentProps) {
-  return (
+  return <Localized>{(
     <section className="legal-page terms-of-use">
       {showTitle ? <h1>Условия использования и заказа</h1> : null}
       <UpdatedAt />
@@ -155,5 +159,5 @@ export function TermsOfUse({ showTitle = true }: LegalDocumentProps) {
       <h2>10. Изменения и контакты</h2>
       <p>Условия могут обновляться вместе с развитием Сервиса. Новая редакция действует с указанной на странице даты. Вопросы можно направить через <a href="/support">поддержку</a>. Реквизиты оператора собраны в разделе <a href="/legal">«Правовая информация»</a>.</p>
     </section>
-  );
+  )}</Localized>;
 }

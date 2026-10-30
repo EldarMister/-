@@ -1,4 +1,5 @@
 import type { Category, PickupLocation, Product, Promotion } from "./types";
+import { initialProductDetails } from "./productDetails";
 
 export const categories: Category[] = [
   { id: 1, name: "Роллы", slug: "rolls", sortOrder: 1, active: true },
@@ -61,7 +62,7 @@ export const products: Product[] = [
   { id: 47, categoryId: 5, name: "Имбирь", price: 18, image: image("1736432677519"), active: true, sortOrder: 2 },
   { id: 48, categoryId: 5, name: "Васаби", price: 16, image: image("1736432695097"), active: true, sortOrder: 3 },
   { id: 49, categoryId: 5, name: "Палочки", price: 6, image: image("1736432710898"), active: true, sortOrder: 4 },
-];
+].map((product) => ({ ...product, ...initialProductDetails(product) }));
 
 export const locations: PickupLocation[] = [
   {

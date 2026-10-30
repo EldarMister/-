@@ -26,12 +26,10 @@ export function getAdminPassword() {
 }
 
 export async function syncAdminPassword() {
-  const passwordHash = await bcrypt.hash(getAdminPassword(), 12);
   const [admin] = await sql`SELECT id FROM admin_users ORDER BY id LIMIT 1`;
-  if (admin) {
-    await sql`UPDATE admin_users SET password_hash = ${passwordHash} WHERE id = ${admin.id}`;
-  } else {
-    await sql`INSERT INTO admin_users (email, password_hash, name)
-      VALUES (${internalAdminEmail}, ${passwordHash}, 'Администратор')`;
+  if (!admin) {
+    const passwordHash = await bcrypt.hash(getAdminPassword(), 12);
+    await sql`INSERT INTO admin_users (email, password_hash, name, role)
+      VALUES (${internalAdminEmail}, ${passwordHash}, 'Владелец', 'OWNER')`;
   }
 }

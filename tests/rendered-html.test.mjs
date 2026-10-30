@@ -2,12 +2,12 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-async function render(path = "/") {
+async function render(path = "/", headers = {}) {
   const workerUrl = new URL("../dist/server/index.js", import.meta.url);
   workerUrl.searchParams.set("test", `${process.pid}-${Date.now()}-${path}`);
   const { default: worker } = await import(workerUrl.href);
   return worker.fetch(
-    new Request(`http://localhost${path}`, { headers: { accept: "text/html" } }),
+    new Request(`http://localhost${path}`, { headers: { accept: "text/html", ...headers } }),
     { ASSETS: { fetch: async () => new Response("Not found", { status: 404 }) } },
     { waitUntil() {}, passThroughOnException() {} },
   );
@@ -27,9 +27,24 @@ test("server-renders the catalog and brand metadata", async () => {
   assert.match(html, /"@type":"CollectionPage"/);
   assert.match(html, /"@type":"Product"/);
   assert.match(html, /href="\/catalog\/2"/);
+  assert.match(html, /rel="manifest" href="\/manifest\.webmanifest"/);
   assert.match(html, /Филадельфия/);
   assert.match(html, /Скидка последний час/);
   assert.doesNotMatch(html, /codex-preview|react-loading-skeleton/i);
+});
+
+test("server-rendered language follows the saved preference on catalogs and legal pages", async () => {
+  for (const [locale, tag, label] of [["ky", "ky-KG", "ПУНКТТУ ТАНДАҢЫЗ"], ["ru", "ru-KG", "ВЫБЕРИТЕ ТОЧКУ"], ["en", "en-GB", "CHOOSE A STORE"], ["kk", "kk-KZ", "ПУНКТТІ ТАҢДАҢЫЗ"], ["uz", "uz-UZ", "PUNKTNI TANLANG"]]) {
+    const response = await render("/catalog/1", { cookie: `daana-language=${locale}` });
+    assert.equal(response.status, 200);
+    const html = await response.text();
+    assert.ok(html.includes(`lang="${tag}"`), tag);
+    assert.ok(html.includes(`<span>${label}</span>`), label);
+  }
+  const response = await render("/privacy", { cookie: "daana-language=en" });
+  const html = await response.text();
+  assert.ok(html.includes("This policy describes data processing when using"));
+  assert.ok(html.includes("Your language preference is saved in a cookie and browser local storage."));
 });
 
 test("publishes crawl controls, sitemap and web manifest", async () => {
@@ -142,7 +157,8 @@ test("customer login uses Nikita OTP without exposing its API key", async () => 
     readFile(new URL("../app/components/CustomerAccountModal.tsx", import.meta.url), "utf8"),
     readFile(new URL("../.env.example", import.meta.url), "utf8"),
   ]);
-  assert.match(provider, /https:\/\/smspro\.nikita\.kg\/api\/otp\/send/);
+  assert.match(provider, /sendNikitaSmsCode/);
+  assert.match(provider, /sender: "DaanaSushKG"/);
   assert.match(provider, /https:\/\/smspro\.nikita\.kg\/api\/otp\/verify/);
   assert.match(provider, /"X-API-KEY": apiKey/);
   assert.match(api, /process\.env\.NIKITA_OTP_API_KEY/);
@@ -176,9 +192,13 @@ test("admin route renders its noindex, session-gated dashboard shell", async () 
   const html = await response.text();
   assert.match(html, /<title>Админка \| ДААНА СУШИ<\/title>/);
   assert.match(html, /name="robots" content="noindex, nofollow"/);
-  assert.match(html, /Проверяем сессию/);
-  assert.match(adminSource, /Управление «ДААНА СУШИ»/);
-  assert.match(adminSource, /\["loyalty", "Лояльность"\]/);
+  assert.match(html, /Проверяем рабочую сессию/);
+  assert.match(html, /rel="manifest" href="\/admin\/manifest\.webmanifest"/);
+  const installed = await render("/admin/app");
+  assert.equal(installed.status, 200);
+  assert.match(await installed.text(), /rel="manifest" href="\/admin\/manifest\.webmanifest"/);
+  assert.match(adminSource, /Панель управления/);
+  assert.match(adminSource, /id: "loyalty", title: "Программа наград"/);
   assert.match(adminSource, /\/admin\/session/);
   assert.match(adminSource, /credentials: "include"/);
   assert.doesNotMatch(adminSource, /localStorage\.setItem\("sushi-admin-token"/);
@@ -255,22 +275,22 @@ test("PostgreSQL schema covers catalog, orders and administration", async () => 
   assert.match(schema, /2026-09-03-remove-quality-control/);
 });
 
-test("production uses one public gateway and password-only admin login", async () => {
-  const [launcher, adminPanel, api, storefront] = await Promise.all([
+test("production uses one public gateway and retains owner password login with separate staff accounts", async () => {
+  const [launcher, adminPanel, api, storefront, orders] = await Promise.all([
     readFile(new URL("../server/production.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/admin/AdminPanel.tsx", import.meta.url), "utf8"),
     readFile(new URL("../server/index.ts", import.meta.url), "utf8"),
     readFile(new URL("../app/SushiApp.tsx", import.meta.url), "utf8"),
+    readFile(new URL("../app/admin/OrdersWorkspace.tsx", import.meta.url), "utf8"),
   ]);
   assert.match(launcher, /path\.startsWith\("\/api\/"\)/);
   assert.doesNotMatch(adminPanel, /Отдел контроля качества|Подпись контроля качества|qualityControl/);
   assert.match(launcher, /path\.startsWith\("\/uploads\/"\)/);
-  assert.doesNotMatch(adminPanel, /type="email"|JSON\.stringify\(\{ email, password \}\)/);
-  assert.match(adminPanel, /JSON\.stringify\(\{ password \}\)/);
-  assert.match(adminPanel, />Подробнее</);
-  assert.match(adminPanel, /Отменить заказ/);
-  assert.match(adminPanel, /updateStatus\(order, "cancelled"\)/);
-  assert.match(api, /SELECT id, password_hash, name FROM admin_users ORDER BY id LIMIT 1/);
+  assert.match(adminPanel, /оставьте пустым для владельца/);
+  assert.match(adminPanel, /autoComplete="current-password" required/);
+  assert.match(orders, /Отменить заказ/);
+  assert.match(orders, /expectedStatus: order\.status/);
+  assert.match(api, /FROM admin_users WHERE active=TRUE AND role='OWNER' ORDER BY id LIMIT 1/);
   assert.match(api, /l\.address AS "locationAddress"/);
   assert.doesNotMatch(`${storefront}\n${adminPanel}`, /₽/);
   assert.match(storefront, /\{product\.price\} С/);

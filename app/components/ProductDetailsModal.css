@@ -1,0 +1,36 @@
+.product-details-dialog { width: min(950px,calc(100vw - 40px)); max-width: none; max-height: calc(100dvh - 32px); padding: 0; border: 0; background: transparent; overflow: auto; color: #000; font-family: "Gilroy",sans-serif; }
+.product-details-dialog::backdrop { background: #0006; backdrop-filter: blur(4px); }
+.product-details-card { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 28px; min-height: 510px; padding: 54px 72px 46px; border-radius: 260px; background: #edeef2; }
+.product-details-close { position: absolute; z-index: 1; top: 0; right: 20px; width: 48px; height: 48px; padding: 0; border: 0; background: transparent; color: #fff; font: 60px/40px Arial,sans-serif; cursor: pointer; }
+.product-details-close:focus-visible { outline: 2px solid var(--blue); border-radius: 10px; }
+.product-details-information { min-width: 0; text-align: center; color: #3c5074; font-size: 22px; line-height: 1.45; }
+.product-details-image { display: block; width: 100%; height: 250px; object-fit: contain; margin: 0 auto 24px; }
+.product-details-serving, .product-details-ingredients { margin: 0; }
+.product-details-ingredients { white-space: pre-line; overflow-wrap: anywhere; }
+.product-details-nutrition { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; margin: 20px 0 0; }
+.product-details-nutrition > div { display: flex; flex-direction: column; align-items: center; }
+.product-details-nutrition dd { margin: 0; font-size: 22px; line-height: 1.1; }
+.product-details-nutrition dt { color: #858585; font: 13px/1.5 "Roboto",sans-serif; }
+.product-details-purchase { align-self: start; padding-top: 60px; text-align: center; min-width: 0; }
+.product-details-purchase h2 { margin: 0 0 24px; font-family: "Gilroy-Bold",sans-serif; font-size: clamp(28px,3vw,48px); line-height: 1.15; overflow-wrap: anywhere; }
+.product-details-price { display: inline-block; padding: 10px 22px; border-radius: 40px; background: #3d5a90; color: #fff; font: 800 38px/1.2 "Roboto",sans-serif; }
+.product-details-quantity { display: flex; justify-content: center; align-items: center; gap: 24px; margin-top: 48px; }
+.product-details-quantity strong { min-width: 42px; font: 800 48px/1.2 "Gilroy-Bold",sans-serif; }
+.product-details-quantity button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: transparent; color: #d70000; cursor: pointer; }
+.product-details-quantity button:disabled { opacity: .35; cursor: default; }
+.product-details-quantity button:focus-visible { outline: 2px solid #3d5a90; border-radius: 50%; outline-offset: 3px; }
+.product-details-quantity .material-icons { font-size: 44px; }
+@media (max-width:680px) {
+  .product-details-dialog { width: calc(100vw - 24px); max-height: calc(100dvh - 24px); border-radius: 32px; }
+  .product-details-card { grid-template-columns: 1fr; gap: 22px; min-height: 0; padding: 36px 24px 28px; border-radius: 32px; }
+  .product-details-close { top: 8px; right: 8px; color: #3c5074; font-size: 42px; }
+  .product-details-image { height: 180px; max-width: 280px; margin-bottom: 16px; }
+  .product-details-information { font-size: 18px; }
+  .product-details-nutrition { gap: 12px; margin-top: 16px; }
+  .product-details-nutrition dd { font-size: 20px; }
+  .product-details-purchase { padding-top: 0; }
+  .product-details-purchase h2 { margin-bottom: 16px; font-size: 30px; }
+  .product-details-price { font-size: 28px; padding: 8px 20px; }
+  .product-details-quantity { margin-top: 20px; }
+  .product-details-quantity strong { font-size: 36px; }
+}

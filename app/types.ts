@@ -15,6 +15,14 @@ export type Product = {
   active: boolean;
   sortOrder: number;
   naktaCoins?: number;
+  ingredients?: string;
+  serving?: string;
+  weight?: number | null;
+  weightUnit?: string;
+  calories?: number | null;
+  protein?: number | null;
+  fat?: number | null;
+  carbohydrates?: number | null;
 };
 
 export type PickupLocation = {

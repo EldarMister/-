@@ -14,9 +14,10 @@ export async function seed() {
         WHERE categories.deleted_at IS NULL`;
     }
     for (const product of products) {
-      await tx`INSERT INTO products (id, category_id, name, price, image, active, sort_order)
-        VALUES (${product.id}, ${product.categoryId}, ${product.name}, ${product.price}, ${product.image}, ${product.active}, ${product.sortOrder})
-        ON CONFLICT (id) DO UPDATE SET category_id = EXCLUDED.category_id, name = EXCLUDED.name, price = EXCLUDED.price, image = EXCLUDED.image, active = EXCLUDED.active, sort_order = EXCLUDED.sort_order, updated_at = NOW()`;
+      await tx`INSERT INTO products (id, category_id, name, price, image, active, sort_order, ingredients, serving, weight_unit, weight, calories, protein, fat, carbohydrates)
+        VALUES (${product.id}, ${product.categoryId}, ${product.name}, ${product.price}, ${product.image}, ${product.active}, ${product.sortOrder}, ${product.ingredients || ""}, ${product.serving || ""}, ${product.weightUnit || "г"}, ${product.weight ?? null}, ${product.calories ?? null}, ${product.protein ?? null}, ${product.fat ?? null}, ${product.carbohydrates ?? null})
+        ON CONFLICT (id) DO UPDATE SET category_id = EXCLUDED.category_id, name = EXCLUDED.name, price = EXCLUDED.price, image = EXCLUDED.image, active = EXCLUDED.active, sort_order = EXCLUDED.sort_order, updated_at = NOW()
+        WHERE products.deleted_at IS NULL`;
     }
     for (const location of locations) {
       await tx`INSERT INTO pickup_locations (id, name, address, phone, hours, opens_at, latitude, longitude, active)

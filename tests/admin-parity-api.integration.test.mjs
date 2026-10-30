@@ -1,0 +1,71 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { unlink } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+import "dotenv/config";
+
+const base=process.env.ADMIN_API_INTEGRATION_URL;
+test("catalog, promotion, settings and verified image upload complete real roundtrips without changing old orders",{skip:base!=="http://127.0.0.1:4100/api"||!process.env.ADMIN_PASSWORD,timeout:45000},async()=>{
+  let cookie="";
+  const call=async(path,{expected=200,...options}={})=>{
+    const response=await fetch(`${base}${path}`,{...options,headers:{...(cookie?{cookie}:{}),...(options.body&&!(options.body instanceof FormData)?{"content-type":"application/json"}:{}),...options.headers}});
+    const nextCookie=response.headers.get("set-cookie");if(nextCookie)cookie=nextCookie.split(";",1)[0];
+    const body=await response.json().catch(()=>({}));assert.equal(response.status,expected,`${options.method||"GET"} ${path}: ${JSON.stringify(body)}`);return body;
+  };
+  await call("/admin/login",{method:"POST",body:JSON.stringify({password:process.env.ADMIN_PASSWORD})});
+  const settings=await call("/admin/settings");const originalGeneral=settings.find(row=>row.key==="general").value;
+  const suffix=Date.now();const categories=[];let product;let promotion;let uploadUrl;
+  try{
+    const first=await call("/admin/categories",{method:"POST",expected:201,body:JSON.stringify({name:`Категория проверки ${suffix}`,sortOrder:0,active:true})});categories.push(first.id);assert.ok(first.slug);
+    const renamedCategory=await call(`/admin/categories/${first.id}`,{method:"PUT",body:JSON.stringify({name:`Категория после переименования ${suffix}`,sortOrder:1,active:true})});assert.equal(renamedCategory.slug,first.slug);
+    const second=await call("/admin/categories",{method:"POST",expected:201,body:JSON.stringify({name:`Вторая категория проверки ${suffix}`,sortOrder:2,active:true})});categories.push(second.id);assert.notEqual(first.slug,second.slug);
+    await call("/admin/categories",{method:"POST",expected:400,body:JSON.stringify({name:"   ",active:true})});
+    const png=Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/l9sAAAAASUVORK5CYII=","base64");
+    const form=new FormData();form.set("file",new Blob([png],{type:"image/png"}),"unsafe-name.html");
+    const uploaded=await call("/admin/upload",{method:"POST",expected:201,body:form});uploadUrl=uploaded.url;assert.match(uploadUrl,/^\/uploads\/[a-f0-9-]+\.png$/);
+    const image=await fetch(new URL(uploadUrl,base));assert.equal(image.status,200);assert.match(image.headers.get("content-type"),/^image\/png/);assert.deepEqual(Buffer.from(await image.arrayBuffer()),png);
+    const falseImage=new FormData();falseImage.set("file",new Blob(["<html>invalid image</html>"],{type:"image/png"}),"image.png");await call("/admin/upload",{method:"POST",expected:400,body:falseImage});
+    const unsupported=new FormData();unsupported.set("file",new Blob(["text"],{type:"text/plain"}),"text.txt");await call("/admin/upload",{method:"POST",expected:400,body:unsupported});
+    const oversized=new FormData();oversized.set("file",new Blob([new Uint8Array(5*1024*1024+1)],{type:"image/png"}),"oversized.png");await call("/admin/upload",{method:"POST",expected:413,body:oversized});
+    const productDraft={name:`Исходный товар ${suffix}`,categoryId:first.id,price:270,image:uploadUrl,active:true,sortOrder:0,naktaCoins:0};
+    const metadata={ingredients:"Лосось, творожный сыр",serving:"1 шт.",weight:30,weightUnit:"г",calories:45,protein:3,fat:2,carbohydrates:5};
+    await call("/admin/products",{method:"POST",expected:400,body:JSON.stringify({...productDraft,price:-1})});
+    for(const invalid of [{weight:-1},{ingredients:"x".repeat(4001)},{weight:"12.345"},{protein:true},{weightUnit:"kg"}])await call("/admin/products",{method:"POST",expected:400,body:JSON.stringify({...productDraft,...invalid})});
+    product=await call("/admin/products",{method:"POST",expected:201,body:JSON.stringify({...productDraft,...metadata})});
+    for(const[key,value]of Object.entries(metadata))assert.deepEqual(product[key],value,key);
+    const initialCatalog=await call("/catalog");const publicProduct=initialCatalog.products.find(row=>row.id===product.id);for(const[key,value]of Object.entries(metadata))assert.deepEqual(publicProduct[key],value,key);
+    const locations=await call("/locations");assert.ok(locations.length);
+    const orderDraft={customerName:"Проверка сохранности заказа",customerPhone:"996555000021",locationId:locations[0].id,items:[{productId:product.id,quantity:2}]};
+    const order=await call("/orders",{method:"POST",expected:201,body:JSON.stringify(orderDraft)});assert.equal(order.total,540);
+    await call(`/admin/products/${product.id}`,{method:"PUT",body:JSON.stringify({...productDraft,name:`Изменённый товар ${suffix}`,categoryId:second.id,price:999})});
+    const products=await call(`/admin/products?limit=10&search=${encodeURIComponent(`Изменённый товар ${suffix}`)}`);assert.equal(products.items[0].categoryId,second.id);assert.equal(products.items[0].price,999);
+    for(const[key,value]of Object.entries(metadata))assert.deepEqual(products.items[0][key],value,`legacy edit preserves ${key}`);
+    const cleared=await call(`/admin/products/${product.id}`,{method:"PUT",body:JSON.stringify({...productDraft,ingredients:"",weight:null,calories:null})});assert.equal(cleared.ingredients,"");assert.equal(cleared.weight,null);assert.equal(cleared.calories,null);assert.equal(cleared.protein,3);
+    const oldOrder=await call(`/admin/orders/${order.id}`);assert.equal(oldOrder.total,540);assert.equal(oldOrder.items[0].unitPrice,270);assert.equal(oldOrder.items[0].productName,productDraft.name);assert.equal(oldOrder.items[0].quantity,2);
+    await call(`/admin/products/${product.id}`,{method:"DELETE",expected:204});
+    const archivedOrder=await call(`/admin/orders/${order.id}`);assert.deepEqual(archivedOrder.items,oldOrder.items);assert.equal(archivedOrder.total,540);
+    await call("/orders",{method:"POST",expected:409,body:JSON.stringify(orderDraft)});
+    const catalog=await call("/catalog");assert.equal(catalog.products.some(row=>row.id===product.id),false);
+    const promotionDraft={title:`Акция проверки ${suffix}`,description:"Описание предложения",image:uploadUrl,active:true,sortOrder:1};
+    promotion=await call("/admin/promotions",{method:"POST",expected:201,body:JSON.stringify(promotionDraft)});
+    const editedPromotion=await call(`/admin/promotions/${promotion.id}`,{method:"PUT",body:JSON.stringify({...promotionDraft,title:`Обновлённая акция ${suffix}`,active:false})});assert.equal(editedPromotion.active,false);
+    const promotions=await call(`/admin/promotions?limit=10&search=${encodeURIComponent(`Обновлённая акция ${suffix}`)}`);assert.equal(promotions.items[0].id,promotion.id);
+    await call(`/admin/promotions/${promotion.id}`,{method:"DELETE",expected:204});
+    const deletedPromotions=await call(`/admin/promotions?limit=10&search=${encodeURIComponent(String(suffix))}`);assert.equal(deletedPromotions.items.some(row=>row.id===promotion.id),false);
+    const general={legalName:"  ИП Проверка административной панели  ",telegram:"https://t.me/daana_admin_test"};
+    const saved=await call("/admin/settings/general",{method:"PUT",body:JSON.stringify({value:general})});assert.equal(saved.value.legalName,general.legalName.trim());assert.equal(saved.value.telegram,general.telegram);
+    const readSettings=await call("/admin/settings");assert.equal(readSettings.find(row=>row.key==="general").value.telegram,general.telegram);
+    const publicSettings=await call("/settings");assert.equal(publicSettings.general.legalName,general.legalName.trim());
+    for(const invalid of [{...general,legalName:""},{...general,legalName:"x".repeat(201)},{...general,legalName:12},{...general,telegram:"http://t.me/unsafe"},{...general,telegram:"https://user:password@t.me/unsafe"},{...general,telegram:"javascript:alert(1)"},{...general,telegram:"not a URL"}])await call("/admin/settings/general",{method:"PUT",expected:400,body:JSON.stringify({value:invalid})});
+    await call("/admin/settings/general",{method:"PUT",expected:400,body:JSON.stringify({value:[]})});
+    await call(`/admin/settings/new-technical-test-${suffix}`,{method:"PUT",expected:400,body:JSON.stringify({value:{debug:true}})});
+    const unchanged=await call("/admin/settings");assert.equal(unchanged.find(row=>row.key==="general").value.telegram,general.telegram);
+    await call("/admin/settings/general",{method:"PUT",body:JSON.stringify({value:{legalName:general.legalName.trim(),telegram:""}})});
+  }finally{
+    await call("/admin/settings/general",{method:"PUT",body:JSON.stringify({value:originalGeneral})});
+    if(product)await call(`/admin/products/${product.id}`,{method:"DELETE",expected:204});
+    if(promotion)await call(`/admin/promotions/${promotion.id}`,{method:"DELETE",expected:204});
+    for(const id of categories)await call(`/admin/categories/${id}`,{method:"DELETE",expected:204});
+    if(uploadUrl&&/^\/uploads\/[a-f0-9-]+\.png$/.test(uploadUrl))await unlink(fileURLToPath(new URL(`../public${uploadUrl}`,import.meta.url)));
+  }
+});

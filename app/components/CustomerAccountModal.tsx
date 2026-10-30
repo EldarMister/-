@@ -1,5 +1,10 @@
 "use client";
 
+import Localized from "../i18n/Localized";
+import { useLanguage } from "../i18n/LanguageProvider";
+import { localeTag, type Locale } from "../i18n/locales";
+
+
 import {
   mdiAlertCircleOutline,
   mdiArrowLeft,
@@ -17,7 +22,7 @@ import {
 } from "@mdi/js";
 import { Icon } from "@mdi/react";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type {
   Customer,
   CustomerProfile,
@@ -38,7 +43,6 @@ type OrderSection = "active" | "history";
 type CancelTarget = { kind: "coins" | "nft"; id: string; label: string };
 
 const KYRGYZ_PHONE_PREFIX = "+996";
-const numberFormat = new Intl.NumberFormat("ru-RU");
 const networkLabels: Record<string, string> = {
   polygon: "Polygon",
   ethereum: "Ethereum",
@@ -85,11 +89,11 @@ function fullKyrgyzPhone(digits: string) {
   return `${KYRGYZ_PHONE_PREFIX} ${formatKyrgyzLocalPhone(digits)}`;
 }
 
-function formatHistoryDate(value?: string | null) {
+function formatHistoryDate(value: string | null | undefined, locale: Locale) {
   if (!value) return "Дата не указана";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "Дата не указана";
-  return new Intl.DateTimeFormat("ru-RU", {
+  return new Intl.DateTimeFormat(localeTag(locale), {
     day: "numeric",
     month: "long",
     year: "numeric",
@@ -110,14 +114,18 @@ function normalizeProfile(value: Partial<CustomerProfile>, fallbackCustomer: Cus
 }
 
 function OrderCard({ order }: { order: ProfileOrder }) {
-  return <article className="customer-order-card">
+  const { locale } = useLanguage();
+  const numberFormat = useMemo(() => new Intl.NumberFormat(localeTag(locale)), [locale]);
+  return <Localized>{<article className="customer-order-card">
     <span className={`customer-order-status status-${order.status}`}>{orderStatusLabels[order.status] || order.status}</span>
-    <span className="customer-order-main"><span><b>Заказ №{order.orderNumber || order.id}</b><small>{formatHistoryDate(order.createdAt)} · самовывоз</small></span><strong>{numberFormat.format(Number(order.total) || 0)} С</strong></span>
+    <span className="customer-order-main"><span><b>Заказ №{order.orderNumber || order.id}</b><small>{formatHistoryDate(order.createdAt, locale)} · самовывоз</small></span><strong>{numberFormat.format(Number(order.total) || 0)} С</strong></span>
     <span className="customer-order-delivery"><i aria-hidden="true"><Icon path={mdiShoppingOutline} size={0.8} /></i><span><b>Самовывоз</b><small>{order.locationAddress || order.locationName || "Адрес уточняется"}</small></span></span>
-  </article>;
+  </article>}</Localized>;
 }
 
 export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onSessionChange }: Props) {
+  const { locale } = useLanguage();
+  const numberFormat = useMemo(() => new Intl.NumberFormat(localeTag(locale)), [locale]);
   const sessionGenerationRef = useRef(0);
   const profileRequestGenerationRef = useRef(0);
   const [checked, setChecked] = useState(false);
@@ -413,7 +421,7 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
   const visibleOrders = orderSection === "active" ? profile?.currentOrders || [] : profile?.orderHistory || [];
   const hasRewardOperations = coinHistory.length > 0 || nftOperations.length > 0;
 
-  return <div className="customer-account-overlay" role="dialog" aria-modal="true" aria-label={session ? "Личный кабинет" : undefined} aria-labelledby={session ? undefined : "customer-account-title"}>
+  return <Localized>{<div className="customer-account-overlay" role="dialog" aria-modal="true" aria-label={session ? "Личный кабинет" : undefined} aria-labelledby={session ? undefined : "customer-account-title"}>
     <button className="customer-account-dismiss" type="button" tabIndex={-1} aria-label="Закрыть личный кабинет" disabled={pending} onClick={onClose} />
     <section className={`customer-account-modal${session ? " is-authenticated" : ""}${section === "orders" ? " is-orders" : ""}`}>
       {!session && <button className="customer-account-close" type="button" onClick={onClose} aria-label="Закрыть"><MaterialIcon>close</MaterialIcon></button>}
@@ -462,7 +470,7 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
               <h3>История операций</h3>
               {hasRewardOperations ? <div className="profile-coin-history">
                 {coinHistory.map((entry) => <article className="profile-history-row" key={entry.id}>
-                  <div className="profile-history-main"><span><b>{entry.description}</b><small>{formatHistoryDate(entry.createdAt)}</small></span><strong className={entry.amount < 0 ? "negative" : ""}>{entry.amount > 0 ? "+" : ""}{numberFormat.format(entry.amount)}</strong></div>
+                  <div className="profile-history-main"><span><b>{entry.description}</b><small>{formatHistoryDate(entry.createdAt, locale)}</small></span><strong className={entry.amount < 0 ? "negative" : ""}>{entry.amount > 0 ? "+" : ""}{numberFormat.format(entry.amount)}</strong></div>
                   {entry.withdrawalReason ? <p className="profile-withdrawal-reason">Причина: {entry.withdrawalReason}</p> : null}
                   {entry.withdrawalStatus === "pending" && entry.withdrawalId ? <button type="button" className="profile-cancel-withdrawal" onClick={() => { setCancelError(""); setCancelTarget({ kind: "coins", id: entry.withdrawalId!, label: `${Math.abs(entry.amount)} NAKTA Coin` }); }}>Отменить вывод</button> : null}
                 </article>)}
@@ -502,5 +510,5 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
       <button className="customer-cancel-dismiss" type="button" aria-label="Закрыть подтверждение" disabled={cancelBusy} onClick={() => setCancelTarget(null)} />
       <section className="customer-cancel-dialog reward-cancel-dialog"><span className="reward-cancel-icon"><Icon path={mdiAlertCircleOutline} size={1.1} aria-hidden="true" /></span><h2 id="customer-cancel-title">Отменить вывод?</h2><p>{cancelTarget.kind === "coins" ? `${cancelTarget.label} вернутся на баланс.` : `${cancelTarget.label} снова станет доступен для вывода.`} Отмена возможна только до начала обработки.</p>{cancelError && <div className="customer-account-error" role="alert">{cancelError}</div>}<div><button type="button" disabled={cancelBusy} onClick={() => setCancelTarget(null)}>Не отменять</button><button type="button" disabled={cancelBusy} onClick={() => void cancelWithdrawal()}>{cancelBusy ? "Отменяем…" : "Отменить вывод"}</button></div></section>
     </div>}
-  </div>;
+  </div>}</Localized>;
 }

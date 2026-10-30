@@ -1,5 +1,11 @@
 "use client";
 
+import Localized from "./i18n/Localized";
+import { useLanguage } from "./i18n/LanguageProvider";
+import { translate } from "./i18n/translate";
+import type { Locale } from "./i18n/locales";
+
+
 import Script from "next/script";
 import { KeyboardEvent as ReactKeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -113,12 +119,12 @@ function viewForLocations(locations: PickupLocation[]) {
   return { center: [(west + east) / 2, (south + north) / 2] as LngLat, zoom };
 }
 
-function createLocationMarkerElement(location: PickupLocation, selected: boolean) {
+function createLocationMarkerElement(location: PickupLocation, selected: boolean, locale: Locale) {
   const status = pickupStatus(location);
   const element = document.createElement("button");
   element.type = "button";
   element.className = `yandex-location-marker${selected ? " is-selected" : ""}`;
-  element.setAttribute("aria-label", `${location.name}, ${location.address}, ${status.label} ${status.time}`);
+  element.setAttribute("aria-label", `${translate(location.name, locale)}, ${translate(location.address, locale)}, ${translate(status.label, locale)} ${status.time}`);
 
   const pin = document.createElement("span");
   pin.className = "yandex-location-pin";
@@ -127,26 +133,26 @@ function createLocationMarkerElement(location: PickupLocation, selected: boolean
   const label = document.createElement("span");
   label.className = "yandex-location-label";
   const title = document.createElement("strong");
-  title.textContent = location.name;
+  title.textContent = translate(location.name, locale);
   const hours = document.createElement("small");
-  hours.textContent = `${status.label} ${status.time}`;
+  hours.textContent = `${translate(status.label, locale)} ${status.time}`;
   label.append(title, hours);
   element.append(pin, label);
   return element;
 }
 
-function createEditMarkerElement() {
+function createEditMarkerElement(locale: Locale) {
   const element = document.createElement("div");
   element.className = "yandex-edit-marker";
-  element.setAttribute("aria-label", "Редактируемая точка");
+  element.setAttribute("aria-label", translate("Редактируемая точка", locale));
   element.setAttribute("role", "img");
   return element;
 }
 
-function createUserMarkerElement() {
+function createUserMarkerElement(locale: Locale) {
   const element = document.createElement("div");
   element.className = "yandex-user-marker";
-  element.setAttribute("aria-label", "Ваше местоположение");
+  element.setAttribute("aria-label", translate("Ваше местоположение", locale));
   element.setAttribute("role", "img");
   return element;
 }
@@ -167,6 +173,8 @@ export default function PickupMap({
   className = "",
   ariaLabel = "Карта точек самовывоза",
 }: PickupMapProps) {
+  const { locale } = useLanguage();
+  const localeRef = useRef(locale);
   const [apiReady, setApiReady] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [geoMessage, setGeoMessage] = useState("");
@@ -197,6 +205,13 @@ export default function PickupMap({
   const onAddressResolveRef = useRef(onAddressResolve);
   const onAddressBusyChangeRef = useRef(onAddressBusyChange);
   const onUserPositionRef = useRef(onUserPosition);
+
+  useEffect(() => {
+    localeRef.current = locale;
+    syncRef.current?.();
+    containerRef.current?.querySelector(".yandex-edit-marker")?.setAttribute("aria-label", translate("Редактируемая точка", locale));
+    containerRef.current?.querySelector(".yandex-user-marker")?.setAttribute("aria-label", translate("Ваше местоположение", locale));
+  }, [locale]);
 
   const validLocations = useMemo(
     () => locations.filter((location) => location.active && hasValidCoordinates(location)),
@@ -372,7 +387,7 @@ export default function PickupMap({
         .join("|");
 
       currentLocations.forEach((location) => {
-        const element = createLocationMarkerElement(location, location.id === currentSelectedId);
+        const element = createLocationMarkerElement(location, location.id === currentSelectedId, localeRef.current);
         element.addEventListener("click", (event) => {
           event.stopPropagation();
           onSelectRef.current?.(location);
@@ -399,7 +414,7 @@ export default function PickupMap({
               marker.update({ coordinates: nextCoordinates });
               void resolvePosition(fromLngLat(nextCoordinates));
             },
-          }, createEditMarkerElement());
+          }, createEditMarkerElement(localeRef.current));
           editMarkerRef.current = marker;
           currentMap.addChild(marker);
         } else {
@@ -473,7 +488,7 @@ export default function PickupMap({
       if (!mountedRef.current || !mapRef.current || !window.ymaps3) return;
       const userPosition = { latitude: coords.latitude, longitude: coords.longitude };
       if (userMarkerRef.current) mapRef.current.removeChild(userMarkerRef.current);
-      const marker = new window.ymaps3.YMapMarker({ coordinates: toLngLat(userPosition), zIndex: 2200 }, createUserMarkerElement());
+      const marker = new window.ymaps3.YMapMarker({ coordinates: toLngLat(userPosition), zIndex: 2200 }, createUserMarkerElement(localeRef.current));
       userMarkerRef.current = marker;
       mapRef.current.addChild(marker);
       onUserPositionRef.current?.(userPosition);
@@ -515,7 +530,7 @@ export default function PickupMap({
     : loadError;
   const editorEnabled = Boolean(onPositionInput && onAddressInput);
 
-  return (
+  return <Localized>{(
     <div className={`pickup-map-shell yandex-map-shell ${editorEnabled ? "is-editor" : ""} ${className}`.trim()}>
       {YANDEX_MAPS_API_KEY ? (
         <Script
@@ -560,5 +575,5 @@ export default function PickupMap({
       {editorEnabled && addressMessage ? <p className="pickup-map-address-status" role="status" aria-live="polite">{addressMessage}</p> : null}
       {editorEnabled ? <p className="pickup-map-editor-hint">Введите адрес, нажмите на карту или перетащите красную метку</p> : null}
     </div>
-  );
+  )}</Localized>;
 }
