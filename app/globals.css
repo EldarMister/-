@@ -915,16 +915,28 @@ button.profile-history-main:disabled { cursor: default; opacity: 1; }
   .customer-cancel-dialog.reward-cancel-dialog { width: 100vw; padding: 28px 20px max(28px,calc(env(safe-area-inset-bottom) + 12px)); border-radius: 28px 28px 0 0; }
 }
 /* Language controls share one preference across the storefront and documents. */
-.language-selector { position: relative; display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 10px; border: 1px solid #dce1e8; border-radius: 10px; background: #fff; color: #343c4b; vertical-align: middle; }
-.language-selector svg { width: 18px; height: 18px; flex: 0 0 18px; }
-.language-selector select { width: auto; max-width: 180px; min-height: 38px; padding: 6px 20px 6px 0; border: 0; border-radius: 8px; background: transparent; color: inherit; font-family: system-ui,Arial,sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
-.language-selector:focus-within { outline: 2px solid #d71920; outline-offset: 3px; }
-.language-selector select:focus { outline: none; }
-.language-selector option { color: #202631; background: #fff; }
-.header-language { order: 6; flex: 0 0 auto; margin-top: 11px; min-height: 36px; padding: 0 6px; border-color: #e3e5e9; border-radius: 20px; }
-.header-language svg { width: 15px; height: 15px; flex-basis: 15px; }
-.header-language select { min-height: 34px; font-size: 12px; }
+.language-selector { position: relative; display: inline-block; flex: 0 0 auto; color: #343c4b; vertical-align: middle; }
+.language-selector summary { display: flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border: 1px solid #dce1e8; border-radius: 12px; background: #fff; font: 600 14px system-ui,Arial,sans-serif; list-style: none; cursor: pointer; user-select: none; }
+.language-selector summary::-webkit-details-marker { display: none; }
+.language-selector summary::marker { content: ""; }
+.language-selector summary > svg { width: 18px; height: 18px; flex: 0 0 18px; }
+.language-selector summary > .language-chevron { width: 16px; height: 16px; flex-basis: 16px; margin-left: auto; transition: transform .15s ease; }
+.language-selector[open] summary > .language-chevron { transform: rotate(180deg); }
+.language-selector summary:hover { border-color: #d71920; }
+.language-selector summary:focus-visible, .language-options button:focus-visible { outline: 2px solid #d71920; outline-offset: 3px; }
+.language-options { position: absolute; z-index: 1000; top: calc(100% + 8px); right: 0; min-width: 214px; margin: 0; padding: 6px; border: 1px solid #eee; border-radius: 16px; background: #fff; box-shadow: 0 12px 32px rgba(31,35,44,.16); list-style: none; }
+.language-options li { margin: 0; padding: 0; }
+.language-options button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 42px; padding: 9px 10px; border: 0; border-radius: 10px; background: transparent; color: #343c4b; font: 500 14px system-ui,Arial,sans-serif; text-align: left; cursor: pointer; }
+.language-options button:hover { background: #f6f6f7; }
+.language-options button[aria-pressed=true] { background: #fff0f1; color: #d71920; }
+.language-option-code { min-width: 26px; color: #838994; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
+.language-options button[aria-pressed=true] .language-option-code { color: #d71920; }
+.language-check { margin-left: auto; font-size: 17px; }
+.header-language { order: 6; margin-top: 11px; }
+.header-language summary { min-height: 36px; padding: 0 10px; border-radius: 20px; font-size: 12px; }
+.header-language summary > svg { width: 15px; height: 15px; flex-basis: 15px; }
 .footer-language { display: flex; justify-content: flex-end; margin-bottom: 20px; }
+.footer-language .language-options { top: auto; bottom: calc(100% + 8px); }
 .mobile-menu-language { display: none; }
 .translated-promotion { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 24px 32px; overflow: hidden; background: linear-gradient(120deg,#fff5e5,#fbe5dc); color: #9c1223; text-align: left; }
 .translated-promotion::after { content: ''; position: absolute; right: -10%; top: -35%; width: 55%; height: 165%; border-radius: 50%; background: #d7192012; }
