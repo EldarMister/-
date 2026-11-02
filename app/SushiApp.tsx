@@ -192,7 +192,7 @@ function ProductCard({ product, quantity, onDecrease, onIncrease, onOpen }: { pr
     <article className="product-card">
       <div className="product-card-inner">
         <button type="button" className="product-image-button" onClick={onOpen} aria-label={`Состав и описание: ${product.name}`}><img src={product.image} alt={product.name} loading="lazy" /></button>
-        {(product.naktaCoins || 0) > 0 && <span className="product-reward-badge"><b>+{product.naktaCoins}</b> NAKTA Coin</span>}
+        {(product.naktaCoins || 0) > 0 && <span className="product-reward-badge"><b>+{product.naktaCoins}</b> DAANA Coin</span>}
         <h2><button type="button" className="product-name-button" onClick={onOpen}><span>{product.name}</span></button></h2>
         <div className="product-card-buy">
           <div className="price-pill">{product.price * Math.max(quantity, 1)} С</div>

@@ -552,7 +552,7 @@ a { color: inherit; }
   .footer-legal span:last-child { grid-column: auto; }
 }
 
-/* NAKTA Coin and NFT */
+/* DAANA Coin and NFT */
 .product-card-inner { position: relative; }
 .product-reward-badge { position: absolute; z-index: 2; top: 135px; left: 50%; display: inline-flex; align-items: center; gap: 4px; max-width: calc(100% - 34px); padding: 6px 11px; border: 2px solid #fff; border-radius: 999px; background: linear-gradient(135deg,#ff7a1a,#ff4214); box-shadow: 0 6px 14px rgba(222,65,18,.24); color: #fff; font-family: "Roboto",sans-serif; font-size: 11px; font-weight: 700; line-height: 1; white-space: nowrap; transform: translate(-50%,-50%); }
 .product-reward-badge b { font-size: 13px; }
@@ -948,9 +948,7 @@ html:not([lang^=ru]) .order-heading-visual > .translated-order-title { margin: 0
   .header-links { flex: 0 0 181px; }
 }
 @media (max-width:1023.98px) {
-  .header-language { position: absolute; right: 113px; top: 6px; width: 64px; min-height: 31px; margin: 0; padding: 0 4px; border-radius: 16px; }
-  .header-language svg { display: none; }
-  .header-language select { width: 100%; min-height: 29px; padding: 2px 12px 2px 4px; font-size: 12px; }
+  .header-language { display: none; }
   .store-selector { width: min(160px,calc(100vw - 196px)); min-width: 0; }
   html:not([lang^=ru]) .store-selector { font-size: 11px; }
   .mobile-menu-language { display: flex; padding: 14px 24px; }

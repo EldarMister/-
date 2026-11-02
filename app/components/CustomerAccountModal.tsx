@@ -452,7 +452,7 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
             </section>
             <nav className="customer-account-menu" aria-label="Разделы личного кабинета">
               <button type="button" onClick={() => { setOrderSection("active"); setSection("orders"); }}><Icon path={mdiShoppingOutline} size={1} aria-hidden="true" /><b>Мои заказы</b><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></button>
-              <button type="button" onClick={() => setSection("rewards")}><Icon path={mdiStarFourPointsOutline} size={1} aria-hidden="true" /><b>NAKTA Coin и NFT</b><em><span>{numberFormat.format(profile?.naktaCoins || 0)}</span><small>{profile?.nfts.length || 0} NFT</small></em><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></button>
+              <button type="button" onClick={() => setSection("rewards")}><Icon path={mdiStarFourPointsOutline} size={1} aria-hidden="true" /><b>DAANA Coin и NFT</b><em><span>{numberFormat.format(profile?.naktaCoins || 0)}</span><small>{profile?.nfts.length || 0} NFT</small></em><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></button>
               <button type="button" onClick={() => setSection("account")}><Icon path={mdiCogOutline} size={1} aria-hidden="true" /><b>Настройки</b><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></button>
               <a href="/support"><Icon path={mdiMessageReplyTextOutline} size={1} aria-hidden="true" /><b>Поддержка</b><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></a>
               <a href="/about"><Icon path={mdiInformationOutline} size={1} aria-hidden="true" /><b>О нас</b><Icon path={mdiChevronRight} size={0.95} aria-hidden="true" /></a>
@@ -461,10 +461,10 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
           </div>}
 
           {profile && section === "rewards" && <div className="customer-rewards-view">
-            <section className="profile-balance-card"><div><span>Ваш баланс</span><strong>{numberFormat.format(profile.naktaCoins)}</strong></div><Image src="/nakta-coin.png" alt="NAKTA Coin" width={78} height={78} /></section>
+            <section className="profile-balance-card"><div><span>Ваш баланс</span><strong>{numberFormat.format(profile.naktaCoins)}</strong></div><Image src="/nakta-coin.png" alt="DAANA Coin" width={78} height={78} /></section>
             <section className="profile-nft-balance-card"><div><span>Ваши NFT</span><strong>{numberFormat.format(profile.nfts.length)}</strong><small>цифровых наград</small></div><i aria-hidden="true"><Icon path={mdiHexagonMultipleOutline} size={1.5} /></i></section>
             <button className="profile-reward-withdraw-button" type="button" disabled={profile.naktaCoins <= 0 && !availableNfts.length} onClick={() => setWithdrawalOpen(true)}><Icon path={mdiBankTransferOut} size={1} aria-hidden="true" />Вывести</button>
-            <section className="profile-info-card profile-reward-explainer"><h3>Как работают NAKTA Coin и NFT</h3><p>Награды не тратятся внутри сайта. Накопленные коины и NFT можно вывести на свой криптокошелёк.</p></section>
+            <section className="profile-info-card profile-reward-explainer"><h3>Как работают DAANA Coin и NFT</h3><p>Награды не тратятся внутри сайта. Накопленные коины и NFT можно вывести на свой криптокошелёк.</p></section>
 
             <section className="profile-info-card profile-reward-history">
               <h3>История операций</h3>
@@ -472,7 +472,7 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
                 {coinHistory.map((entry) => <article className="profile-history-row" key={entry.id}>
                   <div className="profile-history-main"><span><b>{entry.description}</b><small>{formatHistoryDate(entry.createdAt, locale)}</small></span><strong className={entry.amount < 0 ? "negative" : ""}>{entry.amount > 0 ? "+" : ""}{numberFormat.format(entry.amount)}</strong></div>
                   {entry.withdrawalReason ? <p className="profile-withdrawal-reason">Причина: {entry.withdrawalReason}</p> : null}
-                  {entry.withdrawalStatus === "pending" && entry.withdrawalId ? <button type="button" className="profile-cancel-withdrawal" onClick={() => { setCancelError(""); setCancelTarget({ kind: "coins", id: entry.withdrawalId!, label: `${Math.abs(entry.amount)} NAKTA Coin` }); }}>Отменить вывод</button> : null}
+                  {entry.withdrawalStatus === "pending" && entry.withdrawalId ? <button type="button" className="profile-cancel-withdrawal" onClick={() => { setCancelError(""); setCancelTarget({ kind: "coins", id: entry.withdrawalId!, label: `${Math.abs(entry.amount)} DAANA Coin` }); }}>Отменить вывод</button> : null}
                 </article>)}
                 {nftOperations.map((nft) => <article className="profile-history-row profile-nft-operation" key={`nft-${nft.id}`}>
                   <div className="profile-history-main"><span><b>Вывод NFT «{nft.name}»</b><small>{networkLabels[nft.network] || nft.network} · {rewardStatusLabels[nft.status] || nft.status}</small></span><strong className={`nft-status status-${nft.status}`}>NFT</strong></div>
@@ -495,7 +495,7 @@ export default function CustomerAccountModal({ apiUrl, coinNetwork, onClose, onS
 
           {profile && section === "account" && <div className="customer-profile-view">
             <section className="profile-settings-field"><span>Телефон аккаунта</span><strong>{profile.customer.phone || session.phone}</strong></section>
-            <section className="profile-settings-field"><span>Баланс NAKTA Coin</span><strong>{numberFormat.format(profile.naktaCoins)}</strong></section>
+            <section className="profile-settings-field"><span>Баланс DAANA Coin</span><strong>{numberFormat.format(profile.naktaCoins)}</strong></section>
             <section className="profile-settings-field"><span>Получено NFT</span><strong>{numberFormat.format(profile.nfts.length)}</strong></section>
             <a className="profile-settings-link" href="/legal">Правовая информация <span>›</span></a>
             <button type="button" className="profile-logout" disabled={logoutBusy} onClick={() => void logout()}>{logoutBusy ? "Выходим…" : <>Выйти из профиля <span><Icon path={mdiLogout} size={0.9} aria-hidden="true" /></span></>}</button>

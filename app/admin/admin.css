@@ -565,7 +565,8 @@ html.admin-page { --admin-sidebar-width: 16rem; --header-height: 56px; }
 .admin-shell .admin-sidebar { width: var(--admin-sidebar-width); padding: 8px; overflow: hidden; transition: width .18s ease; }
 .admin-workspace { margin-left: var(--admin-sidebar-width); transition: margin-left .18s ease; }
 .ui-sidebar-header { flex-shrink: 0; padding: 0 0 6px; }
-.ui-sidebar-content { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
+.ui-sidebar-content { flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden; scrollbar-width: none; }
+.ui-sidebar-content::-webkit-scrollbar { display: none; }
 .ui-sidebar-footer { display: grid; flex-shrink: 0; gap: 5px; margin-top: auto; padding-top: 10px; }
 .admin-sidebar .admin-brand { display: flex; align-items: center; justify-content: flex-start; width: 100%; min-height: 48px; height: 48px; padding: 6px 8px; margin: 0; border: 0; border-radius: 8px; background: transparent; text-align: left; }
 .admin-brand-copy { display: grid; flex: 1; gap: 1px; }

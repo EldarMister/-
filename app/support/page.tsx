@@ -7,7 +7,7 @@ import { createPageMetadata } from "../seo";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Поддержка",
-  description: "Связь с поддержкой ДААНА СУШИ по заказам, данным, NAKTA Coin, NFT и выводу наград.",
+  description: "Связь с поддержкой ДААНА СУШИ по заказам, данным, DAANA Coin, NFT и выводу наград.",
   path: "/support",
 });
 
@@ -17,7 +17,7 @@ export default function SupportPage() {
       title="Поддержка"
       action={{ label: "Открыть чат поддержки", href: LEGAL_DETAILS.supportUrl }}
     >
-      <p><TranslatedText source={"Поможем с заказом, оплатой при получении, входом в аккаунт, NAKTA Coin, NFT, выводом наград и запросами о персональных данных."} /></p>
+      <p><TranslatedText source={"Поможем с заказом, оплатой при получении, входом в аккаунт, DAANA Coin, NFT, выводом наград и запросами о персональных данных."} /></p>
 
       <h2><TranslatedText source={"Как обратиться"} /></h2>
       <p><TranslatedText source={"Напишите в "} /><a href={LEGAL_DETAILS.supportUrl}><TranslatedText source={"чат поддержки в Telegram"} /></a><TranslatedText source={". Для быстрого поиска заказа укажите его номер и телефон, с которого он был оформлен."} /></p>

@@ -243,8 +243,8 @@ export default function RewardsWithdrawalDialog({ coins, coinNetwork, nfts, onCl
         {step === "confirm" && <div className="reward-withdrawal-content">
           <header className="reward-withdrawal-heading"><button type="button" aria-label="Изменить данные" onClick={() => { setError(""); setStep("form"); }}><Icon path={mdiArrowLeft} size={0.9} aria-hidden="true" /></button><span><h2 id="reward-withdrawal-title">Подтверждение вывода</h2><p>Проверьте данные перед отправкой заявки</p></span></header>
           <dl className="reward-withdrawal-summary">
-            <div><dt>Актив</dt><dd>{kind === "coins" ? "NAKTA Coin" : selectedNft?.name || "NFT"}</dd></div>
-            <div><dt>Сумма</dt><dd>{kind === "coins" ? `${parsedAmount} NAKTA Coin` : "1 NFT"}</dd></div>
+            <div><dt>Актив</dt><dd>{kind === "coins" ? "DAANA Coin" : selectedNft?.name || "NFT"}</dd></div>
+            <div><dt>Сумма</dt><dd>{kind === "coins" ? `${parsedAmount} DAANA Coin` : "1 NFT"}</dd></div>
             <div><dt>Адрес кошелька</dt><dd title={walletAddress.trim()}>{walletAddress.trim()}</dd></div>
             {kind === "coins" && <div><dt>Сеть</dt><dd>{networkLabels[coinNetwork as NftNetwork] || coinNetwork}</dd></div>}
             {kind === "nft" && selectedNft && <div><dt>Сеть</dt><dd>{networkLabels[selectedNft.network] || selectedNft.network}</dd></div>}
@@ -259,14 +259,14 @@ export default function RewardsWithdrawalDialog({ coins, coinNetwork, nfts, onCl
           <h2 id="reward-withdrawal-title">Вывод награды</h2>
           <p className="reward-withdrawal-subtitle">Что хотите вывести?</p>
           <div className="reward-withdrawal-kinds">
-            <button type="button" className={`reward-kind-card coin${kind === "coins" ? " selected" : ""}`} disabled={coins <= 0} aria-pressed={kind === "coins"} onClick={() => chooseKind("coins")}><span>NAKTA Coin</span><strong>{new Intl.NumberFormat("ru-RU").format(coins)}</strong></button>
+            <button type="button" className={`reward-kind-card coin${kind === "coins" ? " selected" : ""}`} disabled={coins <= 0} aria-pressed={kind === "coins"} onClick={() => chooseKind("coins")}><span>DAANA Coin</span><strong>{new Intl.NumberFormat("ru-RU").format(coins)}</strong></button>
             <button type="button" className={`reward-kind-card nft${kind === "nft" ? " selected" : ""}`} disabled={!availableNfts.length} aria-pressed={kind === "nft"} onClick={() => chooseKind("nft")}><span>NFT</span><strong>{availableNfts.length}</strong><i><Icon path={mdiHexagonMultipleOutline} size={1} aria-hidden="true" /></i></button>
           </div>
 
           {kind === "nft" && availableNfts.length > 1 && <fieldset className="reward-nft-selector"><legend>Выберите NFT</legend>{availableNfts.map((nft) => { const inputId = `withdrawal-nft-${nft.id}`; return <label htmlFor={inputId} className={nft.id === nftId ? "selected" : ""} key={nft.id}><input id={inputId} aria-label={`${nft.name}, сеть ${networkLabels[nft.network] || nft.network}`} type="radio" name="withdrawalNft" value={nft.id} checked={nft.id === nftId} onChange={() => setNftId(nft.id)} /><span><b>{nft.name}</b><small>{networkLabels[nft.network] || nft.network}</small></span></label>; })}</fieldset>}
 
           {kind && <div className="reward-withdrawal-form">
-            {kind === "coins" ? <label>Количество NAKTA Coin<input type="text" inputMode="numeric" autoComplete="off" maxLength={10} value={amount} placeholder={`От 1 до ${coins}`} onChange={(event) => { setAmount(event.target.value.replace(/\D/g, "")); setError(""); }} />{amount && !amountValid && <small className="invalid">Введите количество от 1 до {coins}</small>}</label> : <p className="reward-withdrawal-selection">К выводу: {selectedNft?.name || "NFT"}{selectedNft ? ` · ${networkLabels[selectedNft.network] || selectedNft.network}` : ""}</p>}
+            {kind === "coins" ? <label>Количество DAANA Coin<input type="text" inputMode="numeric" autoComplete="off" maxLength={10} value={amount} placeholder={`От 1 до ${coins}`} onChange={(event) => { setAmount(event.target.value.replace(/\D/g, "")); setError(""); }} />{amount && !amountValid && <small className="invalid">Введите количество от 1 до {coins}</small>}</label> : <p className="reward-withdrawal-selection">К выводу: {selectedNft?.name || "NFT"}{selectedNft ? ` · ${networkLabels[selectedNft.network] || selectedNft.network}` : ""}</p>}
             <label>Адрес криптокошелька<span className="reward-wallet-field"><input type="text" autoCapitalize="none" autoCorrect="off" autoComplete="off" spellCheck={false} minLength={16} maxLength={200} value={walletAddress} placeholder="Введите адрес кошелька" onChange={(event) => { setWalletAddress(event.target.value); setError(""); }} /><button type="button" title="Вставить адрес" aria-label="Вставить адрес из буфера" onClick={() => void pasteAddress()}><Icon path={mdiContentPaste} size={0.85} aria-hidden="true" /></button><button type="button" title="Сканировать QR" aria-label="Сканировать QR-код кошелька" onClick={() => { setError(""); setStep("scanner"); }}><Icon path={mdiQrcodeScan} size={0.9} aria-hidden="true" /></button></span>{walletAddress && !addressValid && <small className="invalid">Проверьте адрес для сети {networkLabels[selectedNetwork as NftNetwork] || selectedNetwork}.</small>}</label>
             <p className="reward-withdrawal-hint">Введите адрес вручную или отсканируйте QR-код. После отправки заявки адрес изменить нельзя.</p>
             {error && <p className="reward-withdrawal-error" role="alert">{error}</p>}

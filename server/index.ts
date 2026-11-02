@@ -503,12 +503,12 @@ async function customerProfile(customer: { id: number; phone: string; name: stri
       amount: -Number(withdrawal.amount),
       createdAt: withdrawal.created_at,
       description: withdrawal.status === "withdrawn"
-        ? "Вывод NAKTA Coin завершён"
+        ? "Вывод DAANA Coin завершён"
         : withdrawal.status === "cancelled"
-          ? "Заявка на вывод NAKTA Coin отменена"
+          ? "Заявка на вывод DAANA Coin отменена"
           : withdrawal.status === "failed"
-            ? "Заявка на вывод NAKTA Coin отклонена"
-            : "Заявка на вывод NAKTA Coin",
+            ? "Заявка на вывод DAANA Coin отклонена"
+            : "Заявка на вывод DAANA Coin",
       withdrawalId: String(withdrawal.id),
       withdrawalStatus: withdrawal.status,
       withdrawalReason: reason,
@@ -519,8 +519,8 @@ async function customerProfile(customer: { id: number; phone: string; name: stri
         amount: Number(withdrawal.amount),
         createdAt: withdrawal.processed_at || withdrawal.created_at,
         description: `${withdrawal.status === "cancelled"
-          ? "Возврат NAKTA Coin после отмены вывода"
-          : "Возврат NAKTA Coin после отклонения вывода"}${reason ? `. Причина: ${reason}` : ""}`,
+          ? "Возврат DAANA Coin после отмены вывода"
+          : "Возврат DAANA Coin после отклонения вывода"}${reason ? `. Причина: ${reason}` : ""}`,
         withdrawalId: String(withdrawal.id),
         withdrawalStatus: withdrawal.status,
         withdrawalReason: reason,
@@ -902,7 +902,7 @@ app.post("/api/orders", orderClientLimiter, orderLimiter, async (request, respon
   try {
     calculateOrderCoinReward(orderLines);
   } catch {
-    throw new ApiError(400, "Сумма награды NAKTA Coin слишком велика");
+    throw new ApiError(400, "Сумма награды DAANA Coin слишком велика");
   }
   const orderNumber = `ST-${Date.now().toString().slice(-6)}${Math.floor(Math.random() * 90 + 10)}`;
   const order = await sql.begin(async (tx) => {
@@ -982,12 +982,12 @@ app.post("/api/auth/coins/withdraw", requireCustomer, rewardLimiter, async (requ
       }
       return existing;
     }
-    if (amount < 1) throw new ApiError(400, "Укажите целое количество NAKTA Coin для вывода");
+    if (amount < 1) throw new ApiError(400, "Укажите целое количество DAANA Coin для вывода");
     if (!isWalletAddressValid(rewards.coinNetwork, walletAddress)) {
       throw new ApiError(400, `Некорректный адрес кошелька для сети ${rewards.coinNetwork}`);
     }
     if (amount > Number(account.naktaCoins)) {
-      throw new ApiError(400, "Недостаточно NAKTA Coin для вывода");
+      throw new ApiError(400, "Недостаточно DAANA Coin для вывода");
     }
     const [created] = await tx<DatabaseCoinWithdrawal[]>`
       INSERT INTO nakta_coin_withdrawals (customer_id, request_key, amount, wallet_address, network)
@@ -1470,7 +1470,7 @@ app.patch("/api/admin/orders/:id/status", async (request, response) => {
       if (inserted) {
         const nextBalance = Number(lockedCustomer.naktaCoins || 0) + rewardAmount;
         if (!Number.isSafeInteger(nextBalance) || nextBalance > 2_147_483_647) {
-          throw new ApiError(409, "Начисление превышает допустимый баланс NAKTA Coin");
+          throw new ApiError(409, "Начисление превышает допустимый баланс DAANA Coin");
         }
         await tx`
           UPDATE customers SET nakta_coins = ${nextBalance}, updated_at = NOW()
@@ -1644,7 +1644,7 @@ app.post("/api/admin/customers/:phone/rewards/adjust", async (request, response)
   const delta = integerValue(request.body.delta);
   const reason = String(request.body.reason || "").trim().slice(0, 240);
   if (!(["coin", "nft"] as const).includes(asset as "coin" | "nft")) {
-    throw new ApiError(400, "Выберите NAKTA Coin или NFT");
+    throw new ApiError(400, "Выберите DAANA Coin или NFT");
   }
   if (delta === 0 || Math.abs(delta) > 1_000_000) {
     throw new ApiError(400, "Укажите целое количество больше или меньше нуля");
@@ -1667,7 +1667,7 @@ app.post("/api/admin/customers/:phone/rewards/adjust", async (request, response)
     if (asset === "coin") {
       const nextBalance = Number(customer.naktaCoins) + delta;
       if (!Number.isSafeInteger(nextBalance) || nextBalance < 0 || nextBalance > 2_147_483_647) {
-        throw new ApiError(400, "Недостаточно NAKTA Coin для списания или превышен допустимый баланс");
+        throw new ApiError(400, "Недостаточно DAANA Coin для списания или превышен допустимый баланс");
       }
       await tx`UPDATE customers SET nakta_coins = ${nextBalance}, updated_at = NOW() WHERE id = ${customer.id}`;
       balanceAfter = nextBalance;
@@ -1766,7 +1766,7 @@ app.patch("/api/admin/coin-withdrawals/:id", async (request, response) => {
     }
     const txHash = suppliedTxHash === undefined ? current.tx_hash : suppliedTxHash || null;
     if (status === "withdrawn" && !txHash) {
-      throw new ApiError(400, "Для завершения вывода NAKTA Coin нужен хеш транзакции");
+      throw new ApiError(400, "Для завершения вывода DAANA Coin нужен хеш транзакции");
     }
     if (status === "withdrawn" && !isTransactionHashValid(current.network, txHash || "")) {
       throw new ApiError(400, `Некорректный хеш транзакции для сети ${current.network}`);

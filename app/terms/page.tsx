@@ -5,7 +5,7 @@ import { createPageMetadata } from "../seo";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Условия использования и заказа",
-  description: "Условия заказа, оплаты при получении, начисления и вывода NAKTA Coin и NFT в ДААНА СУШИ.",
+  description: "Условия заказа, оплаты при получении, начисления и вывода DAANA Coin и NFT в ДААНА СУШИ.",
   path: "/terms",
 });
 

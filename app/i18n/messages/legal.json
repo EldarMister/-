@@ -167,11 +167,11 @@
     "Сыйақы бағдарламасының деректері:",
     "Mukofot dasturi ma’lumotlari:"
   ],
-  "баланс NAKTA Coin, история начислений, списаний и корректировок, полученные NFT, связанные заказы, параметры награды и статусы операций.": [
-    "NAKTA Coin балансы, эсептөө, сарптоо жана оңдоолордун тарыхы, алынган NFTлер, байланыштуу буйрутмалар, сыйлыктын параметрлери жана операциялардын статустары.",
-    "NAKTA Coin balance, accrual, deduction and adjustment history, received NFTs, related orders, reward parameters and transaction statuses.",
-    "NAKTA Coin балансы, есептеу, есептен шығару және түзету тарихы, алынған NFT-лер, байланысты тапсырыстар, сыйақы параметрлері мен операциялар мәртебелері.",
-    "NAKTA Coin balansi, hisoblash, yechish va tuzatish tarixi, olingan NFTlar, tegishli buyurtmalar, mukofot parametrlari va amaliyotlar holati."
+  "баланс DAANA Coin, история начислений, списаний и корректировок, полученные NFT, связанные заказы, параметры награды и статусы операций.": [
+    "DAANA Coin балансы, эсептөө, сарптоо жана оңдоолордун тарыхы, алынган NFTлер, байланыштуу буйрутмалар, сыйлыктын параметрлери жана операциялардын статустары.",
+    "DAANA Coin balance, accrual, deduction and adjustment history, received NFTs, related orders, reward parameters and transaction statuses.",
+    "DAANA Coin балансы, есептеу, есептен шығару және түзету тарихы, алынған NFT-лер, байланысты тапсырыстар, сыйақы параметрлері мен операциялар мәртебелері.",
+    "DAANA Coin balansi, hisoblash, yechish va tuzatish tarixi, olingan NFTlar, tegishli buyurtmalar, mukofot parametrlari va amaliyotlar holati."
   ],
   "Данные вывода наград:": [
     "Сыйлыктарды чыгаруу маалыматтары:",
@@ -239,11 +239,11 @@
     "тапсырыстар тарихын көрсету және қолдау қызметі үшін;",
     "buyurtmalar tarixini ko‘rsatish va yordam xizmati uchun;"
   ],
-  "для расчёта, начисления и учёта NAKTA Coin и NFT;": [
-    "NAKTA Coin жана NFTни эсептөө, берүү жана эсепке алуу үчүн;",
-    "calculating, awarding and recording NAKTA Coin and NFTs;",
-    "NAKTA Coin және NFT есептеу, беру және есепке алу үшін;",
-    "NAKTA Coin va NFT hisoblash, berish va hisobga olish uchun;"
+  "для расчёта, начисления и учёта DAANA Coin и NFT;": [
+    "DAANA Coin жана NFTни эсептөө, берүү жана эсепке алуу үчүн;",
+    "calculating, awarding and recording DAANA Coin and NFTs;",
+    "DAANA Coin және NFT есептеу, беру және есепке алу үшін;",
+    "DAANA Coin va NFT hisoblash, berish va hisobga olish uchun;"
   ],
   "для создания, проверки, отмены и исполнения заявок на вывод наград;": [
     "сыйлыктарды чыгаруу өтүнмөлөрүн түзүү, текшерүү, жокко чыгаруу жана аткаруу үчүн;",
@@ -335,11 +335,11 @@
     "5. Блокчейннің ашықтығы",
     "5. Blokcheynning ochiqligi"
   ],
-  "После отправки NAKTA Coin или NFT сведения о кошельке, активе, сумме и хеше транзакции могут стать общедоступными в соответствующем блокчейне. Блокчейн-запись нельзя изменить или удалить силами ДААНА СУШИ. Имя, номер телефона и содержание заказа специально в блокчейн не публикуются.": [
-    "NAKTA Coin же NFT жөнөтүлгөндөн кийин капчык, актив, сумма жана транзакциянын хеши жөнүндө маалыматтар тиешелүү блокчейнде жалпыга ачык болушу мүмкүн. Блокчейн жазуусун ДААНА СУШИ өзгөртө же өчүрө албайт. Аты, телефон номери жана буйрутманын мазмуну атайын блокчейнге жарыяланбайт.",
-    "After NAKTA Coin or NFTs are sent, wallet, asset, amount and transaction hash information may become public on the relevant blockchain. DAANA SUSHI cannot change or delete blockchain records. Names, phone numbers and order contents are not intentionally published on the blockchain.",
-    "NAKTA Coin немесе NFT жіберілгеннен кейін әмиян, актив, сома және транзакция хеші туралы мәліметтер тиісті блокчейнде жалпыға ашық болуы мүмкін. ДААНА СУШИ блокчейн жазбасын өзгерте немесе жоя алмайды. Аты, телефон нөмірі және тапсырыс мазмұны блокчейнге арнайы жарияланбайды.",
-    "NAKTA Coin yoki NFT yuborilgach, hamyon, aktiv, summa va tranzaksiya xeshi haqidagi ma’lumotlar tegishli blokcheynda ochiq bo‘lishi mumkin. DAANA SUSHI blokcheyn yozuvini o‘zgartira yoki o‘chira olmaydi. Ism, telefon raqami va buyurtma tarkibi blokcheynga ataylab e’lon qilinmaydi."
+  "После отправки DAANA Coin или NFT сведения о кошельке, активе, сумме и хеше транзакции могут стать общедоступными в соответствующем блокчейне. Блокчейн-запись нельзя изменить или удалить силами ДААНА СУШИ. Имя, номер телефона и содержание заказа специально в блокчейн не публикуются.": [
+    "DAANA Coin же NFT жөнөтүлгөндөн кийин капчык, актив, сумма жана транзакциянын хеши жөнүндө маалыматтар тиешелүү блокчейнде жалпыга ачык болушу мүмкүн. Блокчейн жазуусун ДААНА СУШИ өзгөртө же өчүрө албайт. Аты, телефон номери жана буйрутманын мазмуну атайын блокчейнге жарыяланбайт.",
+    "After DAANA Coin or NFTs are sent, wallet, asset, amount and transaction hash information may become public on the relevant blockchain. DAANA SUSHI cannot change or delete blockchain records. Names, phone numbers and order contents are not intentionally published on the blockchain.",
+    "DAANA Coin немесе NFT жіберілгеннен кейін әмиян, актив, сома және транзакция хеші туралы мәліметтер тиісті блокчейнде жалпыға ашық болуы мүмкін. ДААНА СУШИ блокчейн жазбасын өзгерте немесе жоя алмайды. Аты, телефон нөмірі және тапсырыс мазмұны блокчейнге арнайы жарияланбайды.",
+    "DAANA Coin yoki NFT yuborilgach, hamyon, aktiv, summa va tranzaksiya xeshi haqidagi ma’lumotlar tegishli blokcheynda ochiq bo‘lishi mumkin. DAANA SUSHI blokcheyn yozuvini o‘zgartira yoki o‘chira olmaydi. Ism, telefon raqami va buyurtma tarkibi blokcheynga ataylab e’lon qilinmaydi."
   ],
   "6. Локальное хранение и сессия": [
     "6. Жергиликтүү сактоо жана сессия",
@@ -455,11 +455,11 @@
     "Қызмет операторы —",
     "Xizmat operatori —"
   ],
-  ". Сервис позволяет посмотреть меню, выбрать точку получения, оформить заказ, подтвердить номер телефона, просматривать сведения аккаунта, получать NAKTA Coin и NFT и направлять заявки на их вывод. Наличие товаров, точек, способов оплаты и отдельных функций может меняться.": [
-    ". Кызмат менюну көрүүгө, алып кетүү пунктун тандоого, буйрутма берүүгө, телефон номерин ырастоого, аккаунттун маалыматтарын көрүүгө, NAKTA Coin жана NFT алууга жана аларды чыгарууга өтүнмө берүүгө мүмкүндүк берет. Товарлардын, пункттардын, төлөм ыкмаларынын жана айрым функциялардын жеткиликтүүлүгү өзгөрүшү мүмкүн.",
-    ". The Service lets you browse the menu, select a pickup store, order, verify your phone number, view account information, receive NAKTA Coin and NFTs and request withdrawals. Availability of products, stores, payment methods and features may change.",
-    ". Қызмет мәзірді қарауға, алып кету пунктін таңдауға, тапсырыс беруге, телефон нөмірін растауға, аккаунт мәліметтерін көруге, NAKTA Coin және NFT алуға және оларды шығаруға өтінім беруге мүмкіндік береді. Тауарлар, пункттер, төлем тәсілдері және кейбір функциялардың қолжетімділігі өзгеруі мүмкін.",
-    ". Xizmat menyuni ko‘rish, olib ketish punktini tanlash, buyurtma berish, telefon raqamini tasdiqlash, akkaunt ma’lumotlarini ko‘rish, NAKTA Coin va NFT olish va ularni chiqarishga ariza berish imkonini beradi. Mahsulotlar, punktlar, to‘lov usullari va ayrim funksiyalar mavjudligi o‘zgarishi mumkin."
+  ". Сервис позволяет посмотреть меню, выбрать точку получения, оформить заказ, подтвердить номер телефона, просматривать сведения аккаунта, получать DAANA Coin и NFT и направлять заявки на их вывод. Наличие товаров, точек, способов оплаты и отдельных функций может меняться.": [
+    ". Кызмат менюну көрүүгө, алып кетүү пунктун тандоого, буйрутма берүүгө, телефон номерин ырастоого, аккаунттун маалыматтарын көрүүгө, DAANA Coin жана NFT алууга жана аларды чыгарууга өтүнмө берүүгө мүмкүндүк берет. Товарлардын, пункттардын, төлөм ыкмаларынын жана айрым функциялардын жеткиликтүүлүгү өзгөрүшү мүмкүн.",
+    ". The Service lets you browse the menu, select a pickup store, order, verify your phone number, view account information, receive DAANA Coin and NFTs and request withdrawals. Availability of products, stores, payment methods and features may change.",
+    ". Қызмет мәзірді қарауға, алып кету пунктін таңдауға, тапсырыс беруге, телефон нөмірін растауға, аккаунт мәліметтерін көруге, DAANA Coin және NFT алуға және оларды шығаруға өтінім беруге мүмкіндік береді. Тауарлар, пункттер, төлем тәсілдері және кейбір функциялардың қолжетімділігі өзгеруі мүмкін.",
+    ". Xizmat menyuni ko‘rish, olib ketish punktini tanlash, buyurtma berish, telefon raqamini tasdiqlash, akkaunt ma’lumotlarini ko‘rish, DAANA Coin va NFT olish va ularni chiqarishga ariza berish imkonini beradi. Mahsulotlar, punktlar, to‘lov usullari va ayrim funksiyalar mavjudligi o‘zgarishi mumkin."
   ],
   "2. Аккаунт и номер телефона": [
     "2. Аккаунт жана телефон номери",
@@ -503,23 +503,23 @@
     "«Төлем, бас тарту және қайтару»",
     "«To‘lov, bekor qilish va qaytarish»"
   ],
-  "5. Начисление NAKTA Coin и NFT": [
-    "5. NAKTA Coin жана NFT берүү",
-    "5. Earning NAKTA Coin and NFTs",
-    "5. NAKTA Coin және NFT есептеу",
-    "5. NAKTA Coin va NFT hisoblash"
+  "5. Начисление DAANA Coin и NFT": [
+    "5. DAANA Coin жана NFT берүү",
+    "5. Earning DAANA Coin and NFTs",
+    "5. DAANA Coin және NFT есептеу",
+    "5. DAANA Coin va NFT hisoblash"
   ],
-  "NAKTA Coin и NFT являются бонусными цифровыми наградами программы лояльности. Они не являются денежными средствами, банковским счётом или способом оплаты заказа внутри Сервиса и не имеют гарантированной денежной или рыночной стоимости.": [
-    "NAKTA Coin жана NFT — лоялдуулук программасынын бонустук санариптик сыйлыктары. Алар акча, банк эсеби же Кызматтын ичинде буйрутма үчүн төлөм каражаты эмес жана алардын кепилденген акчалай же рыноктук наркы жок.",
-    "NAKTA Coin and NFTs are bonus digital rewards in the loyalty programme. They are not money, a bank account or a payment method within the Service, and have no guaranteed monetary or market value.",
-    "NAKTA Coin және NFT — адалдық бағдарламасының бонустық цифрлық сыйақылары. Олар ақша, банк шоты немесе Қызмет ішінде тапсырыс төлеу құралы емес және кепілдендірілген ақшалай не нарықтық құны жоқ.",
-    "NAKTA Coin va NFT sodiqlik dasturining bonus raqamli mukofotlaridir. Ular pul, bank hisobi yoki Xizmat ichida buyurtma to‘lash vositasi emas va kafolatlangan pul yoki bozor qiymatiga ega emas."
+  "DAANA Coin и NFT являются бонусными цифровыми наградами программы лояльности. Они не являются денежными средствами, банковским счётом или способом оплаты заказа внутри Сервиса и не имеют гарантированной денежной или рыночной стоимости.": [
+    "DAANA Coin жана NFT — лоялдуулук программасынын бонустук санариптик сыйлыктары. Алар акча, банк эсеби же Кызматтын ичинде буйрутма үчүн төлөм каражаты эмес жана алардын кепилденген акчалай же рыноктук наркы жок.",
+    "DAANA Coin and NFTs are bonus digital rewards in the loyalty programme. They are not money, a bank account or a payment method within the Service, and have no guaranteed monetary or market value.",
+    "DAANA Coin және NFT — адалдық бағдарламасының бонустық цифрлық сыйақылары. Олар ақша, банк шоты немесе Қызмет ішінде тапсырыс төлеу құралы емес және кепілдендірілген ақшалай не нарықтық құны жоқ.",
+    "DAANA Coin va NFT sodiqlik dasturining bonus raqamli mukofotlaridir. Ular pul, bank hisobi yoki Xizmat ichida buyurtma to‘lash vositasi emas va kafolatlangan pul yoki bozor qiymatiga ega emas."
   ],
-  "Количество NAKTA Coin определяется настройкой товара и его количеством. Начисление за заказ производится после присвоения заказу статуса «Выполнен».": [
-    "NAKTA Coin саны товардын жөндөөсүнө жана анын санына жараша аныкталат. Буйрутмага «Аткарылды» статусу берилгенден кийин сыйлык эсептелет.",
-    "The NAKTA Coin amount depends on each item's reward setting and quantity. Coins are credited after the order is marked completed.",
-    "NAKTA Coin саны тауар баптауы мен санына байланысты анықталады. Тапсырысқа «Орындалды» мәртебесі берілгеннен кейін сыйақы есептеледі.",
-    "NAKTA Coin miqdori mahsulot sozlamasi va uning soniga bog‘liq. Buyurtmaga «Bajarildi» holati berilgandan keyin mukofot hisoblanadi."
+  "Количество DAANA Coin определяется настройкой товара и его количеством. Начисление за заказ производится после присвоения заказу статуса «Выполнен».": [
+    "DAANA Coin саны товардын жөндөөсүнө жана анын санына жараша аныкталат. Буйрутмага «Аткарылды» статусу берилгенден кийин сыйлык эсептелет.",
+    "The DAANA Coin amount depends on each item's reward setting and quantity. Coins are credited after the order is marked completed.",
+    "DAANA Coin саны тауар баптауы мен санына байланысты анықталады. Тапсырысқа «Орындалды» мәртебесі берілгеннен кейін сыйақы есептеледі.",
+    "DAANA Coin miqdori mahsulot sozlamasi va uning soniga bog‘liq. Buyurtmaga «Bajarildi» holati berilgandan keyin mukofot hisoblanadi."
   ],
   "NFT начисляется при достижении установленного количества выполненных заказов. Порог, название, изображение, описание и блокчейн-сеть награды задаются действующими настройками программы.": [
     "Белгиленген сандагы аткарылган буйрутмаларга жеткенде NFT берилет. Сыйлыктын босогосу, аты, сүрөтү, сүрөттөмөсү жана блокчейн тармагы программанын учурдагы жөндөөлөрүнө жараша болот.",
@@ -545,11 +545,11 @@
     "6. Сыйақыны шығару",
     "6. Mukofotlarni chiqarish"
   ],
-  "Награды не расходуются при оплате заказа. Доступные NAKTA Coin или NFT можно запросить к выводу на совместимый криптокошелёк, если функция активна.": [
-    "Сыйлыктар буйрутма үчүн төлөмдө сарпталбайт. Эгер функция активдүү болсо, жеткиликтүү NAKTA Coin же NFTни шайкеш криптокапчыкка чыгарууну сурасаңыз болот.",
-    "Rewards are not spent on orders. If the feature is enabled, you may request withdrawal of available NAKTA Coin or NFTs to a compatible crypto wallet.",
-    "Сыйақылар тапсырыс төлеу кезінде жұмсалмайды. Функция белсенді болса, қолжетімді NAKTA Coin немесе NFT-ді үйлесімді криптоәмиянға шығаруды сұрауға болады.",
-    "Mukofotlar buyurtma uchun to‘lovda sarflanmaydi. Funksiya faol bo‘lsa, mavjud NAKTA Coin yoki NFTni mos kriptohamyonga chiqarishni so‘rash mumkin."
+  "Награды не расходуются при оплате заказа. Доступные DAANA Coin или NFT можно запросить к выводу на совместимый криптокошелёк, если функция активна.": [
+    "Сыйлыктар буйрутма үчүн төлөмдө сарпталбайт. Эгер функция активдүү болсо, жеткиликтүү DAANA Coin же NFTни шайкеш криптокапчыкка чыгарууну сурасаңыз болот.",
+    "Rewards are not spent on orders. If the feature is enabled, you may request withdrawal of available DAANA Coin or NFTs to a compatible crypto wallet.",
+    "Сыйақылар тапсырыс төлеу кезінде жұмсалмайды. Функция белсенді болса, қолжетімді DAANA Coin немесе NFT-ді үйлесімді криптоәмиянға шығаруды сұрауға болады.",
+    "Mukofotlar buyurtma uchun to‘lovda sarflanmaydi. Funksiya faol bo‘lsa, mavjud DAANA Coin yoki NFTni mos kriptohamyonga chiqarishni so‘rash mumkin."
   ],
   "Пользователь самостоятельно проверяет адрес кошелька, выбранную сеть и совместимость кошелька с активом. ДААНА СУШИ никогда не запрашивает приватный ключ или seed-фразу.": [
     "Колдонуучу капчыктын дарегин, тандалган тармакты жана капчыктын активге шайкештигин өзү текшерет. ДААНА СУШИ жеке ачкычты же seed фразасын эч качан сурабайт.",
@@ -575,11 +575,11 @@
     "Баланс жеткіліксіз, деректер қате, техникалық ақау, теріс пайдалану белгілері немесе заң талабы болғанда өтінім тоқтатылуы не қабылданбауы мүмкін. Мәртебесі мен белгілі себебі аккаунтта көрсетіледі.",
     "Balans yetarli emasligi, noto‘g‘ri ma’lumot, texnik nosozlik, suiiste’mol alomatlari yoki qonun talabi sababli ariza to‘xtatilishi yoki rad etilishi mumkin. Holat va ma’lum sabab akkauntda ko‘rsatiladi."
   ],
-  "Оператор не гарантирует возможность продажи, обмена, листинга, доходность или сохранение стоимости NAKTA Coin и NFT. Пользователь самостоятельно оценивает налоговые и иные последствия владения или распоряжения наградой.": [
-    "Оператор NAKTA Coin жана NFTни сатуу, алмаштыруу, листингге киргизүү мүмкүнчүлүгүнө, кирешелүүлүгүнө же наркынын сакталышына кепилдик бербейт. Колдонуучу сыйлыкка ээ болуунун же аны пайдалануунун салыктык жана башка кесепеттерин өзү баалайт.",
-    "The operator does not guarantee that NAKTA Coin or NFTs can be sold, exchanged or listed, will generate returns or retain value. You are responsible for assessing tax and other consequences of owning or disposing of a reward.",
-    "Оператор NAKTA Coin және NFT-ді сату, айырбастау, листингке енгізу мүмкіндігіне, кірістілігіне не құнын сақтауға кепілдік бермейді. Пайдаланушы сыйақыға иелік ету не оны пайдалану салдарынан туындайтын салықтық және басқа салдарды өзі бағалайды.",
-    "Operator NAKTA Coin va NFTni sotish, ayirboshlash, listingga kiritish imkoniyati, daromadliligi yoki qiymati saqlanishini kafolatlamaydi. Foydalanuvchi mukofotga egalik qilish yoki uni tasarruf etishning soliq va boshqa oqibatlarini o‘zi baholaydi."
+  "Оператор не гарантирует возможность продажи, обмена, листинга, доходность или сохранение стоимости DAANA Coin и NFT. Пользователь самостоятельно оценивает налоговые и иные последствия владения или распоряжения наградой.": [
+    "Оператор DAANA Coin жана NFTни сатуу, алмаштыруу, листингге киргизүү мүмкүнчүлүгүнө, кирешелүүлүгүнө же наркынын сакталышына кепилдик бербейт. Колдонуучу сыйлыкка ээ болуунун же аны пайдалануунун салыктык жана башка кесепеттерин өзү баалайт.",
+    "The operator does not guarantee that DAANA Coin or NFTs can be sold, exchanged or listed, will generate returns or retain value. You are responsible for assessing tax and other consequences of owning or disposing of a reward.",
+    "Оператор DAANA Coin және NFT-ді сату, айырбастау, листингке енгізу мүмкіндігіне, кірістілігіне не құнын сақтауға кепілдік бермейді. Пайдаланушы сыйақыға иелік ету не оны пайдалану салдарынан туындайтын салықтық және басқа салдарды өзі бағалайды.",
+    "Operator DAANA Coin va NFTni sotish, ayirboshlash, listingga kiritish imkoniyati, daromadliligi yoki qiymati saqlanishini kafolatlamaydi. Foydalanuvchi mukofotga egalik qilish yoki uni tasarruf etishning soliq va boshqa oqibatlarini o‘zi baholaydi."
   ],
   "7. Отмена заказа, качество и возврат": [
     "7. Буйрутманы жокко чыгаруу, сапат жана кайтаруу",

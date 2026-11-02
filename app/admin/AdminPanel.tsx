@@ -32,7 +32,7 @@ const sections: Array<{ id: Tab; title: string; description: string; permission?
   { id: "promotions", title: "Акции", description: "Предложения на сайте", permission: "promotions.view", group: "Каталог", icon: "M3 3h8l10 10-8 8L3 11z M7 7h.01" },
   { id: "locations", title: "Точки самовывоза", description: "Адреса, карта и время работы", permission: "locations.view", group: "Управление", icon: "M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 0 1 16 0z M15 10a3 3 0 1 1-6 0 3 3 0 0 1 6 0" },
   { id: "schedules", title: "Время работы", description: "Недельное расписание и приём заказов", permission: "schedules.view", group: "Управление", icon: "M12 8v5l3 2 M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0" },
-  { id: "loyalty", title: "Программа наград", description: "NAKTA Coin, NFT и заявки на вывод", permission: "loyalty.view", group: "Управление", icon: "M3 9h18v4H3z M5 13v8h14v-8 M12 9v12 M12 9C3 9 5 1 9 4l3 5c9 0 7-8 3-5z" },
+  { id: "loyalty", title: "Программа наград", description: "DAANA Coin, NFT и заявки на вывод", permission: "loyalty.view", group: "Управление", icon: "M3 9h18v4H3z M5 13v8h14v-8 M12 9v12 M12 9C3 9 5 1 9 4l3 5c9 0 7-8 3-5z" },
   { id: "analytics", title: "Аналитика", description: "Продажи, товары и клиенты за выбранный период", permission: "analytics.view", group: "Управление", icon: "M4 3v18h17 M9 16v-4 M14 16V8 M19 16V4" },
   { id: "staff", title: "Персонал", description: "Команда, роли и персональные права", permission: "staff.view", group: "Управление", icon: "M15 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0 M5 21v-3a7 7 0 0 1 14 0v3 M20 4a3 3 0 0 1 0 6" },
   { id: "audit", title: "Журнал действий", description: "Важные изменения и ответственные сотрудники", permission: "audit.view", group: "Система", icon: "M6 3h12v18H6z M9 7h6 M9 11h6 M9 15h4" },

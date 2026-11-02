@@ -53,41 +53,41 @@
     "Жіберу мәртебесі расталмаған, қолмен тексеру қажет.",
     "Yuborish holati tasdiqlanmagan, qo‘lda tekshirish kerak."
   ],
-  "Вывод NAKTA Coin завершён": [
-    "NAKTA Coin чыгаруу аяктады",
-    "NAKTA Coin withdrawal completed",
-    "NAKTA Coin шығару аяқталды",
-    "NAKTA Coin chiqarish yakunlandi"
+  "Вывод DAANA Coin завершён": [
+    "DAANA Coin чыгаруу аяктады",
+    "DAANA Coin withdrawal completed",
+    "DAANA Coin шығару аяқталды",
+    "DAANA Coin chiqarish yakunlandi"
   ],
-  "Заявка на вывод NAKTA Coin отменена": [
-    "NAKTA Coin чыгаруу өтүнмөсү жокко чыгарылды",
-    "NAKTA Coin withdrawal request cancelled",
-    "NAKTA Coin шығару өтінімі жойылды",
-    "NAKTA Coin chiqarish arizasi bekor qilindi"
+  "Заявка на вывод DAANA Coin отменена": [
+    "DAANA Coin чыгаруу өтүнмөсү жокко чыгарылды",
+    "DAANA Coin withdrawal request cancelled",
+    "DAANA Coin шығару өтінімі жойылды",
+    "DAANA Coin chiqarish arizasi bekor qilindi"
   ],
-  "Заявка на вывод NAKTA Coin отклонена": [
-    "NAKTA Coin чыгаруу өтүнмөсү четке кагылды",
-    "NAKTA Coin withdrawal request rejected",
-    "NAKTA Coin шығару өтінімі қабылданбады",
-    "NAKTA Coin chiqarish arizasi rad etildi"
+  "Заявка на вывод DAANA Coin отклонена": [
+    "DAANA Coin чыгаруу өтүнмөсү четке кагылды",
+    "DAANA Coin withdrawal request rejected",
+    "DAANA Coin шығару өтінімі қабылданбады",
+    "DAANA Coin chiqarish arizasi rad etildi"
   ],
-  "Заявка на вывод NAKTA Coin": [
-    "NAKTA Coin чыгаруу өтүнмөсү",
-    "NAKTA Coin withdrawal request",
-    "NAKTA Coin шығару өтінімі",
-    "NAKTA Coin chiqarish arizasi"
+  "Заявка на вывод DAANA Coin": [
+    "DAANA Coin чыгаруу өтүнмөсү",
+    "DAANA Coin withdrawal request",
+    "DAANA Coin шығару өтінімі",
+    "DAANA Coin chiqarish arizasi"
   ],
-  "Возврат NAKTA Coin после отмены вывода": [
-    "Чыгаруу жокко чыгарылгандан кийин NAKTA Coin кайтарылды",
-    "NAKTA Coin returned after withdrawal cancellation",
-    "Шығарудан бас тартылғаннан кейін NAKTA Coin қайтарылды",
-    "Chiqarish bekor qilingach NAKTA Coin qaytarildi"
+  "Возврат DAANA Coin после отмены вывода": [
+    "Чыгаруу жокко чыгарылгандан кийин DAANA Coin кайтарылды",
+    "DAANA Coin returned after withdrawal cancellation",
+    "Шығарудан бас тартылғаннан кейін DAANA Coin қайтарылды",
+    "Chiqarish bekor qilingach DAANA Coin qaytarildi"
   ],
-  "Возврат NAKTA Coin после отклонения вывода": [
-    "Чыгаруу четке кагылгандан кийин NAKTA Coin кайтарылды",
-    "NAKTA Coin returned after withdrawal rejection",
-    "Шығару қабылданбағаннан кейін NAKTA Coin қайтарылды",
-    "Chiqarish rad etilgach NAKTA Coin qaytarildi"
+  "Возврат DAANA Coin после отклонения вывода": [
+    "Чыгаруу четке кагылгандан кийин DAANA Coin кайтарылды",
+    "DAANA Coin returned after withdrawal rejection",
+    "Шығару қабылданбағаннан кейін DAANA Coin қайтарылды",
+    "Chiqarish rad etilgach DAANA Coin qaytarildi"
   ],
   "Укажите телефон в формате +996": [
     "Телефонду +996 форматында көрсөтүңүз",
@@ -185,11 +185,11 @@
     "Тапсырыс сомасы тым үлкен",
     "Buyurtma summasi juda katta"
   ],
-  "Сумма награды NAKTA Coin слишком велика": [
-    "NAKTA Coin сыйлыгынын суммасы өтө чоң",
-    "The NAKTA Coin reward is too large",
-    "NAKTA Coin сыйақысының сомасы тым үлкен",
-    "NAKTA Coin mukofoti summasi juda katta"
+  "Сумма награды DAANA Coin слишком велика": [
+    "DAANA Coin сыйлыгынын суммасы өтө чоң",
+    "The DAANA Coin reward is too large",
+    "DAANA Coin сыйақысының сомасы тым үлкен",
+    "DAANA Coin mukofoti summasi juda katta"
   ],
   "Точка самовывоза больше недоступна. Выберите другую точку": [
     "Алып кетүү пункту жеткиликсиз. Башка пункт тандаңыз",
@@ -215,17 +215,17 @@
     "Бұл requestId басқа өтінімге қолданылған",
     "Bu requestId boshqa ariza uchun ishlatilgan"
   ],
-  "Укажите целое количество NAKTA Coin для вывода": [
-    "Чыгаруу үчүн NAKTA Coin санын бүтүн сан менен көрсөтүңүз",
-    "Enter a whole number of NAKTA Coin to withdraw",
-    "Шығару үшін NAKTA Coin санын бүтін санмен көрсетіңіз",
-    "Chiqarish uchun NAKTA Coin miqdorini butun sonda kiriting"
+  "Укажите целое количество DAANA Coin для вывода": [
+    "Чыгаруу үчүн DAANA Coin санын бүтүн сан менен көрсөтүңүз",
+    "Enter a whole number of DAANA Coin to withdraw",
+    "Шығару үшін DAANA Coin санын бүтін санмен көрсетіңіз",
+    "Chiqarish uchun DAANA Coin miqdorini butun sonda kiriting"
   ],
-  "Недостаточно NAKTA Coin для вывода": [
-    "Чыгаруу үчүн NAKTA Coin жетишсиз",
-    "Not enough NAKTA Coin to withdraw",
-    "Шығару үшін NAKTA Coin жеткіліксіз",
-    "Chiqarish uchun NAKTA Coin yetarli emas"
+  "Недостаточно DAANA Coin для вывода": [
+    "Чыгаруу үчүн DAANA Coin жетишсиз",
+    "Not enough DAANA Coin to withdraw",
+    "Шығару үшін DAANA Coin жеткіліксіз",
+    "Chiqarish uchun DAANA Coin yetarli emas"
   ],
   "Некорректный номер заявки": [
     "Өтүнмөнүн номери туура эмес",

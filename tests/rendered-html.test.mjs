@@ -145,7 +145,7 @@ test("publishes accurate legal, privacy and loyalty documents", async () => {
   assert.match(payment, /Оплата на сайте не проводится/i);
   assert.match(privacy, /Nikita/);
   assert.match(privacy, /адрес криптокошелька/i);
-  assert.match(terms, /NAKTA Coin/);
+  assert.match(terms, /DAANA Coin/);
   assert.match(terms, /Блокчейн-транзакции необратимы/i);
 });
 
