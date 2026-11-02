@@ -1541,11 +1541,11 @@
     "Сыйақы",
     "Mukofot"
   ],
-  "Награда DAANA Coin": [
-    "DAANA Coin сыйлыгы",
-    "DAANA Coin reward",
-    "DAANA Coin сыйақысы",
-    "DAANA Coin mukofoti"
+  "Награда Bonus DAANA Coin": [
+    "Bonus DAANA Coin сыйлыгы",
+    "Bonus DAANA Coin reward",
+    "Bonus DAANA Coin сыйақысы",
+    "Bonus DAANA Coin mukofoti"
   ],
   "Название награды": [
     "Сыйлыктын аталышы",
@@ -1625,11 +1625,11 @@
     "Әзірге қолмен түзетулер жоқ",
     "Hozircha qo‘lda tuzatishlar yo‘q"
   ],
-  "Заявки DAANA Coin": [
-    "DAANA Coin өтүнмөлөрү",
-    "DAANA Coin requests",
-    "DAANA Coin өтінімдері",
-    "DAANA Coin so‘rovlari"
+  "Заявки Bonus DAANA Coin": [
+    "Bonus DAANA Coin өтүнмөлөрү",
+    "Bonus DAANA Coin requests",
+    "Bonus DAANA Coin өтінімдері",
+    "Bonus DAANA Coin so‘rovlari"
   ],
   "NFT и заявки на вывод": [
     "NFT жана чыгаруу өтүнмөлөрү",
@@ -1691,11 +1691,11 @@
     "Желі",
     "Tarmoq"
   ],
-  "Сеть DAANA Coin": [
-    "DAANA Coin тармагы",
-    "DAANA Coin network",
-    "DAANA Coin желісі",
-    "DAANA Coin tarmog‘i"
+  "Сеть Bonus DAANA Coin": [
+    "Bonus DAANA Coin тармагы",
+    "Bonus DAANA Coin network",
+    "Bonus DAANA Coin желісі",
+    "Bonus DAANA Coin tarmog‘i"
   ],
   "Сеть NFT": [
     "NFT тармагы",
@@ -2711,11 +2711,11 @@
     "Апталық кесте және тапсырыс қабылдау",
     "Haftalik jadval va buyurtma qabul qilish"
   ],
-  "DAANA Coin, NFT и заявки на вывод": [
-    "DAANA Coin, NFT жана чыгаруу өтүнмөлөрү",
-    "DAANA Coin, NFTs and withdrawals",
-    "DAANA Coin, NFT және шығару өтінімдері",
-    "DAANA Coin, NFT va chiqarish so‘rovlari"
+  "Bonus DAANA Coin, NFT и заявки на вывод": [
+    "Bonus DAANA Coin, NFT жана чыгаруу өтүнмөлөрү",
+    "Bonus DAANA Coin, NFTs and withdrawals",
+    "Bonus DAANA Coin, NFT және шығару өтінімдері",
+    "Bonus DAANA Coin, NFT va chiqarish so‘rovlari"
   ],
   "Продажи, товары и клиенты за выбранный период": [
     "Тандалган мезгилдеги сатуулар, товарлар жана кардарлар",
@@ -4907,11 +4907,11 @@
     "Тапсырыс сыйақысы рұқсат етілген шектен асты",
     "Buyurtma mukofoti ruxsat etilgan chegaradan oshdi"
   ],
-  "Начисление превышает допустимый баланс DAANA Coin": [
-    "Кошуу DAANA Coin баланс чегинен ашат",
-    "Credit exceeds the allowed DAANA Coin balance",
-    "Есептеу DAANA Coin теңгерім шегінен асады",
-    "Hisoblash DAANA Coin balansi chegarasidan oshadi"
+  "Начисление превышает допустимый баланс Bonus DAANA Coin": [
+    "Кошуу Bonus DAANA Coin баланс чегинен ашат",
+    "Credit exceeds the allowed Bonus DAANA Coin balance",
+    "Есептеу Bonus DAANA Coin теңгерім шегінен асады",
+    "Hisoblash Bonus DAANA Coin balansi chegarasidan oshadi"
   ],
   "Достигнут предел счётчика заказов программы лояльности": [
     "Сыйлык программасында буйрутма эсептегичтин чеги жетти",
@@ -4943,11 +4943,11 @@
     "Клиент табылмады",
     "Mijoz topilmadi"
   ],
-  "Выберите DAANA Coin или NFT": [
-    "DAANA Coin же NFT тандаңыз",
-    "Select DAANA Coin or NFT",
-    "DAANA Coin немесе NFT таңдаңыз",
-    "DAANA Coin yoki NFT tanlang"
+  "Выберите Bonus DAANA Coin или NFT": [
+    "Bonus DAANA Coin же NFT тандаңыз",
+    "Select Bonus DAANA Coin or NFT",
+    "Bonus DAANA Coin немесе NFT таңдаңыз",
+    "Bonus DAANA Coin yoki NFT tanlang"
   ],
   "Укажите целое количество больше или меньше нуля": [
     "Нөлдөн чоң же кичине бүтүн сан көрсөтүңүз",
@@ -4967,11 +4967,11 @@
     "Түзету себебін енгізіңіз",
     "Tuzatish sababini kiriting"
   ],
-  "Недостаточно DAANA Coin для списания или превышен допустимый баланс": [
-    "Кемитүүгө DAANA Coin жетишсиз же баланс чеги ашты",
-    "Insufficient DAANA Coin or balance limit exceeded",
-    "Есептен шығаруға DAANA Coin жеткіліксіз немесе теңгерім шегі асты",
-    "Ayirish uchun DAANA Coin yetarli emas yoki balans chegarasi oshgan"
+  "Недостаточно Bonus DAANA Coin для списания или превышен допустимый баланс": [
+    "Кемитүүгө Bonus DAANA Coin жетишсиз же баланс чеги ашты",
+    "Insufficient Bonus DAANA Coin or balance limit exceeded",
+    "Есептен шығаруға Bonus DAANA Coin жеткіліксіз немесе теңгерім шегі асты",
+    "Ayirish uchun Bonus DAANA Coin yetarli emas yoki balans chegarasi oshgan"
   ],
   "Неизвестный статус заявки": [
     "Өтүнмөнүн абалы белгисиз",
@@ -4997,11 +4997,11 @@
     "Жазылған транзакция хешін ауыстыруға болмайды",
     "Yozilgan tranzaksiya xeshini almashtirib bo‘lmaydi"
   ],
-  "Для завершения вывода DAANA Coin нужен хеш транзакции": [
-    "DAANA Coin чыгарууну аяктоо үчүн транзакция хеши керек",
-    "A transaction hash is required to complete DAANA Coin withdrawal",
-    "DAANA Coin шығаруды аяқтау үшін транзакция хеші қажет",
-    "DAANA Coin chiqarishni yakunlash uchun tranzaksiya xeshi kerak"
+  "Для завершения вывода Bonus DAANA Coin нужен хеш транзакции": [
+    "Bonus DAANA Coin чыгарууну аяктоо үчүн транзакция хеши керек",
+    "A transaction hash is required to complete Bonus DAANA Coin withdrawal",
+    "Bonus DAANA Coin шығаруды аяқтау үшін транзакция хеші қажет",
+    "Bonus DAANA Coin chiqarishni yakunlash uchun tranzaksiya xeshi kerak"
   ],
   "Баланс нельзя восстановить автоматически": [
     "Балансты автоматтык калыбына келтирүүгө болбойт",

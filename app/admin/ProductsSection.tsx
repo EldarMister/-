@@ -367,7 +367,7 @@ export default function ProductsSection({ products: refreshSignal, categories, r
           const details = product as Product & { categoryName?: string; categoryActive?: boolean };
           const visible = product.active && (details.categoryActive ?? category?.active ?? false);
           return <TableRow key={product.id}>
-            <TableCell><div className="admin-product-cell"><ProductImage src={product.image} className="admin-product-image" /><div><strong>{product.name}</strong><small>{formatNumber(Number(product.naktaCoins || 0))} DAANA Coin</small></div></div></TableCell>
+            <TableCell><div className="admin-product-cell"><ProductImage src={product.image} className="admin-product-image" /><div><strong>{product.name}</strong><small>{formatNumber(Number(product.naktaCoins || 0))} Bonus DAANA Coin</small></div></div></TableCell>
             <TableCell>{details.categoryName || category?.name || t("Категория недоступна")}</TableCell>
             <TableCell><strong>{money(product.price)}</strong></TableCell>
             <TableCell><Badge variant={visible ? "success" : "secondary"}>{visible ? t("На сайте") : t("Скрыт")}</Badge></TableCell>
@@ -402,7 +402,7 @@ export default function ProductsSection({ products: refreshSignal, categories, r
               {([["weight", "Вес или объём"], ["calories", "Калорийность, ккал"], ["protein", "Белки, г"], ["fat", "Жиры, г"], ["carbohydrates", "Углеводы, г"]] as const).map(([key, label]) => <label key={key}>{t(label)}<input type="number" inputMode="decimal" min="0" max="1000000" step="0.01" value={editing[key]} onChange={(event) => setEditing({ ...editing, [key]: event.target.value })} placeholder="—" /></label>)}
             </div></details>
             <details className="admin-additional-fields"><summary>{t("Дополнительно")}</summary><div className="editor-grid">
-              <label>{t("Награда DAANA Coin")}<input type="number" inputMode="numeric" min="0" max="1000000" step="1" value={editing.naktaCoins} onChange={(event) => setEditing({ ...editing, naktaCoins: event.target.value })} required /><small>{t("Начисляется после выдачи заказа.")}</small></label>
+              <label>{t("Награда Bonus DAANA Coin")}<input type="number" inputMode="numeric" min="0" max="1000000" step="1" value={editing.naktaCoins} onChange={(event) => setEditing({ ...editing, naktaCoins: event.target.value })} required /><small>{t("Начисляется после выдачи заказа.")}</small></label>
               <label>{t("Порядок в категории")}<input type="number" inputMode="numeric" min={-MAX_DATABASE_INTEGER} max={MAX_DATABASE_INTEGER} step="1" value={editing.sortOrder} onChange={(event) => setEditing({ ...editing, sortOrder: event.target.value })} required /><small>{t("Меньшее число — выше в списке.")}</small></label>
             </div></details>
           </fieldset>

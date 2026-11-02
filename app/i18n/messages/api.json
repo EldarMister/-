@@ -53,41 +53,41 @@
     "Жіберу мәртебесі расталмаған, қолмен тексеру қажет.",
     "Yuborish holati tasdiqlanmagan, qo‘lda tekshirish kerak."
   ],
-  "Вывод DAANA Coin завершён": [
-    "DAANA Coin чыгаруу аяктады",
-    "DAANA Coin withdrawal completed",
-    "DAANA Coin шығару аяқталды",
-    "DAANA Coin chiqarish yakunlandi"
+  "Вывод Bonus DAANA Coin завершён": [
+    "Bonus DAANA Coin чыгаруу аяктады",
+    "Bonus DAANA Coin withdrawal completed",
+    "Bonus DAANA Coin шығару аяқталды",
+    "Bonus DAANA Coin chiqarish yakunlandi"
   ],
-  "Заявка на вывод DAANA Coin отменена": [
-    "DAANA Coin чыгаруу өтүнмөсү жокко чыгарылды",
-    "DAANA Coin withdrawal request cancelled",
-    "DAANA Coin шығару өтінімі жойылды",
-    "DAANA Coin chiqarish arizasi bekor qilindi"
+  "Заявка на вывод Bonus DAANA Coin отменена": [
+    "Bonus DAANA Coin чыгаруу өтүнмөсү жокко чыгарылды",
+    "Bonus DAANA Coin withdrawal request cancelled",
+    "Bonus DAANA Coin шығару өтінімі жойылды",
+    "Bonus DAANA Coin chiqarish arizasi bekor qilindi"
   ],
-  "Заявка на вывод DAANA Coin отклонена": [
-    "DAANA Coin чыгаруу өтүнмөсү четке кагылды",
-    "DAANA Coin withdrawal request rejected",
-    "DAANA Coin шығару өтінімі қабылданбады",
-    "DAANA Coin chiqarish arizasi rad etildi"
+  "Заявка на вывод Bonus DAANA Coin отклонена": [
+    "Bonus DAANA Coin чыгаруу өтүнмөсү четке кагылды",
+    "Bonus DAANA Coin withdrawal request rejected",
+    "Bonus DAANA Coin шығару өтінімі қабылданбады",
+    "Bonus DAANA Coin chiqarish arizasi rad etildi"
   ],
-  "Заявка на вывод DAANA Coin": [
-    "DAANA Coin чыгаруу өтүнмөсү",
-    "DAANA Coin withdrawal request",
-    "DAANA Coin шығару өтінімі",
-    "DAANA Coin chiqarish arizasi"
+  "Заявка на вывод Bonus DAANA Coin": [
+    "Bonus DAANA Coin чыгаруу өтүнмөсү",
+    "Bonus DAANA Coin withdrawal request",
+    "Bonus DAANA Coin шығару өтінімі",
+    "Bonus DAANA Coin chiqarish arizasi"
   ],
-  "Возврат DAANA Coin после отмены вывода": [
-    "Чыгаруу жокко чыгарылгандан кийин DAANA Coin кайтарылды",
-    "DAANA Coin returned after withdrawal cancellation",
-    "Шығарудан бас тартылғаннан кейін DAANA Coin қайтарылды",
-    "Chiqarish bekor qilingach DAANA Coin qaytarildi"
+  "Возврат Bonus DAANA Coin после отмены вывода": [
+    "Чыгаруу жокко чыгарылгандан кийин Bonus DAANA Coin кайтарылды",
+    "Bonus DAANA Coin returned after withdrawal cancellation",
+    "Шығарудан бас тартылғаннан кейін Bonus DAANA Coin қайтарылды",
+    "Chiqarish bekor qilingach Bonus DAANA Coin qaytarildi"
   ],
-  "Возврат DAANA Coin после отклонения вывода": [
-    "Чыгаруу четке кагылгандан кийин DAANA Coin кайтарылды",
-    "DAANA Coin returned after withdrawal rejection",
-    "Шығару қабылданбағаннан кейін DAANA Coin қайтарылды",
-    "Chiqarish rad etilgach DAANA Coin qaytarildi"
+  "Возврат Bonus DAANA Coin после отклонения вывода": [
+    "Чыгаруу четке кагылгандан кийин Bonus DAANA Coin кайтарылды",
+    "Bonus DAANA Coin returned after withdrawal rejection",
+    "Шығару қабылданбағаннан кейін Bonus DAANA Coin қайтарылды",
+    "Chiqarish rad etilgach Bonus DAANA Coin qaytarildi"
   ],
   "Укажите телефон в формате +996": [
     "Телефонду +996 форматында көрсөтүңүз",
@@ -185,11 +185,11 @@
     "Тапсырыс сомасы тым үлкен",
     "Buyurtma summasi juda katta"
   ],
-  "Сумма награды DAANA Coin слишком велика": [
-    "DAANA Coin сыйлыгынын суммасы өтө чоң",
-    "The DAANA Coin reward is too large",
-    "DAANA Coin сыйақысының сомасы тым үлкен",
-    "DAANA Coin mukofoti summasi juda katta"
+  "Сумма награды Bonus DAANA Coin слишком велика": [
+    "Bonus DAANA Coin сыйлыгынын суммасы өтө чоң",
+    "The Bonus DAANA Coin reward is too large",
+    "Bonus DAANA Coin сыйақысының сомасы тым үлкен",
+    "Bonus DAANA Coin mukofoti summasi juda katta"
   ],
   "Точка самовывоза больше недоступна. Выберите другую точку": [
     "Алып кетүү пункту жеткиликсиз. Башка пункт тандаңыз",
@@ -215,17 +215,17 @@
     "Бұл requestId басқа өтінімге қолданылған",
     "Bu requestId boshqa ariza uchun ishlatilgan"
   ],
-  "Укажите целое количество DAANA Coin для вывода": [
-    "Чыгаруу үчүн DAANA Coin санын бүтүн сан менен көрсөтүңүз",
-    "Enter a whole number of DAANA Coin to withdraw",
-    "Шығару үшін DAANA Coin санын бүтін санмен көрсетіңіз",
-    "Chiqarish uchun DAANA Coin miqdorini butun sonda kiriting"
+  "Укажите целое количество Bonus DAANA Coin для вывода": [
+    "Чыгаруу үчүн Bonus DAANA Coin санын бүтүн сан менен көрсөтүңүз",
+    "Enter a whole number of Bonus DAANA Coin to withdraw",
+    "Шығару үшін Bonus DAANA Coin санын бүтін санмен көрсетіңіз",
+    "Chiqarish uchun Bonus DAANA Coin miqdorini butun sonda kiriting"
   ],
-  "Недостаточно DAANA Coin для вывода": [
-    "Чыгаруу үчүн DAANA Coin жетишсиз",
-    "Not enough DAANA Coin to withdraw",
-    "Шығару үшін DAANA Coin жеткіліксіз",
-    "Chiqarish uchun DAANA Coin yetarli emas"
+  "Недостаточно Bonus DAANA Coin для вывода": [
+    "Чыгаруу үчүн Bonus DAANA Coin жетишсиз",
+    "Not enough Bonus DAANA Coin to withdraw",
+    "Шығару үшін Bonus DAANA Coin жеткіліксіз",
+    "Chiqarish uchun Bonus DAANA Coin yetarli emas"
   ],
   "Некорректный номер заявки": [
     "Өтүнмөнүн номери туура эмес",

@@ -552,7 +552,7 @@ a { color: inherit; }
   .footer-legal span:last-child { grid-column: auto; }
 }
 
-/* DAANA Coin and NFT */
+/* Bonus DAANA Coin and NFT */
 .product-card-inner { position: relative; }
 .product-reward-badge { position: absolute; z-index: 2; top: 135px; left: 50%; display: inline-flex; align-items: center; gap: 4px; max-width: calc(100% - 34px); padding: 6px 11px; border: 2px solid #fff; border-radius: 999px; background: linear-gradient(135deg,#ff7a1a,#ff4214); box-shadow: 0 6px 14px rgba(222,65,18,.24); color: #fff; font-family: "Roboto",sans-serif; font-size: 11px; font-weight: 700; line-height: 1; white-space: nowrap; transform: translate(-50%,-50%); }
 .product-reward-badge b { font-size: 13px; }

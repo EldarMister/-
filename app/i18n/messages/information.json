@@ -11,11 +11,11 @@
     "ДААНА СУШИ — суши мен роллдарға тапсырыс беріп, өзіңіз алып кету қызметі.",
     "DAANA SUSHI — sushi va rollarni buyurtma berib, o‘zingiz olib ketish xizmati."
   ],
-  "За завершённые заказы участникам программы наград могут начисляться DAANA Coin и цифровые награды NFT. Награды доступны в личном кабинете и могут быть выведены на совместимый криптокошелёк.": [
-    "Аткарылган буйрутмалар үчүн сыйлык программасынын катышуучуларына DAANA Coin жана NFT санариптик сыйлыктары берилиши мүмкүн. Сыйлыктар жеке кабинетте жеткиликтүү жана аларды шайкеш криптокапчыкка чыгарууга болот.",
-    "Rewards programme members may earn DAANA Coin and NFT digital rewards for completed orders. Rewards are available in your account and may be withdrawn to a compatible crypto wallet.",
-    "Орындалған тапсырыстар үшін сыйақы бағдарламасының қатысушыларына DAANA Coin және NFT цифрлық сыйақылары есептелуі мүмкін. Сыйақылар жеке кабинетте қолжетімді және оларды үйлесімді криптоәмиянға шығаруға болады.",
-    "Bajarilgan buyurtmalar uchun mukofot dasturi ishtirokchilariga DAANA Coin va NFT raqamli mukofotlari berilishi mumkin. Mukofotlar shaxsiy kabinetda ko‘rinadi va ularni mos kriptohamyonga chiqarish mumkin."
+  "За завершённые заказы участникам программы наград могут начисляться Bonus DAANA Coin и цифровые награды NFT. Награды доступны в личном кабинете и могут быть выведены на совместимый криптокошелёк.": [
+    "Аткарылган буйрутмалар үчүн сыйлык программасынын катышуучуларына Bonus DAANA Coin жана NFT санариптик сыйлыктары берилиши мүмкүн. Сыйлыктар жеке кабинетте жеткиликтүү жана аларды шайкеш криптокапчыкка чыгарууга болот.",
+    "Rewards programme members may earn Bonus DAANA Coin and NFT digital rewards for completed orders. Rewards are available in your account and may be withdrawn to a compatible crypto wallet.",
+    "Орындалған тапсырыстар үшін сыйақы бағдарламасының қатысушыларына Bonus DAANA Coin және NFT цифрлық сыйақылары есептелуі мүмкін. Сыйақылар жеке кабинетте қолжетімді және оларды үйлесімді криптоәмиянға шығаруға болады.",
+    "Bajarilgan buyurtmalar uchun mukofot dasturi ishtirokchilariga Bonus DAANA Coin va NFT raqamli mukofotlari berilishi mumkin. Mukofotlar shaxsiy kabinetda ko‘rinadi va ularni mos kriptohamyonga chiqarish mumkin."
   ],
   "Условия заказа, обработки данных и программы наград собраны в разделе": [
     "Буйрутма, маалыматтарды иштетүү жана сыйлык программасынын шарттары бул бөлүмдө берилген:",
@@ -41,17 +41,17 @@
     "Қызмет операторының деректемелері",
     "Xizmat operatori rekvizitlari"
   ],
-  "Какие данные используются для входа, заказа, карты, DAANA Coin, NFT и вывода наград.": [
-    "Кирүү, буйрутма, карта, DAANA Coin, NFT жана сыйлыктарды чыгаруу үчүн колдонулуучу маалыматтар.",
-    "Data used for sign-in, orders, maps, DAANA Coin, NFTs and reward withdrawals.",
-    "Кіру, тапсырыс, карта, DAANA Coin, NFT және сыйақыны шығару үшін қолданылатын деректер.",
-    "Kirish, buyurtma, xarita, DAANA Coin, NFT va mukofot chiqarish uchun ishlatiladigan ma’lumotlar."
+  "Какие данные используются для входа, заказа, карты, Bonus DAANA Coin, NFT и вывода наград.": [
+    "Кирүү, буйрутма, карта, Bonus DAANA Coin, NFT жана сыйлыктарды чыгаруу үчүн колдонулуучу маалыматтар.",
+    "Data used for sign-in, orders, maps, Bonus DAANA Coin, NFTs and reward withdrawals.",
+    "Кіру, тапсырыс, карта, Bonus DAANA Coin, NFT және сыйақыны шығару үшін қолданылатын деректер.",
+    "Kirish, buyurtma, xarita, Bonus DAANA Coin, NFT va mukofot chiqarish uchun ishlatiladigan ma’lumotlar."
   ],
-  "Правила заказа, начисления и вывода DAANA Coin и NFT.": [
-    "Буйрутма берүү, DAANA Coin жана NFT эсептөө жана чыгаруу эрежелери.",
-    "Rules for orders and for earning and withdrawing DAANA Coin and NFTs.",
-    "Тапсырыс беру, DAANA Coin және NFT есептеу мен шығару ережелері.",
-    "Buyurtma berish, DAANA Coin va NFT hisoblash va chiqarish qoidalari."
+  "Правила заказа, начисления и вывода Bonus DAANA Coin и NFT.": [
+    "Буйрутма берүү, Bonus DAANA Coin жана NFT эсептөө жана чыгаруу эрежелери.",
+    "Rules for orders and for earning and withdrawing Bonus DAANA Coin and NFTs.",
+    "Тапсырыс беру, Bonus DAANA Coin және NFT есептеу мен шығару ережелері.",
+    "Buyurtma berish, Bonus DAANA Coin va NFT hisoblash va chiqarish qoidalari."
   ],
   "Оплата при получении, изменение заказа и обращение по качеству.": [
     "Алууда төлөө, буйрутманы өзгөртүү жана сапат боюнча кайрылуу.",
@@ -89,23 +89,23 @@
     "ДААНА СУШИ қолдау қызметіне",
     "DAANA SUSHI yordam xizmatiga"
   ],
-  "Как ДААНА СУШИ обрабатывает данные аккаунта, заказов, геолокации, DAANA Coin, NFT и заявок на вывод.": [
-    "ДААНА СУШИ аккаунт, буйрутма, геолокация, DAANA Coin, NFT жана чыгаруу өтүнмөлөрүнүн маалыматтарын кантип иштетет.",
-    "How DAANA SUSHI processes account, order, location, DAANA Coin, NFT and withdrawal request data.",
-    "ДААНА СУШИ аккаунт, тапсырыс, геолокация, DAANA Coin, NFT және шығару өтінімдерінің деректерін қалай өңдейді.",
-    "DAANA SUSHI akkaunt, buyurtma, geolokatsiya, DAANA Coin, NFT va chiqarish arizalari ma’lumotlarini qanday qayta ishlaydi."
+  "Как ДААНА СУШИ обрабатывает данные аккаунта, заказов, геолокации, Bonus DAANA Coin, NFT и заявок на вывод.": [
+    "ДААНА СУШИ аккаунт, буйрутма, геолокация, Bonus DAANA Coin, NFT жана чыгаруу өтүнмөлөрүнүн маалыматтарын кантип иштетет.",
+    "How DAANA SUSHI processes account, order, location, Bonus DAANA Coin, NFT and withdrawal request data.",
+    "ДААНА СУШИ аккаунт, тапсырыс, геолокация, Bonus DAANA Coin, NFT және шығару өтінімдерінің деректерін қалай өңдейді.",
+    "DAANA SUSHI akkaunt, buyurtma, geolokatsiya, Bonus DAANA Coin, NFT va chiqarish arizalari ma’lumotlarini qanday qayta ishlaydi."
   ],
-  "Условия заказа, оплаты при получении, начисления и вывода DAANA Coin и NFT в ДААНА СУШИ.": [
-    "ДААНА СУШИде буйрутма берүү, алууда төлөө, DAANA Coin жана NFT эсептөө жана чыгаруу шарттары.",
-    "DAANA SUSHI terms for orders, payment on collection and earning and withdrawing DAANA Coin and NFTs.",
-    "ДААНА СУШИ-де тапсырыс беру, алғанда төлеу, DAANA Coin және NFT есептеу мен шығару шарттары.",
-    "DAANA SUSHI’da buyurtma berish, olishda to‘lash, DAANA Coin va NFT hisoblash va chiqarish shartlari."
+  "Условия заказа, оплаты при получении, начисления и вывода Bonus DAANA Coin и NFT в ДААНА СУШИ.": [
+    "ДААНА СУШИде буйрутма берүү, алууда төлөө, Bonus DAANA Coin жана NFT эсептөө жана чыгаруу шарттары.",
+    "DAANA SUSHI terms for orders, payment on collection and earning and withdrawing Bonus DAANA Coin and NFTs.",
+    "ДААНА СУШИ-де тапсырыс беру, алғанда төлеу, Bonus DAANA Coin және NFT есептеу мен шығару шарттары.",
+    "DAANA SUSHI’da buyurtma berish, olishda to‘lash, Bonus DAANA Coin va NFT hisoblash va chiqarish shartlari."
   ],
-  "Связь с поддержкой ДААНА СУШИ по заказам, данным, DAANA Coin, NFT и выводу наград.": [
-    "Буйрутмалар, маалыматтар, DAANA Coin, NFT жана сыйлыктарды чыгаруу боюнча ДААНА СУШИ колдоо кызматы.",
-    "Contact DAANA SUSHI support about orders, data, DAANA Coin, NFTs and reward withdrawals.",
-    "Тапсырыстар, деректер, DAANA Coin, NFT және сыйақыны шығару бойынша ДААНА СУШИ қолдау қызметі.",
-    "Buyurtmalar, ma’lumotlar, DAANA Coin, NFT va mukofot chiqarish bo‘yicha DAANA SUSHI yordam xizmati."
+  "Связь с поддержкой ДААНА СУШИ по заказам, данным, Bonus DAANA Coin, NFT и выводу наград.": [
+    "Буйрутмалар, маалыматтар, Bonus DAANA Coin, NFT жана сыйлыктарды чыгаруу боюнча ДААНА СУШИ колдоо кызматы.",
+    "Contact DAANA SUSHI support about orders, data, Bonus DAANA Coin, NFTs and reward withdrawals.",
+    "Тапсырыстар, деректер, Bonus DAANA Coin, NFT және сыйақыны шығару бойынша ДААНА СУШИ қолдау қызметі.",
+    "Buyurtmalar, ma’lumotlar, Bonus DAANA Coin, NFT va mukofot chiqarish bo‘yicha DAANA SUSHI yordam xizmati."
   ],
   "Открыть чат поддержки": [
     "Колдоо чатын ачуу",
@@ -113,11 +113,11 @@
     "Қолдау чатын ашу",
     "Yordam chatini ochish"
   ],
-  "Поможем с заказом, оплатой при получении, входом в аккаунт, DAANA Coin, NFT, выводом наград и запросами о персональных данных.": [
-    "Буйрутма, алууда төлөө, аккаунтка кирүү, DAANA Coin, NFT, сыйлыктарды чыгаруу жана жеке маалыматтар боюнча суроолорго жардам беребиз.",
-    "We can help with orders, payment on collection, sign-in, DAANA Coin, NFTs, reward withdrawals and personal data requests.",
-    "Тапсырыс, алғанда төлеу, аккаунтқа кіру, DAANA Coin, NFT, сыйақыны шығару және дербес деректер туралы сұраулар бойынша көмектесеміз.",
-    "Buyurtma, olishda to‘lash, akkauntga kirish, DAANA Coin, NFT, mukofot chiqarish va shaxsiy ma’lumotlar so‘rovlari bo‘yicha yordam beramiz."
+  "Поможем с заказом, оплатой при получении, входом в аккаунт, Bonus DAANA Coin, NFT, выводом наград и запросами о персональных данных.": [
+    "Буйрутма, алууда төлөө, аккаунтка кирүү, Bonus DAANA Coin, NFT, сыйлыктарды чыгаруу жана жеке маалыматтар боюнча суроолорго жардам беребиз.",
+    "We can help with orders, payment on collection, sign-in, Bonus DAANA Coin, NFTs, reward withdrawals and personal data requests.",
+    "Тапсырыс, алғанда төлеу, аккаунтқа кіру, Bonus DAANA Coin, NFT, сыйақыны шығару және дербес деректер туралы сұраулар бойынша көмектесеміз.",
+    "Buyurtma, olishda to‘lash, akkauntga kirish, Bonus DAANA Coin, NFT, mukofot chiqarish va shaxsiy ma’lumotlar so‘rovlari bo‘yicha yordam beramiz."
   ],
   "Как обратиться": [
     "Кантип кайрылуу керек",
@@ -209,11 +209,11 @@
     "Белсенді сессиялар аяқталып, аккаунттың дербес деректері техникалық және заңды тұрғыдан рұқсат етілген көлемде жойылады немесе иесіздендіріледі. Сұрауды өңдемес бұрын қолдау қызметі ашық тапсырысты, дауды немесе күтілген шығару өтінімін аяқтауды сұрауы мүмкін.",
     "Faol seanslar tugatiladi va akkauntning shaxsiy ma’lumotlari texnik va qonuniy jihatdan mumkin bo‘lgan hajmda o‘chiriladi yoki egasizlantiriladi. So‘rovni ko‘rib chiqishdan oldin yordam xizmati ochiq buyurtma, nizo yoki kutilayotgan chiqarish arizasini yakunlashni so‘rashi mumkin."
   ],
-  "После удаления доступ к невыведенному балансу DAANA Coin и NFT может быть утрачен без возможности восстановления. Перед запросом проверьте баланс и статусы операций.": [
-    "Өчүрүлгөндөн кийин чыгарыла элек DAANA Coin жана NFT балансына жетүү калыбына келтирилгис болуп жоголушу мүмкүн. Суроо-талап берүүдөн мурун балансты жана операциялардын статусун текшериңиз.",
-    "Deletion may permanently remove access to your unwithdrawn DAANA Coin and NFT balance. Check your balance and transaction statuses before requesting deletion.",
-    "Жойылғаннан кейін шығарылмаған DAANA Coin және NFT балансына қолжетімділік қалпына келтіру мүмкіндігінсіз жоғалуы мүмкін. Сұрау алдында баланс пен операциялар мәртебесін тексеріңіз.",
-    "O‘chirilgach, chiqarilmagan DAANA Coin va NFT balansidan foydalanish imkoniyati tiklab bo‘lmas tarzda yo‘qolishi mumkin. So‘rov yuborishdan oldin balans va amaliyotlar holatini tekshiring."
+  "После удаления доступ к невыведенному балансу Bonus DAANA Coin и NFT может быть утрачен без возможности восстановления. Перед запросом проверьте баланс и статусы операций.": [
+    "Өчүрүлгөндөн кийин чыгарыла элек Bonus DAANA Coin жана NFT балансына жетүү калыбына келтирилгис болуп жоголушу мүмкүн. Суроо-талап берүүдөн мурун балансты жана операциялардын статусун текшериңиз.",
+    "Deletion may permanently remove access to your unwithdrawn Bonus DAANA Coin and NFT balance. Check your balance and transaction statuses before requesting deletion.",
+    "Жойылғаннан кейін шығарылмаған Bonus DAANA Coin және NFT балансына қолжетімділік қалпына келтіру мүмкіндігінсіз жоғалуы мүмкін. Сұрау алдында баланс пен операциялар мәртебесін тексеріңіз.",
+    "O‘chirilgach, chiqarilmagan Bonus DAANA Coin va NFT balansidan foydalanish imkoniyati tiklab bo‘lmas tarzda yo‘qolishi mumkin. So‘rov yuborishdan oldin balans va amaliyotlar holatini tekshiring."
   ],
   "Какие сведения могут сохраниться": [
     "Кайсы маалыматтар сакталышы мүмкүн",

@@ -17,8 +17,8 @@ export default function LegalPage() {
       <h2><TranslatedText source={"Реквизиты оператора сервиса"} /></h2>
       <LegalOperatorDetails />
       <ul className="legal-document-list">
-        <li><a href="/privacy"><strong><TranslatedText source={"Политика конфиденциальности"} /></strong></a><br /><TranslatedText source={"Какие данные используются для входа, заказа, карты, DAANA Coin, NFT и вывода наград."} /></li>
-        <li><a href="/terms"><strong><TranslatedText source={"Условия использования и заказа"} /></strong></a><br /><TranslatedText source={"Правила заказа, начисления и вывода DAANA Coin и NFT."} /></li>
+        <li><a href="/privacy"><strong><TranslatedText source={"Политика конфиденциальности"} /></strong></a><br /><TranslatedText source={"Какие данные используются для входа, заказа, карты, Bonus DAANA Coin, NFT и вывода наград."} /></li>
+        <li><a href="/terms"><strong><TranslatedText source={"Условия использования и заказа"} /></strong></a><br /><TranslatedText source={"Правила заказа, начисления и вывода Bonus DAANA Coin и NFT."} /></li>
         <li><a href="/payment-rule"><strong><TranslatedText source={"Оплата, отмена и возврат"} /></strong></a><br /><TranslatedText source={"Оплата при получении, изменение заказа и обращение по качеству."} /></li>
         <li><a href="/delete-account"><strong><TranslatedText source={"Удаление аккаунта и данных"} /></strong></a><br /><TranslatedText source={"Как направить запрос и какие сведения могут сохраняться."} /></li>
       </ul>

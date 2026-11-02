@@ -113,7 +113,7 @@ export function calculateOrderCoinReward(
     return total + (Number.isInteger(reward) && reward > 0 ? reward : 0);
   }, 0);
   if (!Number.isSafeInteger(amount) || amount > POSTGRES_INTEGER_MAX) {
-    throw new RangeError("Сумма награды DAANA Coin слишком велика");
+    throw new RangeError("Сумма награды Bonus DAANA Coin слишком велика");
   }
   return amount;
 }

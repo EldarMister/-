@@ -5,7 +5,7 @@ import { createPageMetadata } from "../seo";
 
 export const metadata: Metadata = createPageMetadata({
   title: "Политика конфиденциальности",
-  description: "Как ДААНА СУШИ обрабатывает данные аккаунта, заказов, геолокации, DAANA Coin, NFT и заявок на вывод.",
+  description: "Как ДААНА СУШИ обрабатывает данные аккаунта, заказов, геолокации, Bonus DAANA Coin, NFT и заявок на вывод.",
   path: "/privacy",
 });
 
