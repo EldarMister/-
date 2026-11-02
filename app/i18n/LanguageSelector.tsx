@@ -38,7 +38,7 @@ export default function LanguageSelector({ className = "", compact = false }: { 
           dropdown.current.open = false;
           dropdown.current.querySelector("summary")?.focus();
         }
-      }}><span className="language-option-code">{language.short}</span><span>{language.name}</span><span className="language-check" aria-hidden="true">{locale === language.code ? "✓" : ""}</span></button></li>)}
+      }}><span>{language.name}</span><span className="language-check" aria-hidden="true">{locale === language.code ? "✓" : ""}</span></button></li>)}
     </ul>
   </details>;
 }

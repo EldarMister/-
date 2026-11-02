@@ -929,8 +929,6 @@ button.profile-history-main:disabled { cursor: default; opacity: 1; }
 .language-options button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 42px; padding: 9px 10px; border: 0; border-radius: 10px; background: transparent; color: #343c4b; font: 500 14px system-ui,Arial,sans-serif; text-align: left; cursor: pointer; }
 .language-options button:hover { background: #f6f6f7; }
 .language-options button[aria-pressed=true] { background: #fff0f1; color: #d71920; }
-.language-option-code { min-width: 26px; color: #838994; font-size: 11px; font-weight: 700; letter-spacing: .04em; }
-.language-options button[aria-pressed=true] .language-option-code { color: #d71920; }
 .language-check { margin-left: auto; font-size: 17px; }
 .header-language { order: 6; margin-top: 11px; }
 .header-language summary { min-height: 36px; padding: 0 10px; border-radius: 20px; font-size: 12px; }
